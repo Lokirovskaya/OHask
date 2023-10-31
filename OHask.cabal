@@ -1,0 +1,34 @@
+cabal-version:      3.0
+name:               OHask
+version:            0.1.0.0
+-- synopsis:
+-- description:
+license:            MIT
+license-file:       LICENSE
+-- author:
+-- maintainer:
+-- copyright:
+category:           Language
+build-type:         Simple
+
+
+common common-options
+    ghc-options:      -Wall
+
+library Plugins
+    import:           common-options
+    exposed-modules:  
+        FuncAppStat,
+        SimpleExprInfo
+    build-depends:    base ^>=4.17.2.0, ghc
+    hs-source-dirs:   plugins
+    default-language: Haskell2010
+
+
+executable FuncAppStat
+    import:           common-options
+    main-is:          Hex.hs
+    build-depends:    Plugins, base ^>=4.17.2.0
+    ghc-options:      -O -fplugin=FuncAppStat -fforce-recomp
+    hs-source-dirs:   tests
+    default-language: Haskell2010
