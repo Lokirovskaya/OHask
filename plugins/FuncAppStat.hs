@@ -1,5 +1,6 @@
 module FuncAppStat (plugin) where
 
+import Data.Foldable (Foldable (foldl'))
 import ExprTree
 import GHC.Core.Ppr (pprId)
 import GHC.Plugins
@@ -98,25 +99,10 @@ findFuncApps :: ExprInfo -> [String]
 findFuncApps expr =
   case expr of
     AppExprInfo (VarInfo var) -> [var]
-    AppInfo e1 e2 -> expr2 e1 e2
-    AppExprInfo e -> expr1 e
-    AppArgInfo e -> expr1 e
-    LamInfo e1 e2 -> expr2 e1 e2
-    LamExprInfo e -> expr1 e
-    LetInfo e1 e2 -> expr2 e1 e2
-    LetBindInfo e -> expr1 e
-    LetExprInfo e -> expr1 e
-    NonRecBindInfo e1 e2 -> expr2 e1 e2
-    -- RecBindsInfo bindList -> foldl' (++) "" $ map expr1 bindList
-    RecBindsInfo bindList -> []
-    OneRecBindInfo e1 e2 -> expr2 e1 e2
-    BindExprInfo e -> expr1 e
-    _ -> []
-    where
-      expr1 = findFuncApps
-      expr2 e1 e2 = findFuncApps e1 ++ findFuncApps e2
-
-
+    _ ->
+      case checkNode expr of
+        Leaf _ -> []
+        NonLeaf children -> foldl' (++) [] $ map findFuncApps children
 
 showStats :: [String] -> String
 showStats stat =
