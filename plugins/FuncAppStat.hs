@@ -1,8 +1,8 @@
 module FuncAppStat (plugin) where
 
+import ExprTree
 import GHC.Core.Ppr (pprId)
 import GHC.Plugins
-import SimpleExprInfo
 
 plugin :: GHC.Plugins.Plugin
 plugin =
@@ -36,8 +36,8 @@ printBind dflags bind@(NonRec bndr expr) = do
   let exprInfo = getExprInfo dflags expr
   liftIO $ appendFile treeOutputFile $ showExprInfo exprInfo ++ "\n\n"
   -- stat output
-  liftIO $ appendFile statOutputFile $ "Function " ++ funcName ++ "\n"
-  liftIO $ appendFile statOutputFile $ showStats (findFuncApps exprInfo) ++ "\n\n"
+  -- liftIO $ appendFile statOutputFile $ "Function " ++ funcName ++ "\n"
+  -- liftIO $ appendFile statOutputFile $ showStats (findFuncApps exprInfo) ++ "\n\n"
   return bind
 printBind _ bind = do
   return bind
@@ -58,49 +58,52 @@ printBind _ bind = do
 getExprInfo :: DynFlags -> Expr CoreBndr -> ExprInfo
 getExprInfo dflags expr =
   case expr of
-    Var var -> ExprVar $ getVarStr var
-    Lit lit -> ExprLit $ getLitStr lit
+    Var var -> VarInfo $ getVarStr var
+    Lit lit -> LitInfo $ getLitStr lit
     App expr' arg ->
-      ExprApp $
-        AppInfo
-          { appArgInfo = getExprInfo dflags arg,
-            appExprInfo = getExprInfo dflags expr'
-          }
+      AppInfo
+        (AppArgInfo $ getExprInfo dflags arg)
+        (AppExprInfo $ getExprInfo dflags expr')
     Lam var expr' ->
-      ExprLam $
-        LamInfo
-          { lamVarInfo = getVarStr var,
-            lamExprInfo = getExprInfo dflags expr'
-          }
+      LamInfo
+        (LamVarInfo $ getVarStr var)
+        (LamExprInfo $ getExprInfo dflags expr')
     Let bind expr' ->
-      ExprLet $
-        LetInfo
-          { letExprInfo =
-              getExprInfo dflags expr',
-            letBindInfo = getBindInfo bind
-          }
-    _ -> Other
+      LetInfo
+        (LetExprInfo $ getExprInfo dflags expr')
+        (LetBindInfo $ getBindInfo bind)
+    -- Case expr var _ alts -> _
+    _ -> OtherInfo
   where
     getVarStr var = showSDoc dflags $ pprId var
     getLitStr lit = showSDoc dflags $ pprLiteral id lit
+    -- NonRec b (Expr b)
+    -- Rec [(b, Expr b)]
     getBindInfo (NonRec var expr') =
-      NonRecInfo
-        { bindVarInfo = getVarStr var,
-          bindExprInfo = getExprInfo dflags expr'
-        }
-    getBindInfo (Rec _) = RecInfo
+      NonRecBindInfo
+        (BindVarInfo $ getVarStr var)
+        (BindExprInfo $ getExprInfo dflags expr')
+    getBindInfo (Rec bindList) =
+      RecBindsInfo $
+        map
+          ( \(var, expr') ->
+              OneRecBindInfo
+                (BindVarInfo $ getVarStr var)
+                (BindExprInfo $ getExprInfo dflags expr')
+          )
+          bindList
 
--- Find structure matches AppExpr (Var (...))
-findFuncApps :: ExprInfo -> [String]
-findFuncApps (ExprApp (AppInfo (ExprVar var) _)) = [var]
-findFuncApps (ExprApp (AppInfo expr arg)) = findFuncApps expr ++ findFuncApps arg
-findFuncApps (ExprLam (LamInfo _ expr)) = findFuncApps expr
-findFuncApps (ExprLet (LetInfo bind expr)) = findFuncApps expr
-findFuncApps _ = []
+-- -- Find structure matches AppExpr (Var (...))
+-- findFuncApps :: ExprInfo -> [String]
+-- findFuncApps (ExprApp (AppInfo (ExprVar var) _)) = [var]
+-- findFuncApps (ExprApp (AppInfo expr arg)) = findFuncApps expr ++ findFuncApps arg
+-- findFuncApps (ExprLam (LamInfo _ expr)) = findFuncApps expr
+-- findFuncApps (ExprLet (LetInfo bind expr)) = findFuncApps expr
+-- findFuncApps _ = []
 
-showStats :: [String] -> String
-showStats stat =
-  "Found " ++ show (length stat) ++ " function applications\n" ++ showOneApp stat
-  where
-    showOneApp [] = ""
-    showOneApp (app : rs) = "  " ++ app ++ "\n" ++ showOneApp rs
+-- showStats :: [String] -> String
+-- showStats stat =
+--   "Found " ++ show (length stat) ++ " function applications\n" ++ showOneApp stat
+--   where
+--     showOneApp [] = ""
+--     showOneApp (app : rs) = "  " ++ app ++ "\n" ++ showOneApp rs

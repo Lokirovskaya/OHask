@@ -19,7 +19,8 @@ library Plugins
     import:           common-options
     exposed-modules:  
         FuncAppStat,
-        SimpleExprInfo
+        ExprTree,
+        Util
     build-depends:    base ^>=4.17.2.0, ghc
     hs-source-dirs:   plugins
     default-language: Haskell2010
@@ -29,6 +30,11 @@ executable FuncAppStat
     import:           common-options
     main-is:          Hex.hs
     build-depends:    Plugins, base ^>=4.17.2.0
-    ghc-options:      -O -fplugin=FuncAppStat -fforce-recomp
+    ghc-options:      -O0 
+                      -fplugin=FuncAppStat 
+                      -ddump-ds-preopt 
+                      -dsuppress-all 
+                      -ddump-to-file
+                      -dumpdir=dump
     hs-source-dirs:   tests
     default-language: Haskell2010
