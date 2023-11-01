@@ -73,13 +73,18 @@ getExprInfo dflags expr =
       LetInfo
         (LetExprInfo $ getExprInfo dflags expr')
         (LetBindInfo $ getBindInfo bind)
-    -- Case expr var _ alts -> _
+    Case expr' var _ alts ->
+      CaseInfo
+        (CaseExprInfo $ getExprInfo dflags expr')
+        (CaseVarInfo $ getVarStr var)
+        (CaseAltsInfo $ getAltsInfo alts)
     _ -> OtherInfo
   where
     getVarStr var = showSDoc dflags $ pprId var
     getLitStr lit = showSDoc dflags $ pprLiteral id lit
     -- NonRec b (Expr b)
     -- Rec [(b, Expr b)]
+    getBindInfo :: Bind Var -> ExprInfo
     getBindInfo (NonRec var expr') =
       NonRecBindInfo
         (BindVarInfo $ getVarStr var)
@@ -93,6 +98,11 @@ getExprInfo dflags expr =
                 (BindExprInfo $ getExprInfo dflags expr')
           )
           bindList
+    -- Alt AltCon [b] (Expr b)
+    -- We only care about the final (Expr b) part
+    getAltsInfo :: [Alt Var] -> [ExprInfo]
+    getAltsInfo =
+      map (\(Alt _ _ expr') -> OneCaseAltInfo $ getExprInfo dflags expr')
 
 -- Find structure matches AppExpr (Var (...))
 findFuncApps :: ExprInfo -> [String]
