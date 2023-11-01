@@ -36,8 +36,8 @@ printBind dflags bind@(NonRec bndr expr) = do
   let exprInfo = getExprInfo dflags expr
   liftIO $ appendFile treeOutputFile $ showExprInfo exprInfo ++ "\n\n"
   -- stat output
-  -- liftIO $ appendFile statOutputFile $ "Function " ++ funcName ++ "\n"
-  -- liftIO $ appendFile statOutputFile $ showStats (findFuncApps exprInfo) ++ "\n\n"
+  liftIO $ appendFile statOutputFile $ "Function " ++ funcName ++ "\n"
+  liftIO $ appendFile statOutputFile $ showStats (findFuncApps exprInfo) ++ "\n\n"
   return bind
 printBind _ bind = do
   return bind
@@ -93,17 +93,34 @@ getExprInfo dflags expr =
           )
           bindList
 
--- -- Find structure matches AppExpr (Var (...))
--- findFuncApps :: ExprInfo -> [String]
--- findFuncApps (ExprApp (AppInfo (ExprVar var) _)) = [var]
--- findFuncApps (ExprApp (AppInfo expr arg)) = findFuncApps expr ++ findFuncApps arg
--- findFuncApps (ExprLam (LamInfo _ expr)) = findFuncApps expr
--- findFuncApps (ExprLet (LetInfo bind expr)) = findFuncApps expr
--- findFuncApps _ = []
+-- Find structure matches AppExpr (Var (...))
+findFuncApps :: ExprInfo -> [String]
+findFuncApps expr =
+  case expr of
+    AppExprInfo (VarInfo var) -> [var]
+    AppInfo e1 e2 -> expr2 e1 e2
+    AppExprInfo e -> expr1 e
+    AppArgInfo e -> expr1 e
+    LamInfo e1 e2 -> expr2 e1 e2
+    LamExprInfo e -> expr1 e
+    LetInfo e1 e2 -> expr2 e1 e2
+    LetBindInfo e -> expr1 e
+    LetExprInfo e -> expr1 e
+    NonRecBindInfo e1 e2 -> expr2 e1 e2
+    -- RecBindsInfo bindList -> foldl' (++) "" $ map expr1 bindList
+    RecBindsInfo bindList -> []
+    OneRecBindInfo e1 e2 -> expr2 e1 e2
+    BindExprInfo e -> expr1 e
+    _ -> []
+    where
+      expr1 = findFuncApps
+      expr2 e1 e2 = findFuncApps e1 ++ findFuncApps e2
 
--- showStats :: [String] -> String
--- showStats stat =
---   "Found " ++ show (length stat) ++ " function applications\n" ++ showOneApp stat
---   where
---     showOneApp [] = ""
---     showOneApp (app : rs) = "  " ++ app ++ "\n" ++ showOneApp rs
+
+
+showStats :: [String] -> String
+showStats stat =
+  "Found " ++ show (length stat) ++ " function applications\n" ++ showOneApp stat
+  where
+    showOneApp [] = ""
+    showOneApp (app : rs) = "  " ++ app ++ "\n" ++ showOneApp rs
