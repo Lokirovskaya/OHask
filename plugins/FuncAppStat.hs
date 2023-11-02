@@ -1,15 +1,12 @@
 module FuncAppStat (plugin) where
 
-import Data.Foldable (Foldable (foldl'))
 import ExprTree
-import GHC.Core.Ppr (pprId)
 import GHC.Plugins
+import StatOutput
 
 plugin :: GHC.Plugins.Plugin
 plugin =
-  GHC.Plugins.defaultPlugin
-    { installCoreToDos = install
-    }
+  GHC.Plugins.defaultPlugin {installCoreToDos = install}
 
 install :: [CommandLineOption] -> [CoreToDo] -> CoreM [CoreToDo]
 install _ todo = do
@@ -34,89 +31,10 @@ printBind dflags bind@(NonRec bndr expr) = do
   let funcName = showSDoc dflags (ppr bndr)
   -- tree output
   liftIO $ appendFile treeOutputFile $ "Function " ++ funcName ++ "\n"
-  let exprInfo = getExprInfo dflags expr
-  liftIO $ appendFile treeOutputFile $ showExprInfo exprInfo ++ "\n\n"
+  let exprNode = getExprNode dflags expr
+  liftIO $ appendFile treeOutputFile $ showExprNode exprNode ++ "\n\n"
   -- stat output
-  liftIO $ appendFile statOutputFile $ "Function " ++ funcName ++ "\n"
-  liftIO $ appendFile statOutputFile $ showStats (findFuncApps exprInfo) ++ "\n\n"
+  liftIO $ appendFile statOutputFile $ showStats funcName exprNode ++ "\n\n"
   return bind
 printBind _ bind = do
   return bind
-
--- Var Id
--- Lit Literal
--- App (Expr b) (Arg b)
--- Lam b (Expr b)
--- Let (Bind b) (Expr b)
--- Case (Expr b) b Type [Alt b]
--- Cast (Expr b) CoercionR      -- ignored
--- Tick CoreTickish (Expr b)    -- ignored
--- Type Type                    -- ignored
--- Coercion Coercion            -- ignored
-
--- Note: CoreBndr === Id === Var
-
-getExprInfo :: DynFlags -> Expr CoreBndr -> ExprInfo
-getExprInfo dflags expr =
-  case expr of
-    Var var -> VarInfo $ getVarStr var
-    Lit lit -> LitInfo $ getLitStr lit
-    App expr' arg ->
-      AppInfo
-        (AppArgInfo $ getExprInfo dflags arg)
-        (AppExprInfo $ getExprInfo dflags expr')
-    Lam var expr' ->
-      LamInfo
-        (LamVarInfo $ getVarStr var)
-        (LamExprInfo $ getExprInfo dflags expr')
-    Let bind expr' ->
-      LetInfo
-        (LetExprInfo $ getExprInfo dflags expr')
-        (LetBindInfo $ getBindInfo bind)
-    Case expr' var _ alts ->
-      CaseInfo
-        (CaseExprInfo $ getExprInfo dflags expr')
-        (CaseVarInfo $ getVarStr var)
-        (CaseAltsInfo $ getAltsInfo alts)
-    _ -> OtherInfo
-  where
-    getVarStr var = showSDoc dflags $ pprId var
-    getLitStr lit = showSDoc dflags $ pprLiteral id lit
-    -- NonRec b (Expr b)
-    -- Rec [(b, Expr b)]
-    getBindInfo :: Bind Var -> ExprInfo
-    getBindInfo (NonRec var expr') =
-      NonRecBindInfo
-        (BindVarInfo $ getVarStr var)
-        (BindExprInfo $ getExprInfo dflags expr')
-    getBindInfo (Rec bindList) =
-      RecBindsInfo $
-        map
-          ( \(var, expr') ->
-              OneRecBindInfo
-                (BindVarInfo $ getVarStr var)
-                (BindExprInfo $ getExprInfo dflags expr')
-          )
-          bindList
-    -- Alt AltCon [b] (Expr b)
-    -- We only care about the final (Expr b) part
-    getAltsInfo :: [Alt Var] -> [ExprInfo]
-    getAltsInfo =
-      map (\(Alt _ _ expr') -> OneCaseAltInfo $ getExprInfo dflags expr')
-
--- Find structure matches AppExpr (Var (...))
-findFuncApps :: ExprInfo -> [String]
-findFuncApps expr =
-  case expr of
-    AppExprInfo (VarInfo var) -> [var]
-    _ ->
-      case checkNode expr of
-        Leaf _ -> []
-        NonLeaf children -> foldl' (++) [] $ map findFuncApps children
-
-showStats :: [String] -> String
-showStats stat =
-  "Found " ++ show (length stat) ++ " function applications\n" ++ showOneApp stat
-  where
-    showOneApp [] = ""
-    showOneApp (app : rs) = "  " ++ app ++ "\n" ++ showOneApp rs

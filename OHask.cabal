@@ -18,9 +18,11 @@ common common-options
 library Plugins
     import:           common-options
     exposed-modules:  
-        FuncAppStat,
+        FuncAppStat
+    other-modules:
         ExprTree,
-        Util
+        StatOutput,
+        Util,
     build-depends:    base ^>=4.17.2.0, ghc
     hs-source-dirs:   plugins
     default-language: Haskell2010
