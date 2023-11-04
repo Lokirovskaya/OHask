@@ -85,15 +85,22 @@ getExprNode dflags expr =
     -- Coercion Coercion
     _ -> OtherNode
   where
-    getVarStr var = showSDoc dflags $ pprId var
+    getVarStr var =
+      let prefix
+            | isId var = "Ident"
+            | isTcTyVar var = "TcTyVar"
+            | isTyVar var = "TyVar"
+            | otherwise = "Other"
+       in prefix ++ " " ++ showSDoc dflags (pprId var)
     getLitStr lit = showSDoc dflags $ pprLiteral id lit
     -- NonRec b (Expr b)
     -- Rec [(b, Expr b)]
     getBindNode :: Bind Var -> ExprNode
     getBindNode (NonRec var expr') =
-      NonRecBindNode $ OneBindNode
-        (BindVarNode $ getVarStr var)
-        (BindExprNode $ getExprNode dflags expr')
+      NonRecBindNode $
+        OneBindNode
+          (BindVarNode $ getVarStr var)
+          (BindExprNode $ getExprNode dflags expr')
     getBindNode (Rec bindList) =
       RecBindsNode $
         map
@@ -109,37 +116,37 @@ getExprNode dflags expr =
     getAltsNode =
       map (\(Alt _ _ expr') -> OneCaseAltNode $ getExprNode dflags expr')
 
--- Return data of leaf nodes, or return children of non-leaf nodes
-data Node a = Leaf String | NonLeaf [a]
+-- Node-like representation of ExprNode
+data NodeLike = LeafLike String | NonLeafLike [ExprNode]
 
-checkNode :: ExprNode -> Node ExprNode
+checkNode :: ExprNode -> NodeLike
 checkNode expr =
   case expr of
-    VarNode s -> Leaf s
-    LitNode s -> Leaf s
-    AppNode e1 e2 -> NonLeaf [e1, e2]
-    AppExprNode e -> NonLeaf [e]
-    AppArgNode e -> NonLeaf [e]
-    LamNode e1 e2 -> NonLeaf [e1, e2]
-    LamVarNode s -> Leaf s
-    LamExprNode e -> NonLeaf [e]
-    LetNode e1 e2 -> NonLeaf [e1, e2]
-    LetBindNode e -> NonLeaf [e]
-    LetExprNode e -> NonLeaf [e]
-    NonRecBindNode e -> NonLeaf [e]
-    RecBindsNode eList -> NonLeaf eList
-    OneBindNode e1 e2 -> NonLeaf [e1, e2]
-    BindVarNode s -> Leaf s
-    BindExprNode e -> NonLeaf [e]
-    CaseNode e1 e2 -> NonLeaf [e1, e2]
-    CaseExprNode e -> NonLeaf [e]
-    CaseAltsNode eList -> NonLeaf eList
-    OneCaseAltNode e -> NonLeaf [e]
-    CastNode e -> NonLeaf [e]
-    CastExprNode e -> NonLeaf [e]
-    TickNode e -> NonLeaf [e]
-    TickExprNode e -> NonLeaf [e]
-    OtherNode -> Leaf ""
+    VarNode s -> LeafLike s
+    LitNode s -> LeafLike s
+    AppNode e1 e2 -> NonLeafLike [e1, e2]
+    AppExprNode e -> NonLeafLike [e]
+    AppArgNode e -> NonLeafLike [e]
+    LamNode e1 e2 -> NonLeafLike [e1, e2]
+    LamVarNode s -> LeafLike s
+    LamExprNode e -> NonLeafLike [e]
+    LetNode e1 e2 -> NonLeafLike [e1, e2]
+    LetBindNode e -> NonLeafLike [e]
+    LetExprNode e -> NonLeafLike [e]
+    NonRecBindNode e -> NonLeafLike [e]
+    RecBindsNode eList -> NonLeafLike eList
+    OneBindNode e1 e2 -> NonLeafLike [e1, e2]
+    BindVarNode s -> LeafLike s
+    BindExprNode e -> NonLeafLike [e]
+    CaseNode e1 e2 -> NonLeafLike [e1, e2]
+    CaseExprNode e -> NonLeafLike [e]
+    CaseAltsNode eList -> NonLeafLike eList
+    OneCaseAltNode e -> NonLeafLike [e]
+    CastNode e -> NonLeafLike [e]
+    CastExprNode e -> NonLeafLike [e]
+    TickNode e -> NonLeafLike [e]
+    TickExprNode e -> NonLeafLike [e]
+    OtherNode -> LeafLike ""
 
 -- Pretty printer
 showExprNode :: ExprNode -> String
@@ -190,7 +197,7 @@ showExprRec expr layer
       TickExprNode _ -> "TickExpr"
       OtherNode -> ""
     innerLayerStr = case checkNode expr of
-      Leaf s -> s
-      NonLeaf children -> foldl' (++) "" $ map oneChildStr children
+      LeafLike s -> s
+      NonLeafLike children -> foldl' (++) "" $ map oneChildStr children
       where
         oneChildStr e = showExprRec e (layer + 1)

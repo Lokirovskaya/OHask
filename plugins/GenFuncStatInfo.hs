@@ -1,11 +1,11 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 {-# HLINT ignore "Avoid lambda using `infix`" #-}
-module StatOutput where
+module GenFuncStatInfo where
 
 import Data.Foldable (Foldable (foldl'))
-import ExprTree
 import Text.Printf (printf)
+import ExprTree
 import Util
 
 -- 1. Find func apps in the root function
@@ -52,8 +52,8 @@ findSubFunctions expr curSubFunc =
        in subFunc : findSubFunctions funcExpr (Just subFunc)
     _ ->
       case checkNode expr of
-        Leaf _ -> []
-        NonLeaf children ->
+        LeafLike _ -> []
+        NonLeafLike children ->
           foldl' (++) [] $
             map
               (\childExpr -> findSubFunctions childExpr curSubFunc)
@@ -64,6 +64,15 @@ findSubFunctions expr curSubFunc =
     extractFuncName (' ' : _) = ""
     extractFuncName (c : cs) = c : extractFuncName cs
 
+-- -- Case(CaseExpr(...) CaseAlts[OneCaseAlt(...) ...])
+-- findCases :: ExprNode -> CaseInfoNode
+-- findCases expr =
+--   case expr of
+--     CaseNode caseExpr caseAlts -> 
+--       CaseInfoNonLeaf {
+
+--       }
+
 -- AppExpr(Var(...))
 findFuncApps :: ExprNode -> [String]
 findFuncApps expr =
@@ -72,8 +81,8 @@ findFuncApps expr =
     OneBindNode _ _ -> [] -- Avoid finding func apps in sub-functions
     _ ->
       case checkNode expr of
-        Leaf _ -> []
-        NonLeaf children -> foldl' (++) [] $ map findFuncApps children
+        LeafLike _ -> []
+        NonLeafLike children -> foldl' (++) [] $ map findFuncApps children
 
 prettyResult :: [String] -> String
 prettyResult stat =
