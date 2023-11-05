@@ -31,7 +31,7 @@ treeOutputFile :: String
 treeOutputFile = "tree.txt"
 
 statOutputFile :: String
-statOutputFile = "stat.txt"
+statOutputFile = "stat.json"
 
 pass :: ModGuts -> CoreM ModGuts
 pass guts = do

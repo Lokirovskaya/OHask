@@ -1,30 +1,30 @@
 module ExprTree where
 
 import Data.Foldable (Foldable (foldl'))
-import GHC.Core.Ppr (pprId)
 import GHC.Plugins
 import Util
+import Text.Printf (printf)
 
--- data VarKind = Ident | TcTyVar | TcVar
+data VarKind = IdentKind | TcTyVarKind | TyVarKind | LiteralKind
 
--- data VarNodeInfo = VarNodeInfo {
---   varName :: String,
---   varType :: String,
---   varKind :: VarKind
--- }
+data VarNodeInfo = VarNodeInfo
+  { varName :: String,
+    varType :: String,
+    varKind :: VarKind
+  }
 
 data ExprNode
   = -- Var Id
-    VarNode String
+    VarNode VarNodeInfo
   | -- Lit Literal
-    LitNode String
+    LitNode VarNodeInfo
   | -- App (Expr b) (Arg b)
     AppNode ExprNode ExprNode
   | AppExprNode ExprNode
   | AppArgNode ExprNode
   | -- Lam b (Expr b)
     LamNode ExprNode ExprNode
-  | LamVarNode String
+  | LamVarNode VarNodeInfo
   | LamExprNode ExprNode
   | -- Let (Bind b) (Expr b)
     LetNode ExprNode ExprNode
@@ -35,7 +35,7 @@ data ExprNode
     NonRecBindNode ExprNode
   | RecBindsNode [ExprNode]
   | OneBindNode ExprNode ExprNode
-  | BindVarNode String
+  | BindVarNode VarNodeInfo
   | BindExprNode ExprNode
   | -- Case (Expr b) _b _Type [Alt b]
     CaseNode ExprNode ExprNode
@@ -60,7 +60,7 @@ getExprNode :: DynFlags -> Expr CoreBndr -> ExprNode
 getExprNode dflags expr =
   case expr of
     -- Var Id
-    Var var -> VarNode $ getVarStr var
+    Var var -> VarNode $ getVarInfo var
     -- Lit Literal
     Lit lit -> LitNode $ getLitStr lit
     -- App (Expr b) (Arg b)
@@ -71,7 +71,7 @@ getExprNode dflags expr =
     -- Lam b (Expr b)
     Lam var expr' ->
       LamNode
-        (LamVarNode $ getVarStr var)
+        (LamVarNode $ getVarInfo var)
         (LamExprNode $ getExprNode dflags expr')
     -- Let (Bind b) (Expr b)
     Let bind expr' ->
@@ -93,28 +93,37 @@ getExprNode dflags expr =
     -- Coercion Coercion
     _ -> OtherNode
   where
-    getVarStr var =
-      let prefix
-            | isId var = "Ident"
-            | isTcTyVar var = "TcTyVar"
-            | isTyVar var = "TyVar"
-            | otherwise = "Other"
-       in prefix ++ " " ++ showSDoc dflags (pprId var)
-    getLitStr lit = showSDoc dflags $ pprLiteral id lit
+    getVarInfo var =
+      let kind
+            | isId var = IdentKind
+            | isTcTyVar var = TcTyVarKind
+            | isTyVar var = TyVarKind
+            | otherwise = panic "strange var kind"
+       in VarNodeInfo
+            { ExprTree.varName = showSDoc dflags $ ppr $ GHC.Plugins.varName var,
+              ExprTree.varType = showSDoc dflags $ ppr $ GHC.Plugins.varType var,
+              varKind = kind
+            }
+    getLitStr lit =
+      VarNodeInfo
+        { ExprTree.varName = showSDoc dflags $ pprLiteral id lit,
+          ExprTree.varType = showSDoc dflags $ ppr $ GHC.Plugins.literalType lit,
+          varKind = LiteralKind
+        }
     -- NonRec b (Expr b)
     -- Rec [(b, Expr b)]
     getBindNode :: Bind Var -> ExprNode
     getBindNode (NonRec var expr') =
       NonRecBindNode $
         OneBindNode
-          (BindVarNode $ getVarStr var)
+          (BindVarNode $ getVarInfo var)
           (BindExprNode $ getExprNode dflags expr')
     getBindNode (Rec bindList) =
       RecBindsNode $
         map
           ( \(var, expr') ->
               OneBindNode
-                (BindVarNode $ getVarStr var)
+                (BindVarNode $ getVarInfo var)
                 (BindExprNode $ getExprNode dflags expr')
           )
           bindList
@@ -125,7 +134,7 @@ getExprNode dflags expr =
       map (\(Alt _ _ expr') -> OneCaseAltNode $ getExprNode dflags expr')
 
 -- Node-like representation of ExprNode
-data NodeLike = LeafLike String | NonLeafLike [ExprNode]
+data NodeLike = LeafLike VarNodeInfo | NonLeafLike [ExprNode]
 
 checkNode :: ExprNode -> NodeLike
 checkNode expr =
@@ -154,7 +163,7 @@ checkNode expr =
     CastExprNode e -> NonLeafLike [e]
     TickNode e -> NonLeafLike [e]
     TickExprNode e -> NonLeafLike [e]
-    OtherNode -> LeafLike ""
+    OtherNode -> NonLeafLike []
 
 -- Pretty printer
 showExprNode :: ExprNode -> String
@@ -204,8 +213,20 @@ showExprRec expr layer
       TickNode _ -> "Tick"
       TickExprNode _ -> "TickExpr"
       OtherNode -> ""
+    showVar var = 
+      printf
+        "%s %s :: %s"
+        (showVarKind $ var |> varKind)
+        (var |> ExprTree.varName)
+        (var |> ExprTree.varType)
     innerLayerStr = case checkNode expr of
-      LeafLike s -> s
+      LeafLike var -> showVar var
       NonLeafLike children -> foldl' (++) "" $ map oneChildStr children
       where
         oneChildStr e = showExprRec e (layer + 1)
+
+showVarKind :: VarKind -> String
+showVarKind IdentKind = "Ident"
+showVarKind TyVarKind = "TyVar"
+showVarKind TcTyVarKind = "TcTyVa"
+showVarKind LiteralKind = "Literal"

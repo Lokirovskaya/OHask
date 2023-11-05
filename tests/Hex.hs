@@ -21,6 +21,7 @@ hexBitOf x
   | 0 <= x && x <= 9 = chr $ x + ord '0'
   | 10 <= x && x <= 15 = chr $ (x - 10) + ord 'a'
   | otherwise = '_'
+    
 
 main :: IO ()
 main = do
