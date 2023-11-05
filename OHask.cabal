@@ -21,8 +21,9 @@ library Plugins
         FuncAppStat
     other-modules:
         ExprTree,
-        GenFuncStatInfo,
         StatInfo,
+        GenStatInfo,
+        StatInfoOutput,
         Util,
     build-depends:    base ^>=4.17.2.0, ghc
     hs-source-dirs:   plugins

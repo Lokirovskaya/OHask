@@ -4,9 +4,12 @@
 {-# HLINT ignore "Use uncurry" #-}
 module FuncAppStat (plugin) where
 
+import Data.IORef (IORef, modifyIORef', newIORef, readIORef)
 import ExprTree
 import GHC.Plugins
-import GenFuncStatInfo
+import GenStatInfo (genStatOfRootFunc)
+import StatInfo
+import StatInfoOutput (showStatInfo)
 
 plugin :: GHC.Plugins.Plugin
 plugin =
@@ -36,22 +39,30 @@ pass guts = do
   -- Clear output files
   liftIO $ writeFile treeOutputFile ""
   liftIO $ writeFile statOutputFile ""
-  bindsOnlyPass (mapM (runBind dflags)) guts
+  -- IORef of stat result
+  statRef <- liftIO $ newIORef ([] :: Stat)
+  -- Run plugin pass
+  modguts <- bindsOnlyPass (mapM (runBind dflags statRef)) guts
+  -- Output stat info
+  stat <- liftIO $ readIORef statRef
+  liftIO $ writeFile statOutputFile $ showStatInfo stat
+  return modguts
 
-runBind :: DynFlags -> CoreBind -> CoreM CoreBind
-runBind dflags bind@(NonRec bndr expr) = do
-  runOneBind dflags bndr expr
+runBind :: DynFlags -> IORef Stat -> CoreBind -> CoreM CoreBind
+runBind dflags statRef bind@(NonRec bndr expr) = do
+  runOneBind dflags statRef bndr expr
   return bind
-runBind dflags bind@(Rec bndrList) = do
-  mapM_ (\(bndr, expr) -> runOneBind dflags bndr expr) bndrList
+runBind dflags statRef bind@(Rec bndrList) = do
+  mapM_ (\(bndr, expr) -> runOneBind dflags statRef bndr expr) bndrList
   return bind
 
-runOneBind :: DynFlags -> CoreBndr -> Expr CoreBndr -> CoreM ()
-runOneBind dflags bndr expr = do
+runOneBind :: DynFlags -> IORef Stat -> CoreBndr -> Expr CoreBndr -> CoreM ()
+runOneBind dflags statRef bndr expr = do
   let funcName = showSDoc dflags (ppr bndr)
+  let exprNode = getExprNode dflags expr
   -- tree output
   liftIO $ appendFile treeOutputFile $ "Function " ++ funcName ++ "\n"
-  let exprNode = getExprNode dflags expr
   liftIO $ appendFile treeOutputFile $ showExprNode exprNode ++ "\n\n"
-  -- stat output
-  liftIO $ appendFile statOutputFile $ showStats funcName exprNode ++ "\n\n"
+  -- get StatFunc, append into stat
+  let sfuncList = genStatOfRootFunc funcName exprNode
+  liftIO $ modifyIORef' statRef (++ sfuncList)

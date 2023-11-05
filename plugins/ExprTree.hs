@@ -5,6 +5,14 @@ import GHC.Core.Ppr (pprId)
 import GHC.Plugins
 import Util
 
+-- data VarKind = Ident | TcTyVar | TcVar
+
+-- data VarNodeInfo = VarNodeInfo {
+--   varName :: String,
+--   varType :: String,
+--   varKind :: VarKind
+-- }
+
 data ExprNode
   = -- Var Id
     VarNode String

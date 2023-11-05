@@ -1,27 +1,32 @@
 module StatInfo where
 
--- A function may contain many cases
--- Each case could also branch to more cases
--- At the leaf node of case-tree, there will be a func-app-dep-tree
+-- Extract final stat from ExprTree
 
-type StatInfo = [FuncInfo]
+type Stat = [SFunc]
 
-data FuncInfo = FuncInfo
-  { funcName :: String,
-    funcType :: String, -- type signature
-    caseRootNode :: CaseInfoNode
+data SFunc = SFunc
+  { sfuncName :: String,
+    sfuncType :: String,
+    sfuncExpr :: SExpr,
+    sfuncParams :: [SParam]
   }
 
-data CaseInfoNode
-  = CaseInfoLeaf FuncAppDepNode
-  | CaseInfoNonLeaf
-      { caseGuardExpr :: FuncAppDepNode,
-        caseAlts :: [CaseInfoNode]
+data SParam = SParam {
+  sparamName :: String,
+  sparamType :: String
+}
+
+data SExpr
+  = SVar
+      { svarName :: String,
+        svarType :: String
       }
-
--- Function Application Dependency Node
-data FuncAppDepNode = FuncAppDepNode
-  { funcAppName :: String,
-    funcAppType :: String,
-    funcAppArgs :: [FuncAppDepNode]
-  }
+  | SApp
+      { sappExpr :: SExpr,
+        sappArg :: SExpr
+      }
+  | SCase
+      { scaseExpr :: SExpr,
+        scaseAlts :: [SExpr]
+      }
+  | SNothing
