@@ -6,3 +6,8 @@ module Util where
 endsWith :: (Eq a) => a -> [a] -> Bool
 endsWith _ [] = False
 endsWith x list = x == last list
+
+concatWith :: Char -> [String] -> String
+concatWith _ [] = ""
+concatWith _ [x] = x
+concatWith c (x : xs) = x ++ c : concatWith c xs

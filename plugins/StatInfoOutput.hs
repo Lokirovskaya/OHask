@@ -47,9 +47,7 @@ showStatExpr (SCase expr alts) =
 showStatExpr SNothing = "null"
 
 concatWithComma :: [String] -> String
-concatWithComma [] = ""
-concatWithComma [x, l] = x ++ "," ++ l
-concatWithComma (x : xs) = x ++ "," ++ concatWithComma xs
+concatWithComma = concatWith ','
 
 escape :: String -> String
 escape "" = ""
