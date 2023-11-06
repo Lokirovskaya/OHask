@@ -30,13 +30,13 @@ install _ todos = do
 --   | otherwise = x : insertAfterIf predict e xs
 
 treeOutputFile :: String
-treeOutputFile = "tree.txt"
+treeOutputFile = "stat/tree.txt"
 
 statOutputFile :: String
-statOutputFile = "stat.json"
+statOutputFile = "stat/stat.json"
 
 statBriefOutputFile :: String
-statBriefOutputFile = "stat_brief.txt"
+statBriefOutputFile = "stat/stat_brief.txt"
 
 pass :: ModGuts -> CoreM ModGuts
 pass guts = do
