@@ -2,27 +2,42 @@
 
 import os
 import sys
-import shutil
 import subprocess as sp
 import datetime
 
 
 # Read src path
 if len(sys.argv) != 2:
-    print("Missing argument: source file path")
+    print("Missing argument: source file path.")
     sys.exit(-1)
 
 # Copy to run/Run.hs
-src_path = sys.argv[1]
-with open(src_path, "r") as f:
-    src_content = f.read()
+srcPath = sys.argv[1]
+with open(srcPath, "r") as f:
+    srcContent = f.read()
 
 os.makedirs("run", exist_ok=True)
+
 with open("run/Run.hs", "w") as f:
-    cur_datetime = str(datetime.datetime.now())
-    f.write("-- " + cur_datetime + "\n" + src_content)
+    curDatetime = str(datetime.datetime.now())
+    f.write("-- " + curDatetime + "\n" + srcContent)
 
 # Run cabal
 os.makedirs("stat", exist_ok=True)
 
 sp.run(["cabal", "build"])
+print("\n")
+
+# Read json
+try:
+    import ujson as json
+except ImportError:
+    print("Package ujson not found, use vanilla json.")
+    import json
+
+with open("stat/stat.json", "r") as f:
+    funcListJson = json.load(f)
+
+from calcFuncComplexity.Api import Func
+funcList = list(map(Func, funcListJson))
+print(funcList)

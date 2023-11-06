@@ -1,5 +1,7 @@
 dist-newstyle/
 dump/
 run/
+stat/
+__pycache__/
 *.txt
 *.json
