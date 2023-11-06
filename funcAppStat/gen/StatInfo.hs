@@ -1,7 +1,5 @@
 module StatInfo where
 
-import ExprTree (VarKind)
-
 -- Extract final stat from ExprTree
 
 type Stat = [SFunc]
@@ -21,8 +19,11 @@ data SParam = SParam
 data SExpr
   = SVar
       { svarName :: String,
-        svarType :: String,
-        svarKind :: VarKind
+        svarType :: String
+      }
+  | SLit
+      { slitValue :: String,
+        slitType :: String
       }
   | SApp
       { sappExpr :: SExpr,

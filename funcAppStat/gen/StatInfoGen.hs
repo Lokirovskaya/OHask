@@ -5,6 +5,7 @@ module StatInfoGen where
 
 import Data.Foldable (Foldable (foldl'))
 import ExprTree
+import GHC.Plugins (panic)
 import StatInfo
 import Util
 
@@ -68,16 +69,19 @@ getLambdaName expr = ".lambda" ++ getLambdaName' expr
 
 genStatExpr :: ExprNode -> SExpr
 genStatExpr (VarNode var) =
-  SVar
-    { svarName = var |> varName,
-      svarType = var |> varType,
-      svarKind = var |> varKind
-    }
+  case var |> varKind of
+    IdentKind ->
+      SVar
+        { svarName = var |> varName,
+          svarType = var |> varType
+        }
+    TcTyVarKind -> panic "unexpected var kind: TcTyVarKind"
+    TyVarKind -> panic "unexpected var kind: TyVarKind"
+    LiteralKind -> panic "unexpected var kind: LiteralKind"
 genStatExpr (LitNode var) =
-  SVar
-    { svarName = var |> varName,
-      svarType = var |> varType,
-      svarKind = var |> varKind
+  SLit
+    { slitValue = var |> varName,
+      slitType = var |> varType
     }
 -- Compress the application with no args
 genStatExpr (AppNode (AppArgNode OtherNode) (AppExprNode appExpr)) =
@@ -98,8 +102,7 @@ genStatExpr lamNode@(LamNode _ _) =
   let lamName = getLambdaName lamNode
    in SVar
         { svarName = lamName,
-          svarType = "lambda",
-          svarKind = IdentKind
+          svarType = "lambda"
         }
 genStatExpr (OneCaseAltNode expr) =
   genStatExpr expr

@@ -1,6 +1,5 @@
 module StatInfoJsonOutput (showStatInfoJson) where
 
-import ExprTreeOutput (showVarKind)
 import StatInfo
 import Text.Printf (printf)
 import Util
@@ -28,11 +27,15 @@ showStatParam sparam =
     (sparam |> sparamType |> escape)
 
 showStatExpr :: SExpr -> String
-showStatExpr (SVar name type' kind) =
+showStatExpr (SVar name type') =
   printf
-    "{\"exprKind\":\"Var\",\"varKind\":\"%s\",\"varName\":\"%s\",\"varType\":\"%s\"}"
-    (kind |> showVarKind |> escape)
+    "{\"exprKind\":\"Var\",\"varName\":\"%s\",\"varType\":\"%s\"}"
     (name |> escape)
+    (type' |> escape)
+showStatExpr (SLit value type') =
+  printf
+    "{\"exprKind\":\"Lit\",\"litValue\":\"%s\",\"litType\":\"%s\"}"
+    (value |> escape)
     (type' |> escape)
 showStatExpr (SApp expr arg) =
   printf
