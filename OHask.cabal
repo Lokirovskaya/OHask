@@ -14,26 +14,50 @@ build-type:         Simple
 
 common common-options
     ghc-options:      -Wall
-
-library Plugins
-    import:           common-options
-    exposed-modules:  
-        FuncAppStat
-    other-modules:
-        ExprTree,
-        StatInfo,
-        GenStatInfo,
-        StatInfoOutput,
-        Util,
-    build-depends:    base ^>=4.17.2.0, ghc
-    hs-source-dirs:   plugins
     default-language: Haskell2010
 
 
-executable FuncAppStat
+library Util
+    import:           common-options
+    exposed-modules:  
+        Util
+    build-depends:    base ^>=4.17.2.0
+    hs-source-dirs:   funcAppStat/util
+
+
+library Gen
+    import:           common-options
+    exposed-modules:  
+        ExprTree,
+        ExprTreeGen,
+        StatInfo,
+        StatInfoGen
+    build-depends:    Util, base ^>=4.17.2.0, ghc
+    hs-source-dirs:   funcAppStat/gen
+
+
+library Output
+    import:           common-options
+    exposed-modules:  
+        ExprTreeOutput,
+        StatInfoBriefOutput,
+        StatInfoJsonOutput
+    build-depends:    Util, Gen, base ^>=4.17.2.0
+    hs-source-dirs:   funcAppStat/output
+
+
+library FuncAppStat
+    import:           common-options
+    exposed-modules:  
+        FuncAppStat
+    build-depends:    Gen, Output, base ^>=4.17.2.0, ghc
+    hs-source-dirs:   funcAppStat
+
+
+executable Test
     import:           common-options
     main-is:          Simple.hs
-    build-depends:    Plugins, base ^>=4.17.2.0
+    build-depends:    FuncAppStat, base ^>=4.17.2.0
     ghc-options:      -O0 
                       -fplugin=FuncAppStat 
                       -ddump-ds-preopt 
@@ -41,4 +65,3 @@ executable FuncAppStat
                       -ddump-to-file
                       -dumpdir=dump
     hs-source-dirs:   tests
-    default-language: Haskell2010

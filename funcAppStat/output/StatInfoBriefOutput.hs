@@ -1,12 +1,12 @@
-module StatInfoOutput (showStatInfo) where
+module StatInfoBriefOutput (showStatInfoJson) where
 
-import ExprTree (showVarKind)
+import ExprTreeOutput (showVarKind)
 import StatInfo
 import Text.Printf (printf)
 import Util
 
-showStatInfo :: Stat -> String
-showStatInfo stat =
+showStatInfoJson :: Stat -> String
+showStatInfoJson stat =
   printf
     "[%s]"
     (map showStatFuncInfo stat |> concatWithComma)

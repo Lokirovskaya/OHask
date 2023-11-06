@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 
 {-# HLINT ignore "Avoid lambda using `infix`" #-}
-module GenStatInfo where
+module StatInfoGen where
 
 import Data.Foldable (Foldable (foldl'))
 import ExprTree

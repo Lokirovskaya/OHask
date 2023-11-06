@@ -1,4 +1,5 @@
 module StatInfo where
+
 import ExprTree (VarKind)
 
 -- Extract final stat from ExprTree
@@ -12,11 +13,10 @@ data SFunc = SFunc
     sfuncParams :: [SParam]
   }
 
-data SParam = SParam {
-  sparamName :: String,
-  sparamType :: String
-}
-
+data SParam = SParam
+  { sparamName :: String,
+    sparamType :: String
+  }
 
 data SExpr
   = SVar

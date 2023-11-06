@@ -5,11 +5,12 @@
 module FuncAppStat (plugin) where
 
 import Data.IORef (IORef, modifyIORef', newIORef, readIORef)
-import ExprTree
+import ExprTreeGen (getExprNode)
+import ExprTreeOutput (showExprNode)
 import GHC.Plugins
-import GenStatInfo (genStatOfRootFunc)
-import StatInfo
-import StatInfoOutput (showStatInfo)
+import StatInfo (Stat)
+import StatInfoGen (genStatOfRootFunc)
+import StatInfoJsonOutput (showStatInfoJson)
 
 plugin :: GHC.Plugins.Plugin
 plugin =
@@ -45,7 +46,7 @@ pass guts = do
   modguts <- bindsOnlyPass (mapM (runBind dflags statRef)) guts
   -- Output stat info
   stat <- liftIO $ readIORef statRef
-  liftIO $ writeFile statOutputFile $ showStatInfo stat
+  liftIO $ writeFile statOutputFile $ showStatInfoJson stat
   return modguts
 
 runBind :: DynFlags -> IORef Stat -> CoreBind -> CoreM CoreBind
