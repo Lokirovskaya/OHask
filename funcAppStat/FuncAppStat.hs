@@ -11,6 +11,7 @@ import GHC.Plugins
 import StatInfo (Stat)
 import StatInfoGen (genStatOfRootFunc)
 import StatInfoJsonOutput (showStatInfoJson)
+import StatInfoBriefOutput (showStatInfoBrief)
 
 plugin :: GHC.Plugins.Plugin
 plugin =
@@ -34,6 +35,9 @@ treeOutputFile = "tree.txt"
 statOutputFile :: String
 statOutputFile = "stat.json"
 
+statBriefOutputFile :: String
+statBriefOutputFile = "stat_brief.txt"
+
 pass :: ModGuts -> CoreM ModGuts
 pass guts = do
   dflags <- getDynFlags
@@ -47,6 +51,7 @@ pass guts = do
   -- Output stat info
   stat <- liftIO $ readIORef statRef
   liftIO $ writeFile statOutputFile $ showStatInfoJson stat
+  liftIO $ writeFile statBriefOutputFile $ showStatInfoBrief stat
   return modguts
 
 runBind :: DynFlags -> IORef Stat -> CoreBind -> CoreM CoreBind

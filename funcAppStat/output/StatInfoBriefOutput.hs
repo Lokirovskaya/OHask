@@ -1,56 +1,35 @@
-module StatInfoBriefOutput (showStatInfoJson) where
+module StatInfoBriefOutput (showStatInfoBrief) where
 
-import ExprTreeOutput (showVarKind)
 import StatInfo
 import Text.Printf (printf)
 import Util
 
-showStatInfoJson :: Stat -> String
-showStatInfoJson stat =
-  printf
-    "[%s]"
-    (map showStatFuncInfo stat |> concatWithComma)
+showStatInfoBrief :: Stat -> String
+showStatInfoBrief stat =
+  concatWith "\n\n" $ map showStatFuncInfo stat
 
 showStatFuncInfo :: SFunc -> String
 showStatFuncInfo sfunc =
   printf
-    "{\"funcName\":\"%s\",\"funcType\":\"%s\",\"funcParams\":[%s],\"funcExpr\":%s}"
-    (sfunc |> sfuncName |> escape)
-    (sfunc |> sfuncType |> escape)
-    (sfunc |> sfuncParams |> map showStatParam |> concatWithComma)
+    "%s (%s) =\n  %s"
+    (sfunc |> sfuncName)
+    (sfunc |> sfuncParams |> map showStatParam |> concatWith ", ")
     (sfunc |> sfuncExpr |> showStatExpr)
 
 showStatParam :: SParam -> String
-showStatParam sparam =
-  printf
-    "{\"paramName\":\"%s\",\"paramType\":\"%s\"}"
-    (sparam |> sparamName |> escape)
-    (sparam |> sparamType |> escape)
+showStatParam sparam = sparam |> sparamName
+
 
 showStatExpr :: SExpr -> String
-showStatExpr (SVar name type' kind) =
-  printf
-    "{\"exprKind\":\"Var\",\"varKind\":\"%s\",\"varName\":\"%s\",\"varType\":\"%s\"}"
-    (kind |> showVarKind |> escape)
-    (name |> escape)
-    (type' |> escape)
+showStatExpr (SVar name _ _) = name
 showStatExpr (SApp expr arg) =
   printf
-    "{\"exprKind\":\"App\",\"appExpr\":%s,\"appArg\":%s}"
+    "%s(%s)"
     (showStatExpr expr)
     (showStatExpr arg)
 showStatExpr (SCase expr alts) =
   printf
-    "{\"exprKind\":\"Case\",\"caseExpr\":%s,\"caseAlts\":[%s]}"
+    "(case %s of | %s)"
     (showStatExpr expr)
-    (map showStatExpr alts |> concatWithComma)
-showStatExpr SNothing = "null"
-
-concatWithComma :: [String] -> String
-concatWithComma = concatWith ','
-
-escape :: String -> String
-escape "" = ""
-escape ('"' : s) = "\\\"" ++ escape s
-escape ('\\' : s) = "\\\\" ++ escape s
-escape (c : s) = c : escape s
+    (map showStatExpr alts |> concatWith " | ")
+showStatExpr SNothing = "()"

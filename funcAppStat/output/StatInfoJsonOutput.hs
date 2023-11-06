@@ -45,12 +45,3 @@ showStatExpr (SCase expr alts) =
     (showStatExpr expr)
     (map showStatExpr alts |> concatWithComma)
 showStatExpr SNothing = "null"
-
-concatWithComma :: [String] -> String
-concatWithComma = concatWith ','
-
-escape :: String -> String
-escape "" = ""
-escape ('"' : s) = "\\\"" ++ escape s
-escape ('\\' : s) = "\\\\" ++ escape s
-escape (c : s) = c : escape s
