@@ -19,7 +19,8 @@ data SParam = SParam
 data SExpr
   = SVar
       { svarName :: String,
-        svarType :: String
+        svarType :: String,
+        svarParams :: [String]
       }
   | SLit
       { slitValue :: String,

@@ -2,6 +2,7 @@ module ExprTreeGen (getExprNode) where
 
 import ExprTree
 import GHC.Plugins
+import Util
 
 -- Fetch useful AST nodes from GHC Core
 -- Note: CoreBndr === Id === Var
@@ -49,19 +50,28 @@ getVarInfo dflags var =
         | isTcTyVar var = TcTyVarKind
         | isTyVar var = TyVarKind
         | otherwise = panic "strange var kind"
-   in VarNodeInfo
+      params =
+        getRuntimeArgTys (GHC.Plugins.varType var)
+          |> filter (\(_, flag) -> case flag of VisArg -> True; _ -> False) -- Filter visible params
+          |> map fst -- throw away ArgFlag
+          |> map (showSDoc dflags . ppr) -- type to string
+   in -- showSDoc dflags $ ppr $ splitAppTys $ GHC.Plugins.varType var
+      VarNodeInfo
         { ExprTree.varName = showSDoc dflags $ ppr $ GHC.Plugins.varName var,
           ExprTree.varType = showSDoc dflags $ ppr $ GHC.Plugins.varType var,
-          varKind = kind
+          varKind = kind,
+          varParams = params
         }
 
 getLitStr :: DynFlags -> Literal -> VarNodeInfo
 getLitStr dflags lit =
-  VarNodeInfo
-    { ExprTree.varName = showSDoc dflags $ pprLiteral id lit,
-      ExprTree.varType = showSDoc dflags $ ppr $ GHC.Plugins.literalType lit,
-      varKind = LiteralKind
-    }
+  let litTypeStr = showSDoc dflags $ ppr $ GHC.Plugins.literalType lit
+   in VarNodeInfo
+        { ExprTree.varName = showSDoc dflags $ pprLiteral id lit,
+          ExprTree.varType = litTypeStr,
+          varKind = LiteralKind,
+          varParams = [litTypeStr]
+        }
 
 -- NonRec b (Expr b)
 -- Rec [(b, Expr b)]

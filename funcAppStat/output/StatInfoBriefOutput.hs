@@ -20,7 +20,7 @@ showStatParam :: SParam -> String
 showStatParam sparam = sparam |> sparamName
 
 showStatExpr :: SExpr -> String
-showStatExpr (SVar name _) = name
+showStatExpr (SVar name _ _) = name
 showStatExpr (SLit value _) = value
 showStatExpr (SApp expr arg) =
   printf

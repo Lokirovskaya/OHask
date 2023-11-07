@@ -5,7 +5,8 @@ data VarKind = IdentKind | TcTyVarKind | TyVarKind | LiteralKind
 data VarNodeInfo = VarNodeInfo
   { varName :: String,
     varType :: String,
-    varKind :: VarKind
+    varKind :: VarKind,
+    varParams :: [String]
   }
 
 data ExprNode

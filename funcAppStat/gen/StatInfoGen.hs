@@ -60,12 +60,19 @@ stripLambdas :: ExprNode -> ExprNode
 stripLambdas (LamNode _ (LamExprNode expr')) = stripLambdas expr'
 stripLambdas expr' = expr'
 
+getLambdaParams :: ExprNode -> [VarNodeInfo]
+getLambdaParams (LamNode (LamVarNode param) (LamExprNode expr')) =
+  param : getLambdaParams expr'
+getLambdaParams _ = []
+
 getLambdaName :: ExprNode -> String
-getLambdaName expr = ".lambda" ++ getLambdaName' expr
-  where
-    getLambdaName' (LamNode (LamVarNode param) (LamExprNode expr')) =
-      '.' : (param |> varName) ++ getLambdaName' expr'
-    getLambdaName' _ = ""
+getLambdaName expr =
+  ".lambda." ++ (getLambdaParams expr |> map varName |> concatWithChar '.')
+
+getLambdaType :: ExprNode -> String
+getLambdaType expr =
+  (getLambdaParams expr |> map varType |> map (\s -> "(" ++ s ++ ")") |> concatWith " -> ")
+    ++ " -> a"
 
 genStatExpr :: ExprNode -> SExpr
 genStatExpr (VarNode var) =
@@ -73,7 +80,8 @@ genStatExpr (VarNode var) =
     IdentKind ->
       SVar
         { svarName = var |> varName,
-          svarType = var |> varType
+          svarType = var |> varType,
+          svarParams = var |> varParams
         }
     TcTyVarKind -> panic "unexpected var kind: TcTyVarKind"
     TyVarKind -> panic "unexpected var kind: TyVarKind"
@@ -99,11 +107,11 @@ genStatExpr (CaseNode (CaseExprNode caseExpr) (CaseAltsNode caseAlts)) =
 -- Meet a lambda node. It should be lifted as a root function
 -- Replace it with a named-function
 genStatExpr lamNode@(LamNode _ _) =
-  let lamName = getLambdaName lamNode
-   in SVar
-        { svarName = lamName,
-          svarType = "lambda"
-        }
+  SVar
+    { svarName = getLambdaName lamNode,
+      svarType = getLambdaType lamNode,
+      svarParams = []
+    }
 genStatExpr (OneCaseAltNode expr) =
   genStatExpr expr
 genStatExpr (LetNode (LetExprNode expr) _) =

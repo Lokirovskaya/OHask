@@ -27,11 +27,12 @@ showStatParam sparam =
     (sparam |> sparamType |> escape)
 
 showStatExpr :: SExpr -> String
-showStatExpr (SVar name type') =
+showStatExpr (SVar name type' params) =
   printf
-    "{\"exprKind\":\"Var\",\"varName\":\"%s\",\"varType\":\"%s\"}"
+    "{\"exprKind\":\"Var\",\"varName\":\"%s\",\"varType\":\"%s\",\"varParams\":[%s]}"
     (name |> escape)
     (type' |> escape)
+    (params |> map (\s -> "\"" ++ s |> escape ++ "\"") |> concatWithComma)
 showStatExpr (SLit value type') =
   printf
     "{\"exprKind\":\"Lit\",\"litValue\":\"%s\",\"litType\":\"%s\"}"
