@@ -11,12 +11,17 @@ import Util
 -- 1. Generate StatFunc for root expr
 -- 2. Find all sub-functions
 -- 3. Generate StatFunc for each sub-function
+-- Note: all TyConFunc filtered 
 genStatOfRootFunc :: String -> ExprNode -> [SFunc]
-genStatOfRootFunc rootFuncName rootExpr =
-  let statRootFunc = genOneStatFunc rootFuncName rootExpr
-      subFuncNodeList = findSubFuncNodes (stripLambdas rootExpr)
-      statSubFuncList = map (uncurry genOneStatFunc) subFuncNodeList
-   in statRootFunc : statSubFuncList
+genStatOfRootFunc rootFuncName rootExpr
+  | isTyConFunc rootFuncName = []
+  | otherwise =
+      let statRootFunc = genOneStatFunc rootFuncName rootExpr
+          subFuncNodeList =
+            findSubFuncNodes (stripLambdas rootExpr)
+              |> filter (\(name, _) -> not $ isTyConFunc name)
+          statSubFuncList = map (uncurry genOneStatFunc) subFuncNodeList
+       in statRootFunc : statSubFuncList
 
 -- find all sub-functions
 -- 1. Manually declared sub-function: OneBind(...)
