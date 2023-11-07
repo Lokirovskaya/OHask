@@ -5,7 +5,6 @@ module StatInfoGen where
 
 import Data.Foldable (Foldable (foldl'))
 import ExprTree
-import GHC.Plugins (panic)
 import StatInfo
 import Util
 
@@ -42,7 +41,7 @@ genOneStatFunc funcName expr =
   SFunc
     { sfuncName = funcName,
       sfuncType = "",
-      sfuncExpr = genStatExpr $ stripLambdas expr,
+      sfuncExpr = genStatExpr (stripLambdas expr) |> simplifyStatExpr,
       sfuncParams = findStatFuncParams expr
     }
 
@@ -69,31 +68,31 @@ getLambdaName :: ExprNode -> String
 getLambdaName expr =
   ".lambda." ++ (getLambdaParams expr |> map varName |> concatWithChar '.')
 
-getLambdaType :: ExprNode -> String
-getLambdaType expr =
-  (getLambdaParams expr |> map varType |> map (\s -> "(" ++ s ++ ")") |> concatWith " -> ")
-    ++ " -> a"
+getLambdaParamTypes :: ExprNode -> [String]
+getLambdaParamTypes expr = getLambdaParams expr |> map varType
+
+isTyConFunc :: String -> Bool
+isTyConFunc ('$' : _ : _) = True
+isTyConFunc _ = False
 
 genStatExpr :: ExprNode -> SExpr
-genStatExpr (VarNode var) =
-  case var |> varKind of
-    IdentKind ->
+genStatExpr (VarNode var)
+  | isTyConFunc $ var |> varName =
+      SNothing
+  | otherwise =
       SVar
         { svarName = var |> varName,
           svarType = var |> varType,
           svarParams = var |> varParams
         }
-    TcTyVarKind -> panic "unexpected var kind: TcTyVarKind"
-    TyVarKind -> panic "unexpected var kind: TyVarKind"
-    LiteralKind -> panic "unexpected var kind: LiteralKind"
 genStatExpr (LitNode var) =
   SLit
     { slitValue = var |> varName,
       slitType = var |> varType
     }
--- Compress the application with no args
-genStatExpr (AppNode (AppArgNode OtherNode) (AppExprNode appExpr)) =
-  genStatExpr appExpr
+-- -- Compress the application with no args
+-- genStatExpr (AppNode (AppArgNode OtherNode) (AppExprNode appExpr)) =
+--   genStatExpr appExpr
 genStatExpr (AppNode (AppArgNode arg) (AppExprNode appExpr)) =
   SApp
     { sappExpr = genStatExpr appExpr,
@@ -109,8 +108,8 @@ genStatExpr (CaseNode (CaseExprNode caseExpr) (CaseAltsNode caseAlts)) =
 genStatExpr lamNode@(LamNode _ _) =
   SVar
     { svarName = getLambdaName lamNode,
-      svarType = getLambdaType lamNode,
-      svarParams = []
+      svarType = "(lambda)",
+      svarParams = getLambdaParamTypes lamNode
     }
 genStatExpr (OneCaseAltNode expr) =
   genStatExpr expr
@@ -118,3 +117,29 @@ genStatExpr (LetNode (LetExprNode expr) _) =
   genStatExpr expr
 genStatExpr _ =
   SNothing
+
+-- Simplify until no change occurs
+simplifyStatExpr :: SExpr -> SExpr
+simplifyStatExpr expr =
+  let (s, change) = simpl expr
+   in if change then simplifyStatExpr s else s
+  where
+    simpl :: SExpr -> (SExpr, Bool)
+    -- App, but expr is null
+    simpl (SApp SNothing _) = (SNothing, True)
+    -- App, but arg is null
+    simpl (SApp expr' SNothing) = simpl expr'
+    -- Recursively simplify
+    simpl (SApp expr' arg) =
+      let (simplExpr, changeExpr) = simpl expr'
+          (simplArg, changeArg) = simpl arg
+          change = changeExpr || changeArg
+       in (SApp simplExpr simplArg, change)
+    simpl (SCase expr' alts) =
+      let (simplExpr, changeExpr) = simpl expr'
+          ss = map simpl alts
+          simplAlts = map fst ss
+          changeAlts = map snd ss
+          change = changeExpr || foldl' (||) False changeAlts
+       in (SCase simplExpr simplAlts, change)
+    simpl expr' = (expr', False)

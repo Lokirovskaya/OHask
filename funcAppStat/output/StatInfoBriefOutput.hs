@@ -32,4 +32,4 @@ showStatExpr (SCase expr alts) =
     "(case %s of | %s)"
     (showStatExpr expr)
     (map showStatExpr alts |> concatWith " | ")
-showStatExpr SNothing = "()"
+showStatExpr SNothing = "^"
