@@ -38,6 +38,9 @@ except ImportError:
 with open("stat/stat.json", "r") as f:
     funcListJson = json.load(f)
 
+# calc func complexity
 from calcFuncComplexity.Api import Func
-funcList = list(map(Func, funcListJson))
-print(funcList)
+from calcFuncComplexity.CalcFuncComplexity import calcCompl
+
+funcComplList = list((map(Func, funcListJson)))
+calcCompl(funcComplList)
