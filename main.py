@@ -25,7 +25,7 @@ with open("run/Run.hs", "w") as f:
 # Run cabal
 os.makedirs("stat", exist_ok=True)
 
-sp.run(["cabal", "build"])
+# sp.run(["cabal", "build"])
 print("\n")
 
 # Read json

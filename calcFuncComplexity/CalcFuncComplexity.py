@@ -1,16 +1,12 @@
 import sympy
 from typing import List, Dict, Any
-from .Api import Func, Param, Expr, Var, Lit, App, Case, ExternFunc
+from .Api import Func, Param, Expr, Var, Lit, App, Case
 from .Util import zEncode
 
 # module-defined function
 modFuncTable: Dict[str, Func] = {}
 # extern function
-extFuncTable: Dict[str, ExternFunc] = {}
-# Function full-application - Complexity map
-# i.e. no partial-application, no lambda-wrapped result
-funcComplMap: Dict[str, sympy.Symbol] = {}
-
+# extFuncTable: Dict[str, ExternFunc] = {}
 
 # Complexity means computational step.
 # Complexity of function-application `f(a1,...,an)` is an n-ary function `O(a1,...,an)`
@@ -20,21 +16,22 @@ funcComplMap: Dict[str, sympy.Symbol] = {}
 def calcCompl(funcList: List[Func]):
     # Init function table
     for func in funcList:
-        modFuncTable[func.funcName()] = func
+        modFuncTable[func.funcName] = func
 
     for func in funcList:
         compl = calcFuncCompl(func)
-        print(f"O({func.funcName()}) = {compl}")
+        print(f"O_{func.funcName} = {compl}")
 
 
 def calcFuncCompl(func: Func):
-    return calcExprCompl(func.funcExpr())
+    compl = calcExprCompl(func.funcExpr)
+    return compl
 
 
 def calcExprCompl(expr: Expr):
     if var := expr.matchVar():
         compl = calcVarCompl(var)
-        print(f"var={var.varName()}, compl={compl}")
+        # print(f"var={var.varName}, compl={compl}")
     elif lit := expr.matchLit():
         compl = calcLitCompl(lit)
     elif app := expr.matchApp():
@@ -47,30 +44,26 @@ def calcExprCompl(expr: Expr):
 
 
 def calcVarCompl(var: Var):
-    name = var.varName()
+    name = var.varName
     # Var is a type argument, ignore.
     if name != "$" and name.startswith("$"):
         return 0
     else:
-        paramCount = var.varParamCount()
+        paramCount = var.varParamCount
         # Var is a function with params.
         # Complexity of function-literal `f` is an lambda function `λa1. ... λan. O(a1,...,an)`
         if paramCount > 0:
             encName = zEncode(name)
-            if name in funcComplMap:
-                funcCompl = funcComplMap[name]
-            else:
-                funcCompl = sympy.symbols("O_" + encName)
+            funcCompl = sympy.symbols(f"O_{encName}")
 
             lamParams = []
             for idx in range(1, paramCount + 1):
-                p = sympy.symbols(encName + "_arg" + str(idx))
+                p = sympy.symbols(f"p{idx}_{encName}")
                 lamParams.append(p)
 
             # result = λ.λ.λ... (funcCompl)
             assert len(lamParams) > 0
-            result = currying(lamParams, funcCompl)
-            return result
+            return currying(lamParams, funcCompl)
 
         # Trivial var
         else:
@@ -94,17 +87,13 @@ def calcLitCompl(lit: Lit):
 
 
 def calcAppCompl(app: App):
-    appExpr = app.appExpr()
-    appArg = app.appArg()
-    appExprCompl = calcExprCompl(appExpr)
-    appArgCompl = calcExprCompl(appArg)
-    assert isinstance(appExprCompl, sympy.Lambda), str(appExprCompl) + " is not a lambda."
+    appExprCompl = calcExprCompl(app.appExpr)
+    appArgCompl = calcExprCompl(app.appArg)
+    assert isinstance(appExprCompl, sympy.Lambda), f"{appExprCompl} is not a lambda."
     return appExprCompl(appArgCompl)
 
 
 def calcCaseCompl(case_: Case):
-    caseExpr = case_.caseExpr()
-    caseAlt = case_.caseAlts()[0]
-    caseExprCompl = calcExprCompl(caseExpr)
-    caseAltCompl = calcExprCompl(caseAlt)
+    caseExprCompl = calcExprCompl(case_.caseExpr)
+    caseAltCompl = calcExprCompl(case_.caseAlts[-1])
     return caseExprCompl + caseAltCompl
