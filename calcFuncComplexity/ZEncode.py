@@ -1,5 +1,3 @@
-from typing import Dict, Any
-
 encDict = {
     "z": "z",
     "!": "a",
@@ -33,10 +31,11 @@ encDict = {
     "|": "3",
     "}": "4",
     "~": "5",
+    " ": "6",
 }
 
 
-def reverseDict(d: Dict[Any, Any]) -> Dict[Any, Any]:
+def reverseDict(d):
     result = {}
     for k, v in d.items():
         assert v not in result
@@ -55,4 +54,22 @@ def zEncode(s: str) -> str:
             result += "z" + encDict[c]
         else:
             result += c
+    return result
+
+
+def zDecode(s: str) -> str:
+    if len(s) <= 1:
+        return s
+
+    result = ""
+    i = 0
+    while i < len(s) - 1:
+        if s[i] == "z":
+            assert s[i + 1] in decDict, f"Bad character `{s[i+1]}` in `{s}`"
+            dec = decDict[s[i + 1]]
+            result += dec
+            i += 1
+        else:
+            result += s[i]
+        i += 1
     return result

@@ -1,5 +1,5 @@
 from sympy import Symbol
-from .Util import zEncode
+from .ZEncode import zEncode
 
 # Symbol naming convention:
 # O_f: Complexity of function f
