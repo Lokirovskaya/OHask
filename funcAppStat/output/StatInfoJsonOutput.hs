@@ -13,9 +13,10 @@ showStatInfoJson stat =
 showStatFuncInfo :: SFunc -> String
 showStatFuncInfo sfunc =
   printf
-    "{\"funcName\":\"%s\",\"funcType\":\"%s\",\"funcParams\":[%s],\"funcExpr\":%s}"
+    "{\"funcName\":\"%s\",\"funcType\":\"%s\",\"funcUnique\":\"%s\",\"funcParams\":[%s],\"funcExpr\":%s}"
     (sfunc |> sfuncName |> escape)
     (sfunc |> sfuncType |> escape)
+    (sfunc |> sfuncUnique |> escape)
     (sfunc |> sfuncParams |> map showStatParam |> concatWithComma)
     (sfunc |> sfuncExpr |> showStatExpr)
 

@@ -13,9 +13,9 @@ import Util
 -- 2. Find all sub-functions
 -- 3. Generate StatFunc for each sub-function
 -- Note: all TyConFunc filtered
-genStatOfRootFunc :: String -> ExprNode -> [SFunc]
-genStatOfRootFunc rootFuncName rootExpr =
-  let funcList = findSubFuncList rootFuncName rootExpr
+genStatOfRootFunc :: VarNodeInfo -> ExprNode -> [SFunc]
+genStatOfRootFunc rootFunc rootExpr =
+  let funcList = findSubFuncList rootFunc rootExpr
    in map genOneStatFunc funcList
 
 genOneStatFunc :: SubFunc -> SFunc
@@ -23,6 +23,7 @@ genOneStatFunc func =
   SFunc
     { sfuncName = func |> subFuncName,
       sfuncType = func |> subFuncType,
+      sfuncUnique = func |> subFuncUnique,
       sfuncExpr = genStatExpr (func |> subFuncExpr) |> simplifyStatExpr,
       sfuncParams = map genStatParam $ func |> subFuncParams
     }

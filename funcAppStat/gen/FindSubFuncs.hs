@@ -7,13 +7,14 @@ import Util
 data SubFunc = SubFunc
   { subFuncName :: String,
     subFuncType :: String,
+    subFuncUnique :: String,
     subFuncParams :: [VarNodeInfo],
     subFuncExpr :: ExprNode
   }
 
 -- find all sub-functions, filter type construction func
-findSubFuncList :: String -> ExprNode -> [SubFunc]
-findSubFuncList rootFuncName rootExpr = filterTyCon $ findFuncs rootFuncName rootExpr
+findSubFuncList :: VarNodeInfo -> ExprNode -> [SubFunc]
+findSubFuncList rootFunc rootExpr = filterTyCon $ findFuncs rootFunc rootExpr
   where
     filterTyCon = filter (\f -> not $ isTyConFunc $ f |> subFuncName)
     isTyConFunc ('$' : _ : _) = True
@@ -21,12 +22,13 @@ findSubFuncList rootFuncName rootExpr = filterTyCon $ findFuncs rootFuncName roo
 
 -- find all sub-functions
 -- OneBind(...)
-findFuncs :: String -> ExprNode -> [SubFunc]
-findFuncs rootFuncName rootExpr =
+findFuncs :: VarNodeInfo -> ExprNode -> [SubFunc]
+findFuncs rootFunc rootExpr =
   -- The root func is also a sub func
   SubFunc
-    { subFuncName = rootFuncName,
-      subFuncType = "",
+    { subFuncName = rootFunc |> varName,
+      subFuncType = rootFunc |> varType,
+      subFuncUnique = rootFunc |> varUnique,
       subFuncParams = getParamList rootExpr,
       subFuncExpr = stripParams rootExpr
     }
@@ -37,6 +39,7 @@ findFuncs rootFuncName rootExpr =
       SubFunc
         { subFuncName = var |> varName,
           subFuncType = var |> varType,
+          subFuncUnique = var |> varUnique,
           subFuncParams = getParamList expr,
           subFuncExpr = stripParams expr
         }

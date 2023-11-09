@@ -7,6 +7,7 @@ type Stat = [SFunc]
 data SFunc = SFunc
   { sfuncName :: String,
     sfuncType :: String,
+    sfuncUnique :: String,
     sfuncExpr :: SExpr,
     sfuncParams :: [SParam]
   }

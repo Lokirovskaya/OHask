@@ -5,13 +5,14 @@
 module FuncAppStat (plugin) where
 
 import Data.IORef (IORef, modifyIORef', newIORef, readIORef)
+import ExprTree
 import ExprTreeGen (getExprNode)
 import ExprTreeOutput (showExprNode)
 import GHC.Plugins
 import StatInfo (Stat)
+import StatInfoBriefOutput (showStatInfoBrief)
 import StatInfoGen (genStatOfRootFunc)
 import StatInfoJsonOutput (showStatInfoJson)
-import StatInfoBriefOutput (showStatInfoBrief)
 
 plugin :: GHC.Plugins.Plugin
 plugin =
@@ -64,11 +65,21 @@ runBind dflags statRef bind@(Rec bndrList) = do
 
 runOneBind :: DynFlags -> IORef Stat -> CoreBndr -> Expr CoreBndr -> CoreM ()
 runOneBind dflags statRef bndr expr = do
-  let funcName = showSDoc dflags (ppr bndr)
+  let funcName = showSDoc dflags $ ppr $ GHC.Plugins.varName bndr
+  let funcType = showSDoc dflags $ ppr $ GHC.Plugins.varType bndr
+  let funcUnique = showSDoc dflags $ ppr $ GHC.Plugins.varUnique bndr
+  let funcVar =
+        VarNodeInfo
+          { ExprTree.varName = funcName,
+            ExprTree.varType = funcType,
+            ExprTree.varUnique = funcName ++ "_" ++ funcUnique,
+            varKind = IdentKind, -- Will not be use
+            varParams = [] -- Will not be use
+          }
   let exprNode = getExprNode dflags expr
   -- tree output
   liftIO $ appendFile treeOutputFile $ "Function " ++ funcName ++ "\n"
   liftIO $ appendFile treeOutputFile $ showExprNode exprNode ++ "\n\n"
   -- get StatFunc, append into stat
-  let sfuncList = genStatOfRootFunc funcName exprNode
+  let sfuncList = genStatOfRootFunc funcVar exprNode
   liftIO $ modifyIORef' statRef (++ sfuncList)
