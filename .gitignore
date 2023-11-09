@@ -3,5 +3,6 @@ dump/
 run/
 stat/
 __pycache__/
+.vscode/
 *.txt
 *.json

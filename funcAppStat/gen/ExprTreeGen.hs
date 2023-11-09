@@ -60,7 +60,7 @@ getVarInfo dflags var =
    in VarNodeInfo
         { ExprTree.varName = name,
           ExprTree.varType = showSDoc dflags $ ppr $ GHC.Plugins.varType var,
-          ExprTree.varUnique = name ++ "_" ++ unique,
+          ExprTree.varUnique = name ++ "." ++ unique,
           varKind = kind,
           varParams = params
         }

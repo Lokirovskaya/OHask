@@ -5,7 +5,6 @@ import sys
 import subprocess as sp
 import datetime
 
-
 # Read src path
 if len(sys.argv) != 2:
     print("Missing argument: source file path.")
@@ -25,7 +24,7 @@ with open("run/Run.hs", "w") as f:
 # Run cabal
 os.makedirs("stat", exist_ok=True)
 
-# sp.run(["cabal", "build"])
+sp.run(["cabal", "build"])
 print("\n")
 
 # Read json

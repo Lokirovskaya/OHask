@@ -37,6 +37,8 @@ def calcExprCompl(expr: Expr, curFunc: Func):
         compl = calcAppCompl(app, curFunc)
     elif case_ := expr.matchCase():
         compl = calcCaseCompl(case_, curFunc)
+    elif expr.matchLam():
+        assert False, "All lambdas should be promoted."
     else:
         assert False
     return compl

@@ -1,14 +1,45 @@
 from __future__ import annotations
 from typing import List, Dict, Any, Optional
 
+# Structure of stat info, for detail, see ./funcAppStat/gen/StatInfo.hs
+
 
 class Func:
-    def __init__(self, data: Dict[str, Any]):
-        self.funcName: str = data["funcName"]
-        self.funcType: str = data["funcType"]
-        self.funcParams: List[Param] = list(map(Param, data["funcParams"]))
+    def __init__(
+        self,
+        data: Dict[str, Any],
+        funcName: str = None,
+        funcDisplayName: str = None,
+        funcType: str = None,
+        funcParams: List[Param] = None,
+        funcExpr: Expr = None,
+    ):
+        if funcName != None:
+            self.funcName: str = funcName
+        else:
+            self.funcName: str = data["funcUnique"]
+
+        if funcDisplayName != None:
+            self.funcDisplayName: str = funcDisplayName
+        else:
+            self.funcDisplayName: str = data["funcName"]
+
+        if funcType != None:
+            self.funcType: str = funcType
+        else:
+            self.funcType: str = data["funcType"]
+
+        if funcParams != None:
+            self.funcParams: List[Param] = funcParams
+        else:
+            self.funcParams: List[Param] = list(map(Param, data["funcParams"]))
+
         self.funcParamCount: int = len(self.funcParams)
-        self.funcExpr: Expr = Expr.makeExpr(data["funcExpr"])
+
+        if funcExpr != None:
+            self.funcExpr: Expr = funcExpr
+        else:
+            self.funcExpr: Expr = Expr.makeExpr(data["funcExpr"])
 
     # return -1: Given var is not a param of the function
     def findParam(self, var: Var) -> int:
@@ -25,7 +56,8 @@ class Func:
 
 class Param:
     def __init__(self, data: Dict[str, Any]):
-        self.paramName: str = data["paramName"]
+        self.paramName: str = data["paramUnique"]
+        self.paramDisplayName: str = data["paramName"]
         self.paramType: str = data["paramType"]
 
 
@@ -39,6 +71,8 @@ class Expr:
             return App(data)
         elif data["exprKind"] == "Case":
             return Case(data)
+        elif data["exprKind"] == "Lam":
+            return Lam(data)
         else:
             assert False
 
@@ -66,21 +100,53 @@ class Expr:
         else:
             return None
 
+    def matchLam(self) -> Optional[Lam]:
+        if isinstance(self, Lam):
+            return self
+        else:
+            return None
+
     def children(self) -> List[Expr]:
         if app := self.matchApp():
             return [app.appExpr, app.appArg]
         elif case_ := self.matchCase():
             return [case_.caseExpr] + case_.caseAlts
+        elif lam := self.matchLam():
+            return [lam.lamExpr]
         else:
             return []
 
 
 class Var(Expr):
-    def __init__(self, data: Dict[str, Any]):
-        self.varName: str = data["varName"]
-        self.varType: str = data["varType"]
-        self.varParams: List[str] = data["varParams"]
-        self.varParamCount: int = len(self.varParams)
+    def __init__(
+        self,
+        data: Dict[str, Any],
+        varName: str = None,
+        varDisplayName: str = None,
+        varType: str = None,
+        varParamTypes: str = None,
+    ):
+        if varName != None:
+            self.varName: str = varName
+        else:
+            self.varName: str = data["varUnique"]
+
+        if varDisplayName != None:
+            self.varDisplayName: str = varDisplayName
+        else:
+            self.varDisplayName: str = data["varName"]
+
+        if varType != None:
+            self.varType: str = varType
+        else:
+            self.varType: str = data["varType"]
+
+        if varParamTypes != None:
+            self.varParamTypes: List[str] = varParamTypes
+        else:
+            self.varParamTypes: List[str] = data["varParams"]
+
+        self.varParamCount: int = len(self.varParamTypes)
 
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, Var):
@@ -116,3 +182,10 @@ class Case(Expr):
         self.caseExpr: Expr = Expr.makeExpr(data["caseExpr"])
         self.caseAlts: List[Expr] = list(map(Expr.makeExpr, data["caseAlts"]))
         self.caseAltCount: int = len(self.caseAlts)
+
+
+class Lam(Expr):
+    def __init__(self, data: Dict[str, Any]):
+        self.lamExpr: Expr = Expr.makeExpr(data["lamExpr"])
+        self.lamParams: List[Param] = list(map(Param, data["lamParams"]))
+        self.lamParamCount: int = len(self.lamParams)
