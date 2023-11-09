@@ -20,18 +20,20 @@ showStatFuncInfo sfunc =
     (sfunc |> sfuncExpr |> showStatExpr)
 
 showStatParam :: SParam -> String
-showStatParam sparam =
+showStatParam (SParam name type' unique) =
   printf
-    "{\"paramName\":\"%s\",\"paramType\":\"%s\"}"
-    (sparam |> sparamName |> escape)
-    (sparam |> sparamType |> escape)
-
-showStatExpr :: SExpr -> String
-showStatExpr (SVar name type' params) =
-  printf
-    "{\"exprKind\":\"Var\",\"varName\":\"%s\",\"varType\":\"%s\",\"varParams\":[%s]}"
+    "{\"paramName\":\"%s\",\"paramType\":\"%s\",\"paramUnique\":\"%s\"}"
     (name |> escape)
     (type' |> escape)
+    (unique |> escape)
+
+showStatExpr :: SExpr -> String
+showStatExpr (SVar name type' unique params) =
+  printf
+    "{\"exprKind\":\"Var\",\"varName\":\"%s\",\"varType\":\"%s\",\"varUnique\":\"%s\",\"varParams\":[%s]}"
+    (name |> escape)
+    (type' |> escape)
+    (unique |> escape)
     (params |> map (\s -> "\"" ++ s |> escape ++ "\"") |> concatWithComma)
 showStatExpr (SLit value type') =
   printf

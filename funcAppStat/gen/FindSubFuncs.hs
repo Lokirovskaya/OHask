@@ -42,10 +42,7 @@ findFuncs rootFuncName rootExpr =
         }
         : findInside (stripParams expr)
     findInside expr =
-      case checkNode expr of
-        LeafLike _ -> []
-        NonLeafLike children ->
-          foldl' (++) [] $ map findInside children
+      foldl' (++) [] $ map findInside (getChildren expr)
 
 -- If a function has params, the root node of its ExprTree should be Lam
 -- Lam(LamVar(p1), LamExpr(LamVar(p2), LamExpr(...)))

@@ -13,13 +13,15 @@ data SFunc = SFunc
 
 data SParam = SParam
   { sparamName :: String,
-    sparamType :: String
+    sparamType :: String,
+    sparamUnique :: String
   }
 
 data SExpr
   = SVar
       { svarName :: String,
         svarType :: String,
+        sVarUnique :: String,
         svarParams :: [String]
       }
   | SLit

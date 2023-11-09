@@ -31,7 +31,8 @@ genStatParam :: VarNodeInfo -> SParam
 genStatParam param =
   SParam
     { sparamName = param |> varName,
-      sparamType = param |> varType
+      sparamType = param |> varType,
+      sparamUnique = param |> varUnique
     }
 
 isTyConFunc :: String -> Bool
@@ -46,12 +47,13 @@ genStatExpr (VarNode var)
       SVar
         { svarName = var |> varName,
           svarType = var |> varType,
+          sVarUnique = var |> varUnique,
           svarParams = var |> varParams
         }
-genStatExpr (LitNode var) =
+genStatExpr (LitNode lit) =
   SLit
-    { slitValue = var |> varName,
-      slitType = var |> varType
+    { slitValue = lit |> litValue,
+      slitType = lit |> litType
     }
 genStatExpr (AppNode (AppArgNode arg) (AppExprNode appExpr)) =
   SApp

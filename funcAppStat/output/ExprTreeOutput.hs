@@ -59,9 +59,16 @@ showExprRec expr layer
         (showVarKind $ var |> varKind)
         (var |> ExprTree.varName)
         (var |> ExprTree.varType)
-    innerLayerStr = case checkNode expr of
-      LeafLike var -> showVar var
-      NonLeafLike children -> foldl' (++) "" $ map oneChildStr children
+    showLit lit =
+      printf
+        "%s :: %s"
+        (lit |> ExprTree.litValue)
+        (lit |> ExprTree.litType)
+    innerLayerStr =
+      case expr of
+        VarNode var -> showVar var
+        LitNode lit -> showLit lit
+        _ -> foldl' (++) "" $ map oneChildStr (getChildren expr)
       where
         oneChildStr e = showExprRec e (layer + 1)
 
@@ -69,4 +76,3 @@ showVarKind :: VarKind -> String
 showVarKind IdentKind = "Ident"
 showVarKind TyVarKind = "TyVar"
 showVarKind TcTyVarKind = "TcTyVa"
-showVarKind LiteralKind = "Literal"

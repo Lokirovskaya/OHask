@@ -58,20 +58,19 @@ getVarInfo dflags var =
           |> map fst -- throw away ArgFlag
           |> map (showSDoc dflags . ppr) -- type to string
    in VarNodeInfo
-        { ExprTree.varName = name ++ "_" ++ unique,
+        { ExprTree.varName = name,
           ExprTree.varType = showSDoc dflags $ ppr $ GHC.Plugins.varType var,
+          ExprTree.varUnique = name ++ "_" ++ unique,
           varKind = kind,
           varParams = params
         }
 
-getLitStr :: DynFlags -> Literal -> VarNodeInfo
+getLitStr :: DynFlags -> Literal -> LitNodeInfo
 getLitStr dflags lit =
   let litTypeStr = showSDoc dflags $ ppr $ GHC.Plugins.literalType lit
-   in VarNodeInfo
-        { ExprTree.varName = showSDoc dflags $ pprLiteral id lit,
-          ExprTree.varType = litTypeStr,
-          varKind = LiteralKind,
-          varParams = [litTypeStr]
+   in LitNodeInfo
+        { ExprTree.litValue = showSDoc dflags $ pprLiteral id lit,
+          ExprTree.litType = litTypeStr
         }
 
 -- NonRec b (Expr b)

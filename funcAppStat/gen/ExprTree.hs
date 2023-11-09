@@ -1,19 +1,25 @@
 module ExprTree where
 
-data VarKind = IdentKind | TcTyVarKind | TyVarKind | LiteralKind
+data VarKind = IdentKind | TcTyVarKind | TyVarKind
 
 data VarNodeInfo = VarNodeInfo
   { varName :: String,
     varType :: String,
+    varUnique :: String,
     varKind :: VarKind,
     varParams :: [String]
+  }
+
+data LitNodeInfo = LitNodeInfo
+  { litValue :: String,
+    litType :: String
   }
 
 data ExprNode
   = -- Var Id
     VarNode VarNodeInfo
   | -- Lit Literal
-    LitNode VarNodeInfo
+    LitNode LitNodeInfo
   | -- App (Expr b) (Arg b)
     AppNode ExprNode ExprNode
   | AppExprNode ExprNode
@@ -50,34 +56,31 @@ data ExprNode
     -- Coercion Coercion
     OtherNode
 
--- Node-like representation of ExprNode
-data NodeLike = LeafLike VarNodeInfo | NonLeafLike [ExprNode]
-
-checkNode :: ExprNode -> NodeLike
-checkNode expr =
+getChildren :: ExprNode -> [ExprNode]
+getChildren expr =
   case expr of
-    VarNode s -> LeafLike s
-    LitNode s -> LeafLike s
-    AppNode e1 e2 -> NonLeafLike [e1, e2]
-    AppExprNode e -> NonLeafLike [e]
-    AppArgNode e -> NonLeafLike [e]
-    LamNode e1 e2 -> NonLeafLike [e1, e2]
-    LamVarNode s -> LeafLike s
-    LamExprNode e -> NonLeafLike [e]
-    LetNode e1 e2 -> NonLeafLike [e1, e2]
-    LetBindNode e -> NonLeafLike [e]
-    LetExprNode e -> NonLeafLike [e]
-    NonRecBindNode e -> NonLeafLike [e]
-    RecBindsNode eList -> NonLeafLike eList
-    OneBindNode e1 e2 -> NonLeafLike [e1, e2]
-    BindVarNode s -> LeafLike s
-    BindExprNode e -> NonLeafLike [e]
-    CaseNode e1 e2 -> NonLeafLike [e1, e2]
-    CaseExprNode e -> NonLeafLike [e]
-    CaseAltsNode eList -> NonLeafLike eList
-    OneCaseAltNode e -> NonLeafLike [e]
-    CastNode e -> NonLeafLike [e]
-    CastExprNode e -> NonLeafLike [e]
-    TickNode e -> NonLeafLike [e]
-    TickExprNode e -> NonLeafLike [e]
-    OtherNode -> NonLeafLike []
+    VarNode _ -> []
+    LitNode _ -> []
+    AppNode e1 e2 -> [e1, e2]
+    AppExprNode e -> [e]
+    AppArgNode e -> [e]
+    LamNode e1 e2 -> [e1, e2]
+    LamVarNode _ -> []
+    LamExprNode e -> [e]
+    LetNode e1 e2 -> [e1, e2]
+    LetBindNode e -> [e]
+    LetExprNode e -> [e]
+    NonRecBindNode e -> [e]
+    RecBindsNode eList -> eList
+    OneBindNode e1 e2 -> [e1, e2]
+    BindVarNode _ -> []
+    BindExprNode e -> [e]
+    CaseNode e1 e2 -> [e1, e2]
+    CaseExprNode e -> [e]
+    CaseAltsNode eList -> eList
+    OneCaseAltNode e -> [e]
+    CastNode e -> [e]
+    CastExprNode e -> [e]
+    TickNode e -> [e]
+    TickExprNode e -> [e]
+    OtherNode -> []
