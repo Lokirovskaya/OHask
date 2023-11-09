@@ -8,9 +8,9 @@ import Data.Char
 toHexStr :: Int -> String
 toHexStr x = toHexStrRev x |> reverse
   where
-    toHexStrRev x'
-      | x' <= 0 = ""
-      | otherwise = hexBitOf (mod16 x') : toHexStrRev (div16 x')
+    toHexStrRev x
+      | x <= 0 = ""
+      | otherwise = hexBitOf (mod16 x) : toHexStrRev (div16 x)
       where 
         mod16 a = a `mod` 16
         div16 a = a `div` 16

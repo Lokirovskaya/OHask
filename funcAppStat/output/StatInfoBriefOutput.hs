@@ -13,11 +13,8 @@ showStatFuncInfo sfunc =
   printf
     "%s (%s) =\n  %s"
     (sfunc |> sfuncName)
-    (sfunc |> sfuncParams |> map showStatParam |> concatWith ", ")
+    (sfunc |> sfuncParams |> map sparamName |> concatWith ", ")
     (sfunc |> sfuncExpr |> showStatExpr)
-
-showStatParam :: SParam -> String
-showStatParam sparam = sparam |> sparamName
 
 showStatExpr :: SExpr -> String
 showStatExpr (SVar name _ _) = name
@@ -32,4 +29,9 @@ showStatExpr (SCase expr alts) =
     "(case %s of | %s)"
     (showStatExpr expr)
     (map showStatExpr alts |> concatWith " | ")
+showStatExpr (SLam params expr) = 
+  printf
+    "λ(%s -> %s)"
+    (params |> map sparamName |> concatWith ", ")
+    (showStatExpr expr)
 showStatExpr SNothing = "^"

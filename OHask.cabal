@@ -30,6 +30,7 @@ library Gen
     exposed-modules:  
         ExprTree,
         ExprTreeGen,
+        FindSubFuncs,
         StatInfo,
         StatInfoGen
     build-depends:    Util, base ^>=4.17.2.0, ghc

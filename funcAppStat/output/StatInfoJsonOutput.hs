@@ -48,4 +48,9 @@ showStatExpr (SCase expr alts) =
     "{\"exprKind\":\"Case\",\"caseExpr\":%s,\"caseAlts\":[%s]}"
     (showStatExpr expr)
     (map showStatExpr alts |> concatWithComma)
+showStatExpr (SLam params expr) =
+  printf
+    "{\"exprKind\":\"Lam\",\"lamParams\":[%s],\"lamExpr\":%s}"
+    (map showStatParam params |> concatWithComma)
+    (showStatExpr expr)
 showStatExpr SNothing = "null"

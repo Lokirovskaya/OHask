@@ -34,4 +34,9 @@ data SExpr
       { scaseExpr :: SExpr,
         scaseAlts :: [SExpr]
       }
+  | SLam
+      { 
+        slamParams :: [SParam],
+        slamExpr :: SExpr
+      }
   | SNothing

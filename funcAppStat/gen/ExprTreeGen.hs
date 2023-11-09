@@ -45,7 +45,9 @@ getExprNode dflags expr =
 
 getVarInfo :: DynFlags -> Var -> VarNodeInfo
 getVarInfo dflags var =
-  let kind
+  let name = showSDoc dflags $ ppr $ GHC.Plugins.varName var
+      unique = showSDoc dflags $ ppr $ GHC.Plugins.varUnique var
+      kind
         | isId var = IdentKind
         | isTcTyVar var = TcTyVarKind
         | isTyVar var = TyVarKind
@@ -55,9 +57,8 @@ getVarInfo dflags var =
           |> filter (\(_, flag) -> case flag of VisArg -> True; _ -> False) -- Filter visible params
           |> map fst -- throw away ArgFlag
           |> map (showSDoc dflags . ppr) -- type to string
-   in -- showSDoc dflags $ ppr $ splitAppTys $ GHC.Plugins.varType var
-      VarNodeInfo
-        { ExprTree.varName = showSDoc dflags $ ppr $ GHC.Plugins.varName var,
+   in VarNodeInfo
+        { ExprTree.varName = name ++ "_" ++ unique,
           ExprTree.varType = showSDoc dflags $ ppr $ GHC.Plugins.varType var,
           varKind = kind,
           varParams = params
