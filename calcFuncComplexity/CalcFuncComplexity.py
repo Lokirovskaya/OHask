@@ -15,20 +15,25 @@ def calcCompl(funcListData):
     varsymDict = symbolize(funcList)
     constraintList = genConstraintList(funcList, varsymDict)
 
-    log('Raw Constraints')
+    log("Raw Constraints")
     for con in constraintList:
         log(con)
 
     symNodeDict = buildDepGraph(constraintList)
-    topoSeq = topoSortDepGraph(symNodeDict)
 
-    log('\nSymbol Dependency Info')
+    log("\nSymbol Dependency Info")
     for _, node in symNodeDict.items():
         log(node)
 
-    log('\nReduction Sequence')
-    for con in topoSeq:
-        log(con)
+    (reductionSeq, recConstrList) = topoSortDepGraph(symNodeDict)
+
+    log("\nReduction Sequence")
+    for con in reductionSeq:
+        log(con.lhs)
+
+    log("\nRecursive Constraints")
+    for con in recConstrList:
+        log(con.lhs)
 
 
 logFile = "stat/calc_log.txt"

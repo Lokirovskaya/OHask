@@ -7,26 +7,22 @@ from ..preprocess.LazyLambda import LazyLambda, LazyApply, LazySubstitute, LazyA
 
 
 class SymbolNode:
-    def __init__(self, lhs: Symbol, rhs: Optional[Any]):
-        self.lhs = lhs
-        self.rhs = rhs  # None means external symbol
+    def __init__(self, constraint: Constraint):
+        self.constraint = constraint
         self.depSymNodeSet: Set[SymbolNode] = set()
         # Update when running topo-sort
         self.childLeft: int = 0
         self.parentSet: Set[SymbolNode] = set()
 
     def __str__(self) -> str:
-        depSymNames = [node.lhs.name for node in self.depSymNodeSet]
+        depSymNames = [node.constraint.lhs.name for node in self.depSymNodeSet]
         depSymStr = ", ".join(depSymNames)
-        return f"{self.lhs} -> [{depSymStr}]"
+        return f"{self.constraint.lhs} -> [{depSymStr}]"
 
     def addDepSymNode(self, node: SymbolNode):
         self.depSymNodeSet.add(node)
         self.childLeft += 1
         node.parentSet.add(self)
-        
-    def getConstraint(self) -> Constraint:
-        return Constraint(self.lhs, self.rhs)
 
 
 def buildDepGraph(constraintList: List[Constraint]) -> Dict[Symbol, SymbolNode]:
@@ -34,11 +30,9 @@ def buildDepGraph(constraintList: List[Constraint]) -> Dict[Symbol, SymbolNode]:
 
     # Add defined complexity symbol
     for cons in constraintList:
-        lhs = cons.lhs
-        rhs = cons.rhs
-        assert lhs not in symNodeDict, f"Duplicated lhs {lhs}."
-        symNode = SymbolNode(lhs, rhs)
-        symNodeDict[lhs] = symNode
+        assert cons.lhs not in symNodeDict, f"Duplicated lhs {cons.lhs}."
+        symNode = SymbolNode(cons)
+        symNodeDict[cons.lhs] = symNode
 
     # Add external complexity symbol
     # Fill the field depSymNodeSet of nodes
@@ -49,7 +43,7 @@ def buildDepGraph(constraintList: List[Constraint]) -> Dict[Symbol, SymbolNode]:
         for depSym in complSyms:
             # An external compl sym
             if depSym not in symNodeDict:
-                symNodeDict[depSym] = SymbolNode(depSym, None)
+                symNodeDict[depSym] = SymbolNode(Constraint(depSym, None))
 
             symNodeDict[lhs].addDepSymNode(symNodeDict[depSym])
 

@@ -1,13 +1,19 @@
 from sympy import Symbol
-from typing import Any, List, Optional, Set, Tuple, Dict
+from typing import List, Tuple, Dict
 from queue import SimpleQueue
 from ..preprocess.GenConstraints import Constraint
 from .DependencyGraph import SymbolNode
 
 
-def topoSortDepGraph(symNodeDict: Dict[Symbol, SymbolNode]) -> List[Constraint]:
+def topoSortDepGraph(
+    symNodeDict: Dict[Symbol, SymbolNode]
+) -> Tuple[List[Constraint], List[Constraint]]:
+    
     result = []
-    nodesLeft = set()  # Ruled out nodes because it consists a ring
+    # Recursive constraints, each should be one of:
+    # 1. Node of a loop in dependency graph;
+    # 2. Depends on a recursive function
+    recConstrSet = set([node.constraint for node in symNodeDict.values()])
 
     queue = SimpleQueue()
 
@@ -17,11 +23,14 @@ def topoSortDepGraph(symNodeDict: Dict[Symbol, SymbolNode]) -> List[Constraint]:
 
     while not queue.empty():
         node: SymbolNode = queue.get()
-        result.append(node.getConstraint())
-        
+        result.append(node.constraint)
+
         for parent in node.parentSet:
             parent.childLeft -= 1
             if parent.childLeft == 0:
                 queue.put(parent)
-                
-    return result
+
+    for node in result:
+        recConstrSet.remove(node)
+
+    return (result, list(recConstrSet))
