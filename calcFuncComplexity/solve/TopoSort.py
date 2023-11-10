@@ -1,7 +1,7 @@
 from sympy import Symbol
 from typing import List, Tuple, Dict
 from queue import SimpleQueue
-from ..preprocess.GenConstraints import Constraint
+from ..struct.Constraint import Constraint
 from .DependencyGraph import SymbolNode
 
 

@@ -1,7 +1,7 @@
 from typing import List, Dict, Set, Any
 import sympy
 from .Api import Func, Expr, Var
-from .LazyLambda import LazyLambda, LazySubstitute
+from ..struct.LazyLambda import LazyLambda, LazySubstitute
 from .SymbolMaker import (
     makeComplSymbol,
     makeParamSymbol,
@@ -41,7 +41,7 @@ def defSymbolForVars(varSet: Set[Var]) -> Dict[str, Any]:
     varsymDict = {}
     for var in varSet:
         varsym = defVarSymbol(var)
-        assert (var.varName not in varsymDict, f"Duplicated var {var.varName}")
+        assert var.varName not in varsymDict, f"Duplicated var {var.varName}"
         varsymDict[var.varName] = varsym
     return varsymDict
 

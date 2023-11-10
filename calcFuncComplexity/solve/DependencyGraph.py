@@ -2,8 +2,8 @@ from __future__ import annotations
 from sympy import Symbol
 from typing import Any, List, Optional, Set, Dict
 
-from ..preprocess.GenConstraints import Constraint
-from ..preprocess.LazyLambda import LazyLambda, LazyApply, LazySubstitute, LazyAdd
+from ..struct.Constraint import Constraint
+from ..struct.LazyLambda import LazyLambda, LazyApply, LazySubstitute, LazyAdd
 
 
 class SymbolNode:
