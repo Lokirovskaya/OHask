@@ -7,7 +7,6 @@ from .Api import Func, Expr, Var, Lam
 # Promotion runs recursively
 def promoteStatLambdas(funcList: List[Func]):
     for func in funcList:
-        print(func.funcExpr)
         runExpr(func.funcExpr, funcList)
 
 
@@ -37,7 +36,7 @@ def runExpr(expr: Expr, funcList: List[Func]):
                 funcList.append(lamFunc)
                 runExpr(lamFunc.funcExpr, funcList)
 
-    elif lam := expr.matchLam():
+    elif expr.matchLam():
         assert False, "Top-most level of expr should not be Lam"
 
     for child in expr.children():
