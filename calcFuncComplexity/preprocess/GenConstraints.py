@@ -1,7 +1,7 @@
 from sympy import Symbol
 from typing import Any, Dict, List, Tuple
 from .LazyLambda import LazyAdd, LazyApply
-from .SymbolMaker import makeComplSymbol
+from .SymbolMaker import makeComplSymbol, makeParamSymbol, makeScaleSymbol
 from .Api import Func, Expr, Var, App, Case
 
 
@@ -26,10 +26,20 @@ def genConstraintList(
     varsymDict = _varsymDict
 
     constraintList = []
+
     for func in funcList:
+        # Var = Param constraints
+        for idx in range(len(func.funcParams)):
+            param = func.funcParams[idx]
+            paramSymbol = makeParamSymbol(func.funcName, idx)
+            varSymbol = makeScaleSymbol(param.paramName)
+            constraintList.append(Constraint(varSymbol, paramSymbol))
+
+        # FuncExpr constrains
         complSymbol = makeComplSymbol(func.funcName)
         complValue = calcFuncCompl(func)
         constraintList.append(Constraint(complSymbol, complValue))
+
     return constraintList
 
 
