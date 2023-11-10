@@ -5,41 +5,62 @@ import sys
 import subprocess as sp
 import datetime
 
-# Read src path
-if len(sys.argv) != 2:
-    print("Missing argument: source file path.")
-    sys.exit(-1)
+# Read args
+# required: srcPath
+# optional: --cabal
+#           --compl
 
-# Copy to run/Run.hs
-srcPath = sys.argv[1]
-with open(srcPath, "r") as f:
-    srcContent = f.read()
+srcPath = ""
+runCabal = False
+runComplCalc = False
+hasOptArg = False
+for arg in sys.argv[1:]:
+    if not arg.startswith("--"):
+        srcPath = arg
+    if arg == "--cabal":
+        runCabal = True
+        hasOptArg = True
+    elif arg == "--compl":
+        runComplCalc = True
+        hasOptArg = True
+if srcPath == "":
+    print("Error: No src path provided.")
+    exit(-1)
+if not hasOptArg:
+    runCabal = True
+    runComplCalc = True
 
-os.makedirs("run", exist_ok=True)
 
-with open("run/Run.hs", "w") as f:
-    curDatetime = str(datetime.datetime.now())
-    f.write("-- " + curDatetime + "\n" + srcContent)
+if runCabal:
+    # Copy to run/Run.hs
+    srcPath = sys.argv[1]
+    with open(srcPath, "r") as f:
+        srcContent = f.read()
 
-# Run cabal
-os.makedirs("stat", exist_ok=True)
+    os.makedirs("run", exist_ok=True)
 
-sp.run(["cabal", "build"])
-print("\n")
+    with open("run/Run.hs", "w") as f:
+        curDatetime = str(datetime.datetime.now())
+        f.write("-- " + curDatetime + "\n" + srcContent)
 
-# Read json
-try:
-    import ujson as json
-except ImportError:
-    print("Package ujson not found, use vanilla json.")
-    import json
+    # Run cabal
+    os.makedirs("stat", exist_ok=True)
 
-with open("stat/stat.json", "r") as f:
-    funcListJson = json.load(f)
+    sp.run(["cabal", "build"])
 
-# calc func complexity
-from calcFuncComplexity.Api import Func
-from calcFuncComplexity.CalcFuncComplexity import calcCompl
 
-funcComplList = list((map(Func, funcListJson)))
-calcCompl(funcComplList)
+if runComplCalc:
+    # Read json
+    try:
+        import ujson as json
+    except ImportError:
+        print("Package ujson not found, use vanilla json.")
+        import json
+
+    with open("stat/stat.json", "r") as f:
+        funcListData = json.load(f)
+
+    # calc func complexity
+    from calcFuncComplexity.CalcFuncComplexity import calcCompl
+    
+    calcCompl(funcListData)
