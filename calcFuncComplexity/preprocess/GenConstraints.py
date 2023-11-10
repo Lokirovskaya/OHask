@@ -1,26 +1,36 @@
-import sympy
+from sympy import Symbol
 from typing import Any, Dict, List, Tuple
 from .LazyLambda import LazyAdd, LazyApply
 from .SymbolMaker import makeComplSymbol
 from .Api import Func, Expr, Var, App, Case
+
+
+class Constraint:
+    def __init__(self, lhs: Symbol, rhs: Any):
+        self.lhs = lhs
+        self.rhs = rhs
+
+    def __str__(self) -> str:
+        return f"{self.lhs} = {self.rhs}"
+
 
 varsymDict: Dict[str, Any]
 
 
 # List of equations
 # [(lhs, rhs), ...]
-def genConstrainList(
+def genConstraintList(
     funcList: List[Func], _varsymDict: Dict[str, Any]
-) -> List[Tuple[sympy.Symbol, Any]]:
+) -> List[Constraint]:
     global varsymDict
     varsymDict = _varsymDict
-    
-    constrainList = []
+
+    constraintList = []
     for func in funcList:
         complSymbol = makeComplSymbol(func.funcName)
         complValue = calcFuncCompl(func)
-        constrainList.append((complSymbol, complValue))
-    return constrainList
+        constraintList.append(Constraint(complSymbol, complValue))
+    return constraintList
 
 
 def calcFuncCompl(func: Func):

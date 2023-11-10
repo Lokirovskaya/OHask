@@ -1,7 +1,8 @@
 from __future__ import annotations
 from sympy import Symbol
-from typing import Any, Optional, Set, Tuple, Dict
+from typing import Any, List, Optional, Set, Dict
 
+from ..preprocess.GenConstraints import Constraint
 from ..preprocess.LazyLambda import LazyLambda, LazyApply, LazySubstitute, LazyAdd
 
 
@@ -17,18 +18,22 @@ class SymbolNode:
         return f"{self.lhs} -> [{depSymStr}]"
 
 
-def buildDepGraph(constrainList: Tuple[Symbol, Any]) -> Dict[Symbol, SymbolNode]:
+def buildDepGraph(constraintList: List[Constraint]) -> Dict[Symbol, SymbolNode]:
     symNodeDict = {}
 
     # Add defined complexity symbol
-    for lhs, rhs in constrainList:
+    for cons in constraintList:
+        lhs = cons.lhs
+        rhs = cons.rhs
         assert lhs not in symNodeDict, f"Duplicated lhs {lhs}."
         symNode = SymbolNode(lhs, rhs)
         symNodeDict[lhs] = symNode
 
     # Add external complexity symbol
     # Fill the field depSymNodeSet of nodes
-    for lhs, rhs in constrainList:
+    for cons in constraintList:
+        lhs = cons.lhs
+        rhs = cons.rhs
         complSyms = findComplSymbols(rhs)
         for depSym in complSyms:
             # An external compl sym
