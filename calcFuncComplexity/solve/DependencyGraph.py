@@ -11,11 +11,22 @@ class SymbolNode:
         self.lhs = lhs
         self.rhs = rhs  # None means external symbol
         self.depSymNodeSet: Set[SymbolNode] = set()
+        # Update when running topo-sort
+        self.childLeft: int = 0
+        self.parentSet: Set[SymbolNode] = set()
 
     def __str__(self) -> str:
         depSymNames = [node.lhs.name for node in self.depSymNodeSet]
         depSymStr = ", ".join(depSymNames)
         return f"{self.lhs} -> [{depSymStr}]"
+
+    def addDepSymNode(self, node: SymbolNode):
+        self.depSymNodeSet.add(node)
+        self.childLeft += 1
+        node.parentSet.add(self)
+        
+    def getConstraint(self) -> Constraint:
+        return Constraint(self.lhs, self.rhs)
 
 
 def buildDepGraph(constraintList: List[Constraint]) -> Dict[Symbol, SymbolNode]:
@@ -40,7 +51,7 @@ def buildDepGraph(constraintList: List[Constraint]) -> Dict[Symbol, SymbolNode]:
             if depSym not in symNodeDict:
                 symNodeDict[depSym] = SymbolNode(depSym, None)
 
-            symNodeDict[lhs].depSymNodeSet.add(symNodeDict[depSym])
+            symNodeDict[lhs].addDepSymNode(symNodeDict[depSym])
 
     return symNodeDict
 

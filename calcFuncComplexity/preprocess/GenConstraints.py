@@ -8,7 +8,7 @@ from .Api import Func, Expr, Var, App, Case
 class Constraint:
     def __init__(self, lhs: Symbol, rhs: Any):
         self.lhs = lhs
-        self.rhs = rhs
+        self.rhs = rhs  # None means external symbol
 
     def __str__(self) -> str:
         return f"{self.lhs} = {self.rhs}"
