@@ -17,6 +17,9 @@ class LazyLambda(LazyExpr):
 
     def __str__(self) -> str:
         return f"λ{self.lamParam}. {self.lamExpr}"
+    
+    def eval(self):
+        
 
 
 # expr(arg)
@@ -29,11 +32,12 @@ class LazyApply(LazyExpr):
         return f"({self.appExpr})({self.appArg})"
 
 
-# expr[var -> newExpr]
+# expr[oldVar -> newVar]
 class LazySubstitute(LazyExpr):
-    # substList: [(var, newExpr), ...]
+    # substList: [(oldVar, newVar), ...]
     # Please ensure each 2 substitutions are independent.
-    def __init__(self, expr, substList: List[Tuple[sympy.Symbol, Any]]):
+    # Note: In whole process, oldVar = param symbol, newVar = lambda param symbol 
+    def __init__(self, expr, substList: List[Tuple[sympy.Symbol, sympy.Symbol]]):
         self.substExpr = expr
         self.substList = substList
 
