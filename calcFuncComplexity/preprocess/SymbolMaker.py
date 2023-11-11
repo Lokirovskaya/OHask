@@ -1,4 +1,5 @@
-from sympy import Symbol
+from sympy import Symbol, Function
+from typing import List
 from .ZEncode import zEncode
 
 # Symbol naming convention:
@@ -8,8 +9,8 @@ from .ZEncode import zEncode
 # lp+uuid: Lambda param, chosen fresh, i.e. with uuid
 
 
-def makeComplSymbol(funcName: str) -> Symbol:
-    return Symbol("O_" + zEncode(funcName))
+def makeComplSymbol(funcName: str, params: List[Symbol]) -> Symbol:
+    return Function("O_" + zEncode(funcName))(*tuple(params))
 
 
 def makeScaleSymbol(varName: str) -> Symbol:

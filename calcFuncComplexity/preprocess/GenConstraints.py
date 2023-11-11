@@ -27,7 +27,11 @@ def genConstraintList(
             constraintList.append(Constraint(varSymbol, paramSymbol))
 
         # FuncExpr constrains
-        complSymbol = makeComplSymbol(func.funcName)
+        paramsSymbol = [
+            makeParamSymbol(func.funcParams[i].paramName, i)
+            for i in range(len(func.funcParams))
+        ]
+        complSymbol = makeComplSymbol(func.funcName, paramsSymbol)
         complValue = calcFuncCompl(func)
         constraintList.append(Constraint(complSymbol, complValue))
 
@@ -62,10 +66,10 @@ def calcVarCompl(var: Var):
 def calcAppCompl(app: App, curFunc: Func):
     appExprCompl = calcExprCompl(app.appExpr, curFunc)
     appArgCompl = calcExprCompl(app.appArg, curFunc)
-    return LazyApply(appExprCompl, appArgCompl)
+    return appExprCompl(appArgCompl)
 
 
 def calcCaseCompl(case_: Case, curFunc: Func):
     caseExprCompl = calcExprCompl(case_.caseExpr, curFunc)
     caseAltCompl = calcExprCompl(case_.caseAlts[-1], curFunc)
-    return LazyAdd(caseExprCompl, caseAltCompl)
+    return caseExprCompl + caseAltCompl

@@ -1,10 +1,8 @@
 from typing import List, Dict, Set, Any
-import sympy
+from sympy import Lambda, Symbol
 from .Api import Func, Expr, Var
-from ..struct.LazyLambda import LazyLambda, LazySubstitute
 from .SymbolMaker import (
     makeComplSymbol,
-    makeParamSymbol,
     makeScaleSymbol,
     makeLambdaParamSymbol,
 )
@@ -21,7 +19,7 @@ def symbolize(funcList: List[Func]):
     return varsymDict
 
 
-def findAllVars(funcList: List[Func]) -> Dict[str, Var]:
+def findAllVars(funcList: List[Func]) -> Set[Var]:
     varSet = set()
 
     def runExpr(expr: Expr):
@@ -52,27 +50,20 @@ def defVarSymbol(var: Var) -> Any:
     # Complexity of var `f` is an lambda `λp1. ... λpn. O(a1,...,an)[a1 -> p1, ..., an -> pn]`
     paramCount = var.varParamCount
     if paramCount > 0:
-        funcCompl = makeComplSymbol(name)
-
-        funcParams = [makeParamSymbol(name, idx) for idx in range(paramCount)]
         lamParams = [makeLambdaParamSymbol() for _ in range(paramCount)]
-        substList = [(funcParams[i], lamParams[i]) for i in range(paramCount)]
-
-        lamExpr = LazySubstitute(funcCompl, substList)
-
-        return currying(lamParams, lamExpr)
-
+        funcCompl = makeComplSymbol(name, lamParams)
+        return currying(lamParams, funcCompl)
     else:
         return makeScaleSymbol(name)
 
 
-def currying(lamParams: List[sympy.Symbol], lamExpr) -> LazyLambda:
+def currying(lamParams: List[Symbol], lamExpr):
     if len(lamParams) == 0:
         return lamExpr
     elif len(lamParams) == 1:
-        return LazyLambda(lamParams[0], lamExpr)
+        return Lambda(lamParams[0], lamExpr)
     else:
-        result = LazyLambda(lamParams[-1], lamExpr)
+        result = Lambda(lamParams[-1], lamExpr)
         for p in reversed(lamParams[:-1]):
-            result = LazyLambda(p, result)
+            result = Lambda(p, result)
         return result
