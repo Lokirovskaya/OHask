@@ -9,8 +9,8 @@ from .ZEncode import zEncode
 # lp+uuid: Lambda param, chosen fresh, i.e. with uuid
 
 
-def makeComplSymbol(funcName: str, params: List[Symbol]) -> Symbol:
-    return Function("O_" + zEncode(funcName))(*tuple(params))
+def makeComplSymbol(funcName: str, params: List[Symbol]) -> Function:
+    return Function("O_" + zEncode(funcName))(*params)
 
 
 def makeScaleSymbol(varName: str) -> Symbol:

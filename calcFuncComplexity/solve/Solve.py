@@ -2,9 +2,8 @@ from sympy import Symbol
 from typing import List, Tuple, Dict
 from queue import SimpleQueue
 
-from ..struct.LazyLambda import LazyLambda, LazyAdd, LazySubstitute, LazyApply
 from ..struct.Constraint import Constraint
-from .DependencyGraph import SymbolNode
+from ..struct.DepGraphNode import DepGraphNode
 
 
 def solve(

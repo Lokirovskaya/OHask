@@ -1,5 +1,4 @@
 from typing import Any, Dict, List
-from ..struct.LazyLambda import LazyAdd, LazyApply
 from ..struct.Constraint import Constraint
 from .SymbolMaker import makeComplSymbol, makeParamSymbol, makeScaleSymbol
 from .Api import Func, Expr, Var, App, Case
@@ -28,12 +27,12 @@ def genConstraintList(
 
         # FuncExpr constrains
         paramsSymbol = [
-            makeParamSymbol(func.funcParams[i].paramName, i)
+            makeParamSymbol(func.funcName, i)
             for i in range(len(func.funcParams))
         ]
         complSymbol = makeComplSymbol(func.funcName, paramsSymbol)
         complValue = calcFuncCompl(func)
-        constraintList.append(Constraint(complSymbol, complValue))
+        constraintList.append(Constraint(complSymbol, complValue)) # type: ignore
 
     return constraintList
 
