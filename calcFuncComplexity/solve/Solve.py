@@ -22,37 +22,3 @@ def solve(
     # Evaluation of lazy lambdas
 
     return reductionSeq + recConstrList
-
-
-def evalLazy(expr):
-    if isinstance(expr, LazyLambda):
-        if expr.lamExpr == constr.lhs:
-            expr.lamExpr = constr.rhs
-        else:
-            runExpr(expr.lamExpr)
-
-    elif isinstance(expr, LazyApply):
-        if expr.appExpr == constr.lhs:
-            expr.appExpr = constr.rhs
-        else:
-            runExpr(expr.appExpr)
-        if expr.appArg == constr.lhs:
-            expr.appArg = constr.rhs
-        else:
-            runExpr(expr.appArg)
-
-    elif isinstance(expr, LazySubstitute):
-        if expr.substExpr == constr.lhs:
-            expr.substExpr = constr.rhs
-        else:
-            runExpr(expr.substExpr)
-
-    elif isinstance(expr, LazyAdd):
-        if expr.lhs == constr.lhs:
-            expr.lhs = constr.rhs
-        else:
-            runExpr(expr.lhs)
-        if expr.rhs == constr.lhs:
-            expr.rhs = constr.rhs
-        else:
-            runExpr(expr.rhs)

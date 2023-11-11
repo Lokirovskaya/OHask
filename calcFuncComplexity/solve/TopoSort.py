@@ -8,8 +8,7 @@ from .DependencyGraph import SymbolNode
 def topoSortDepGraph(
     symNodeDict: Dict[Symbol, SymbolNode]
 ) -> Tuple[List[Constraint], List[Constraint]]:
-    
-    result = []
+    result: List[Constraint] = []
     # Recursive constraints, each should be one of:
     # 1. Node of a loop in dependency graph;
     # 2. Depends on a recursive function
@@ -30,7 +29,7 @@ def topoSortDepGraph(
             if parent.childLeft == 0:
                 queue.put(parent)
 
-    for node in result:
-        recConstrSet.remove(node)
+    for constr in result:
+        recConstrSet.remove(constr)
 
     return (result, list(recConstrSet))

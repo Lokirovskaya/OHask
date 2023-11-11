@@ -53,14 +53,14 @@ def promote(lam: Lam) -> Tuple[Var, Func]:
     idx += 1
     paramTypes = [param.paramType for param in lam.lamParams]
     var = Var(
-        data=None,
+        data={},
         varName=uniqueName,
         varDisplayName=uniqueName,
         varType="",
         varParamTypes=paramTypes,
     )
     func = Func(
-        data=None,
+        data={},
         funcName=uniqueName,
         funcDisplayName=uniqueName,
         funcType="",
