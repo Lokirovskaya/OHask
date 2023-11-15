@@ -10,11 +10,11 @@ from .ZEncode import zEncode
 
 
 def makeComplSymbol(funcName: str, params: List[Symbol]) -> Function:
-    return Function("O_" + zEncode(funcName))(*params)
+    return Function("T_" + zEncode(funcName))(*params)
 
 
-def makeScaleSymbol(varName: str) -> Symbol:
-    return Symbol("s_" + zEncode(varName))
+def makeVarSymbol(varName: str) -> Symbol:
+    return Symbol("v_" + zEncode(varName))
 
 
 def makeParamSymbol(funcName: str, idx: int) -> Symbol:

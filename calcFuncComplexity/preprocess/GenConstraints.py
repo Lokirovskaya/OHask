@@ -1,38 +1,28 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Callable
 from ..struct.Constraint import Constraint
-from .SymbolMaker import makeComplSymbol, makeParamSymbol, makeScaleSymbol
+from ..struct.MaxCompl import MaxCompl
+from .SymbolMaker import (
+    makeComplSymbol,
+    makeLambdaParamSymbol,
+    makeParamSymbol,
+    makeVarSymbol,
+)
 from .Api import Func, Expr, Var, App, Case
-
-
-varsymDict: Dict[str, Any]
+from sympy import Function, Symbol, Lambda, symbols
 
 
 # List of equations
 # [(lhs, rhs), ...]
-def genConstraintList(
-    funcList: List[Func], _varsymDict: Dict[str, Any]
-) -> List[Constraint]:
-    global varsymDict
-    varsymDict = _varsymDict
-
+def genConstraintList(funcList: List[Func]) -> List[Constraint]:
     constraintList = []
 
     for func in funcList:
-        # Var = Param constraints
-        for idx in range(len(func.funcParams)):
-            param = func.funcParams[idx]
-            paramSymbol = makeParamSymbol(func.funcName, idx)
-            varSymbol = makeScaleSymbol(param.paramName)
-            constraintList.append(Constraint(varSymbol, paramSymbol))
-
-        # FuncExpr constrains
         paramsSymbol = [
-            makeParamSymbol(func.funcName, i)
-            for i in range(len(func.funcParams))
+            makeParamSymbol(func.funcName, i) for i in range(len(func.funcParams))
         ]
         complSymbol = makeComplSymbol(func.funcName, paramsSymbol)
         complValue = calcFuncCompl(func)
-        constraintList.append(Constraint(complSymbol, complValue)) # type: ignore
+        constraintList.append(Constraint(complSymbol, complValue))  # type: ignore
 
     return constraintList
 
@@ -46,7 +36,7 @@ def calcExprCompl(expr: Expr, curFunc: Func):
     if var := expr.matchVar():
         compl = calcVarCompl(var)
     elif expr.matchLit():
-        compl = 1
+        compl = 0
     elif app := expr.matchApp():
         compl = calcAppCompl(app, curFunc)
     elif case_ := expr.matchCase():
@@ -59,16 +49,51 @@ def calcExprCompl(expr: Expr, curFunc: Func):
 
 
 def calcVarCompl(var: Var):
-    return varsymDict[var.varName]
+    # Complexity of var `f` is an lambda `λp1. ... λpn. T(p1,...,pn)`
+    paramCount = var.varParamCount
+    if paramCount > 0:
+        lamParams = [makeLambdaParamSymbol() for _ in range(paramCount)]
+        funcCompl = makeComplSymbol(var.varName, lamParams)
+        return currying(lamParams, funcCompl)
+    else:
+        return 0
 
 
 def calcAppCompl(app: App, curFunc: Func):
     appExprCompl = calcExprCompl(app.appExpr, curFunc)
     appArgCompl = calcExprCompl(app.appArg, curFunc)
-    return appExprCompl(appArgCompl)
+    # appArg = makeVarSymbol(app.appArg.varName)
+    appArg = symbols("var")
+    return appArgCompl + appExprCompl.rcall(appArg)
 
 
 def calcCaseCompl(case_: Case, curFunc: Func):
     caseExprCompl = calcExprCompl(case_.caseExpr, curFunc)
-    caseAltCompl = calcExprCompl(case_.caseAlts[-1], curFunc)
-    return caseExprCompl + caseAltCompl
+    caseAltsCompl = [calcExprCompl(alt, curFunc) for alt in case_.caseAlts]
+    maxAltCompl = maxN(caseAltsCompl)
+    return caseExprCompl + maxAltCompl
+
+
+def currying(lamParams: List[Symbol], lamExpr):
+    if len(lamParams) == 0:
+        return lamExpr
+    elif len(lamParams) == 1:
+        return Lambda(lamParams[0], lamExpr)
+    else:
+        result = Lambda(lamParams[-1], lamExpr)
+        for p in reversed(lamParams[:-1]):
+            result = Lambda(p, result)
+        return result
+
+
+def maxN(args: List[Any]):
+    assert len(args) > 0
+    if len(args) == 1:
+        return args[0]
+    elif len(args) == 2:
+        return MaxCompl(args[0], args[1])
+    else:
+        result = MaxCompl(args[-2], args[-1])
+        for arg in reversed(args[:-2]):
+            result = MaxCompl(arg, result)
+        return result

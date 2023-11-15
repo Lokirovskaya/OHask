@@ -1,6 +1,5 @@
 from .preprocess.Api import Func
 from .preprocess.PromoteStatLambdas import promoteStatLambdas
-from .preprocess.SymbolizeVars import symbolize
 from .preprocess.GenConstraints import genConstraintList
 
 from .solve.BuildDepGraph import buildDepGraph
@@ -14,8 +13,7 @@ def calcCompl(funcListData):
 
     funcList = [Func(funcData) for funcData in funcListData]
     promoteStatLambdas(funcList)
-    varsymDict = symbolize(funcList)
-    constraintList = genConstraintList(funcList, varsymDict)
+    constraintList = genConstraintList(funcList)
     log("[Raw Constraints]")
     for con in constraintList:
         log(con)
