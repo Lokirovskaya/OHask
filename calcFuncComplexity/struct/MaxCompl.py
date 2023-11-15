@@ -2,6 +2,8 @@ from sympy import Function
 
 
 class MaxCompl(Function):
+    name = "MaxCompl"
+
     @classmethod
     def eval(cls, m, n):
         if m == 0:
@@ -12,7 +14,6 @@ class MaxCompl(Function):
     def doit(self, deep=False, **hints):
         m, n = self.args
         if deep:
-           m, n = m.doit(deep=deep, **hints), n.doit(deep=deep, **hints)
+            m, n = m.doit(deep=deep, **hints), n.doit(deep=deep, **hints)
 
         pass
-       

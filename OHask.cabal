@@ -61,5 +61,4 @@ executable Run
     build-depends:    FuncAppStat, base ^>=4.17.2.0
     ghc-options:      -O0 
                       -fplugin=FuncAppStat
-                      -fno-code
     hs-source-dirs:   run

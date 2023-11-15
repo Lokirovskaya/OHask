@@ -36,7 +36,7 @@ def calcExprCompl(expr: Expr, curFunc: Func):
     if var := expr.matchVar():
         compl = calcVarCompl(var)
     elif expr.matchLit():
-        compl = 0
+        compl = 1
     elif app := expr.matchApp():
         compl = calcAppCompl(app, curFunc)
     elif case_ := expr.matchCase():
@@ -56,7 +56,7 @@ def calcVarCompl(var: Var):
         funcCompl = makeComplSymbol(var.varName, lamParams)
         return currying(lamParams, funcCompl)
     else:
-        return 0
+        return 1
 
 
 def calcAppCompl(app: App, curFunc: Func):
@@ -64,7 +64,7 @@ def calcAppCompl(app: App, curFunc: Func):
     appArgCompl = calcExprCompl(app.appArg, curFunc)
     # appArg = makeVarSymbol(app.appArg.varName)
     appArg = symbols("var")
-    return appArgCompl + appExprCompl.rcall(appArg)
+    return 1 + appArgCompl + appExprCompl.rcall(appArg)
 
 
 def calcCaseCompl(case_: Case, curFunc: Func):
@@ -88,6 +88,7 @@ def currying(lamParams: List[Symbol], lamExpr):
 
 def maxN(args: List[Any]):
     assert len(args) > 0
+    # max2 = MaxCompl("max")
     if len(args) == 1:
         return args[0]
     elif len(args) == 2:
