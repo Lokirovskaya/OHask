@@ -9,8 +9,8 @@ from .ZEncode import zEncode
 # lp+uuid: Lambda param, chosen fresh, i.e. with uuid
 
 
-def makeComplSymbol(funcName: str, params: List[Symbol]) -> Function:
-    return Function("T_" + zEncode(funcName))(*params)
+def makeComplSymbol(funcName: str) -> Function:
+    return Function("T_" + zEncode(funcName))
 
 
 def makeVarSymbol(varName: str) -> Symbol:
@@ -29,3 +29,7 @@ def makeLambdaParamSymbol() -> Symbol:
     s = Symbol("lp" + str(idx))
     idx += 1
     return s
+
+
+def makePlaceholderSymbol() -> Symbol:
+    return Symbol("unknown")

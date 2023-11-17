@@ -20,17 +20,13 @@ def buildDepGraph(constraintList: List[Constraint]) -> Dict[str, DepGraphNode]:
     for cons in constraintList:
         lhs = cons.lhs
         rhs = cons.rhs
-        assert rhs != None
-        varOccur = list(rhs.free_symbols) + [
-            node for node in preorder_traversal(rhs) if isinstance(node, Function)
+        funcOccurs = [
+            node
+            for node in preorder_traversal(rhs)
+            if isinstance(node, Function) and node.name != "MaxCompl"
         ]
-        for depSym in varOccur:
-            # if not isinstance(depSym, Symbol):
-            # continue
-            # An external compl sym
-            if depSym.name not in depNodeDict:
-                depNodeDict[depSym.name] = DepGraphNode(Constraint(depSym, None))
-
-            depNodeDict[lhs.name].addDepSymNode(depNodeDict[depSym.name])
+        # lhs depends on every funcs
+        for func in funcOccurs:
+            depNodeDict[lhs.name].addDepSymNode(depNodeDict[func.name])
 
     return depNodeDict

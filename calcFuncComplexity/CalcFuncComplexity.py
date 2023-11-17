@@ -24,8 +24,8 @@ def calcCompl(funcListData):
         log(node)
 
     (reductionSeq, recConstrList) = topoSortDepGraph(depNodeDict)
-    applyBuiltinConstraints(reductionSeq)
-    applyBuiltinConstraints(recConstrList)
+    # applyBuiltinConstraints(reductionSeq)
+    # applyBuiltinConstraints(recConstrList)
     log("\n[Reduction Sequence]")
     for con in reductionSeq:
         log(con.lhs)

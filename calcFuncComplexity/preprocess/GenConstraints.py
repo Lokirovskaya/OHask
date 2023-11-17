@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Callable
+from typing import Any, Dict, List, Set
 from ..struct.Constraint import Constraint
 from ..struct.MaxCompl import MaxCompl
 from .SymbolMaker import (
@@ -6,23 +6,34 @@ from .SymbolMaker import (
     makeLambdaParamSymbol,
     makeParamSymbol,
     makeVarSymbol,
+    makePlaceholderSymbol,
 )
 from .Api import Func, Expr, Var, App, Case
 from sympy import Function, Symbol, Lambda, symbols
+
+constraintList: List[Constraint]
+curConstrNames: Set[str]
 
 
 # List of equations
 # [(lhs, rhs), ...]
 def genConstraintList(funcList: List[Func]) -> List[Constraint]:
+    global constraintList
     constraintList = []
+    global curConstrNames
+    curConstrNames = set()
+
+    # Init current constraint name set with all internal functions first
+    for func in funcList:
+        curConstrNames.add(func.funcName)
 
     for func in funcList:
-        paramsSymbol = [
+        paramSymbols = [
             makeParamSymbol(func.funcName, i) for i in range(len(func.funcParams))
         ]
-        complSymbol = makeComplSymbol(func.funcName, paramsSymbol)
-        complValue = calcFuncCompl(func)
-        constraintList.append(Constraint(complSymbol, complValue))  # type: ignore
+        complSymbol = makeComplSymbol(func.funcName)
+        complValue = currying(paramSymbols, calcFuncCompl(func))
+        constraintList.append(Constraint(complSymbol, complValue))
 
     return constraintList
 
@@ -52,9 +63,22 @@ def calcVarCompl(var: Var):
     # Complexity of var `f` is an lambda `λp1. ... λpn. T(p1,...,pn)`
     paramCount = var.varParamCount
     if paramCount > 0:
+        name = var.varName
         lamParams = [makeLambdaParamSymbol() for _ in range(paramCount)]
-        funcCompl = makeComplSymbol(var.varName, lamParams)
-        return currying(lamParams, funcCompl)
+        funcCompl = makeComplSymbol(name)
+
+        # External function call
+        if name not in curConstrNames:
+            curConstrNames.add(name)
+            paramSymbols = [makeParamSymbol(name, i) for i in range(paramCount)]
+            constraintList.append(
+                Constraint(
+                    funcCompl,
+                    currying(paramSymbols, makePlaceholderSymbol()),
+                )
+            )
+
+        return currying(lamParams, funcCompl(*lamParams))
     else:
         return 1
 

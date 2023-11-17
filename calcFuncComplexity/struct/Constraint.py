@@ -10,9 +10,10 @@ class Constraint:
 
     # Substitute all constr.lhs with constr.rhs in self.rhs
     def substitute(self, constr: Constraint):
-        # if self.rhs == None:
-            # return
-        # self.rhs = Lambda(constr.lhs, self.rhs)(constr.rhs)
+        if self.rhs == None:
+            return
+        if hasattr(self.rhs, "subs"):
+            self.rhs = self.rhs.subs(constr.lhs, constr.rhs)
         pass
 
     def __str__(self) -> str:
