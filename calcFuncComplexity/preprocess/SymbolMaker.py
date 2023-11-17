@@ -29,7 +29,3 @@ def makeLambdaParamSymbol() -> Symbol:
     s = Symbol("lp" + str(idx))
     idx += 1
     return s
-
-
-def makePlaceholderSymbol() -> Symbol:
-    return Symbol("unknown")

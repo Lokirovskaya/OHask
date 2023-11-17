@@ -1,19 +1,19 @@
 from __future__ import annotations
-from sympy import Function, Symbol, Expr, Lambda
+from sympy import Function, Symbol, Expr
 from typing import Any, Optional
 
 
 class Constraint:
     def __init__(self, lhs: Symbol | Function, rhs: Optional[Expr]):
         self.lhs = lhs
-        self.rhs = rhs  # None means external symbol
+        self.rhs = rhs
 
-    # Substitute all constr.lhs with constr.rhs in self.rhs
-    def substitute(self, constr: Constraint):
+    # Substitute all `old` with `new` in `self.rhs`
+    def substitute(self, old, new):
         if self.rhs == None:
             return
-        if hasattr(self.rhs, "subs"):
-            self.rhs = self.rhs.subs(constr.lhs, constr.rhs)
+        if hasattr(self.rhs, "replace"):
+            self.rhs = self.rhs.replace(old, new)
         pass
 
     def __str__(self) -> str:

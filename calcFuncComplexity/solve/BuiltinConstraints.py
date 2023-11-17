@@ -6,5 +6,4 @@ from ..struct.Constraint import Constraint
 
 def applyBuiltinConstraints(constrList: List[Constraint]):
     for constr in constrList:
-        if constr.rhs == None:
-            constr.rhs = 1
+        constr.substitute(Symbol('external'), 1)

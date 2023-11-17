@@ -1,15 +1,15 @@
 from typing import Any, Dict, List, Set
 from ..struct.Constraint import Constraint
 from ..struct.MaxCompl import MaxCompl
+from ..struct.MyLambda import MyLambda
 from .SymbolMaker import (
     makeComplSymbol,
     makeLambdaParamSymbol,
     makeParamSymbol,
     makeVarSymbol,
-    makePlaceholderSymbol,
 )
 from .Api import Func, Expr, Var, App, Case
-from sympy import Function, Symbol, Lambda, symbols
+from sympy import Function, Symbol, symbols
 
 constraintList: List[Constraint]
 curConstrNames: Set[str]
@@ -32,7 +32,7 @@ def genConstraintList(funcList: List[Func]) -> List[Constraint]:
             makeParamSymbol(func.funcName, i) for i in range(len(func.funcParams))
         ]
         complSymbol = makeComplSymbol(func.funcName)
-        complValue = currying(paramSymbols, calcFuncCompl(func))
+        complValue = MyLambda(tuple(paramSymbols), calcFuncCompl(func))
         constraintList.append(Constraint(complSymbol, complValue))
 
     return constraintList
@@ -74,11 +74,11 @@ def calcVarCompl(var: Var):
             constraintList.append(
                 Constraint(
                     funcCompl,
-                    currying(paramSymbols, makePlaceholderSymbol()),
+                    MyLambda(tuple(paramSymbols), Symbol("external")),
                 )
             )
 
-        return currying(lamParams, funcCompl(*lamParams))
+        return MyLambda(tuple(lamParams), funcCompl(*lamParams))
     else:
         return 1
 
@@ -96,18 +96,6 @@ def calcCaseCompl(case_: Case, curFunc: Func):
     caseAltsCompl = [calcExprCompl(alt, curFunc) for alt in case_.caseAlts]
     maxAltCompl = maxN(caseAltsCompl)
     return caseExprCompl + maxAltCompl
-
-
-def currying(lamParams: List[Symbol], lamExpr):
-    if len(lamParams) == 0:
-        return lamExpr
-    elif len(lamParams) == 1:
-        return Lambda(lamParams[0], lamExpr)
-    else:
-        result = Lambda(lamParams[-1], lamExpr)
-        for p in reversed(lamParams[:-1]):
-            result = Lambda(p, result)
-        return result
 
 
 def maxN(args: List[Any]):
