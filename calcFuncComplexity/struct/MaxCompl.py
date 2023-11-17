@@ -1,4 +1,5 @@
 from sympy import Function
+from sympy.core.numbers import Integer, IntegerConstant
 
 
 class MaxCompl(Function):
@@ -6,9 +7,9 @@ class MaxCompl(Function):
 
     @classmethod
     def eval(cls, m, n):
-        if m == 0:
+        if isInt(m):
             return n
-        if n == 0:
+        if isInt(n):
             return m
 
     def doit(self, deep=False, **hints):
@@ -16,4 +17,7 @@ class MaxCompl(Function):
         if deep:
             m, n = m.doit(deep=deep, **hints), n.doit(deep=deep, **hints)
 
-        pass
+
+
+def isInt(x):
+    return isinstance(x, (int, Integer, IntegerConstant))
