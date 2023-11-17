@@ -51,8 +51,8 @@ pass guts = do
   modguts <- bindsOnlyPass (mapM (runBind dflags statRef)) guts
   -- Output stat info
   stat <- liftIO $ readIORef statRef
-  liftIO $ writeFile statOutputFile $ showStatInfoJson stat
-  liftIO $ writeFile statBriefOutputFile $ showStatInfoBrief stat
+  liftIO $ writeFile statOutputFile $ showStatInfoJson $ init stat
+  liftIO $ writeFile statBriefOutputFile $ showStatInfoBrief $ init stat
   return modguts
 
 runBind :: DynFlags -> IORef Stat -> CoreBind -> CoreM CoreBind
