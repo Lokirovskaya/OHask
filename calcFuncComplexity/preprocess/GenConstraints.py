@@ -32,10 +32,17 @@ def genConstraintList(funcList: List[Func]) -> List[Constraint]:
             makeParamSymbol(func.funcName, i) for i in range(len(func.funcParams))
         ]
         complSymbol = makeComplSymbol(func.funcName)
-        complValue = MyLambda(tuple(paramSymbols), calcFuncCompl(func))
+        complValue = makeLambda(paramSymbols, calcFuncCompl(func))
         constraintList.append(Constraint(complSymbol, complValue))
 
     return constraintList
+
+
+def makeLambda(params, expr):
+    if len(params) > 0:
+        return MyLambda(tuple(params), expr)
+    else:
+        return expr
 
 
 def calcFuncCompl(func: Func):
@@ -74,11 +81,11 @@ def calcVarCompl(var: Var):
             constraintList.append(
                 Constraint(
                     funcCompl,
-                    MyLambda(tuple(paramSymbols), Symbol("external")),
+                    makeLambda(paramSymbols, Symbol("external")),
                 )
             )
 
-        return MyLambda(tuple(lamParams), funcCompl(*lamParams))
+        return makeLambda(lamParams, funcCompl(*lamParams))
     else:
         return 1
 
