@@ -24,4 +24,11 @@ escape :: String -> String
 escape "" = ""
 escape ('"' : s) = "\\\"" ++ escape s
 escape ('\\' : s) = "\\\\" ++ escape s
+escape ('\n' : s) = escape s
 escape (c : s) = c : escape s
+
+squeeze :: Char -> String -> String
+squeeze _ "" = ""
+squeeze c (x : s)
+  | c == x = squeeze c s
+  | otherwise = x : squeeze c s

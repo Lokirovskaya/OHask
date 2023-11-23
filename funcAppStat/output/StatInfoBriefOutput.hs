@@ -18,7 +18,7 @@ showStatFuncInfo sfunc =
 
 showStatExpr :: SExpr -> String
 showStatExpr (SVar name _ _ _) = name
-showStatExpr (SLit value _) = value
+showStatExpr (SLit value _) = value |> squeeze '\n'
 showStatExpr (SApp expr arg) =
   printf
     "%s(%s)"
