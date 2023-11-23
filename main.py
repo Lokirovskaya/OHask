@@ -31,6 +31,13 @@ if not hasOptArg:
     runComplCalc = True
 
 
+RED = "\x1b[31m"
+GREEN = "\x1b[32m"
+YELLOW = "\x1b[33m"
+BOLD = "\x1b[1m"
+END = "\x1b[0m"
+
+
 if runCabal:
     # Copy to run/Run.hs
     srcPath = sys.argv[1]
@@ -46,10 +53,20 @@ if runCabal:
     # Run cabal
     os.makedirs("stat", exist_ok=True)
 
-    sp.run(["cabal", "build"])
+    print(f"{BOLD}{YELLOW}=== Analysing Haskell File ==={END}")
+
+    r = sp.run(["cabal", "build"])
+
+    if r.returncode != 0:
+        print(f"{RED}Error Occurred ({r.returncode}){END}\n")
+        exit(-1)
+    else:
+        print(f"{GREEN}Success{END}\n")
 
 
 if runComplCalc:
+    print(f"{BOLD}{YELLOW}=== Solving Complexity ==={END}")
+
     # Read json
     try:
         import ujson as json
@@ -62,5 +79,7 @@ if runComplCalc:
 
     # calc func complexity
     from calcFuncComplexity.CalcFuncComplexity import calcCompl
-    
+
     calcCompl(funcListData)
+
+    print(f"{GREEN}Success{END}\n")

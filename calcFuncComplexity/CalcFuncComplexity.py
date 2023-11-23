@@ -12,7 +12,13 @@ def calcCompl(funcListData):
     newLog()
 
     funcList = [Func(funcData) for funcData in funcListData]
+
+    solveResult = runSolve(funcList)
+
+
+def runSolve(funcList):
     promoteStatLambdas(funcList)
+
     constraintList = genConstraintList(funcList)
     log("[Raw Constraints]")
     for con in constraintList:
@@ -37,6 +43,8 @@ def calcCompl(funcListData):
     log("\n[Solve Result]")
     for con in solveResult:
         log(con)
+
+    return solveResult
 
 
 logFile = "stat/calc_log.txt"

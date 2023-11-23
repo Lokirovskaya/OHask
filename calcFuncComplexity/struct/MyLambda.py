@@ -2,7 +2,7 @@ from sympy import Lambda
 from sympy.core.function import BadArgumentsError
 
 
-# Extention of sympy.Lambda which supports partial-application
+# Extention of sympy.Lambda in order to support partial-application
 
 
 class MyLambda(Lambda):
