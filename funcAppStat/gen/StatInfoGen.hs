@@ -102,4 +102,7 @@ simplifyStatExpr expr =
           changeAlts = map snd ss
           change = changeExpr || foldl' (||) False changeAlts
        in (SCase simplExpr simplAlts, change)
+    simpl (SLam params expr') =
+      let (simplExpr, changeExpr) = simpl expr'
+       in (SLam params simplExpr, changeExpr)
     simpl expr' = (expr', False)
