@@ -7,7 +7,7 @@ data VarNodeInfo = VarNodeInfo
     varType :: String,
     varUnique :: String,
     varKind :: VarKind,
-    varParams :: [String]
+    varArity :: Int
   }
 
 data LitNodeInfo = LitNodeInfo

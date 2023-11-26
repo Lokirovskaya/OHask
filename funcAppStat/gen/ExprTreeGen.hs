@@ -52,17 +52,16 @@ getVarInfo dflags var =
         | isTcTyVar var = TcTyVarKind
         | isTyVar var = TyVarKind
         | otherwise = panic "strange var kind"
-      params =
+      arity =
         getRuntimeArgTys (GHC.Plugins.varType var)
           |> filter (\(_, flag) -> case flag of VisArg -> True; _ -> False) -- Filter visible params
-          |> map fst -- throw away ArgFlag
-          |> map (showSDoc dflags . ppr) -- type to string
+          |> length -- count
    in VarNodeInfo
         { ExprTree.varName = name,
           ExprTree.varType = showSDoc dflags $ ppr $ GHC.Plugins.varType var,
           ExprTree.varUnique = name ++ "." ++ unique,
           varKind = kind,
-          varParams = params
+          varArity = arity
         }
 
 getLitStr :: DynFlags -> Literal -> LitNodeInfo

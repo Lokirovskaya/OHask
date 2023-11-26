@@ -15,7 +15,8 @@ data SFunc = SFunc
 data SParam = SParam
   { sparamName :: String,
     sparamType :: String,
-    sparamUnique :: String
+    sparamUnique :: String,
+    sparamArity :: Int
   }
 
 data SExpr
@@ -23,7 +24,7 @@ data SExpr
       { svarName :: String,
         svarType :: String,
         sVarUnique :: String,
-        svarParams :: [String]
+        svarArity :: Int
       }
   | SLit
       { slitValue :: String,

@@ -21,21 +21,22 @@ showStatFuncInfo sfunc =
     (sfunc |> sfuncExpr |> showStatExpr)
 
 showStatParam :: SParam -> String
-showStatParam (SParam name type' unique) =
+showStatParam (SParam name type' unique arity) =
   printf
-    "{\"paramName\":\"%s\",\"paramType\":\"%s\",\"paramUnique\":\"%s\"}"
+    "{\"paramName\":\"%s\",\"paramType\":\"%s\",\"paramUnique\":\"%s\",\"paramArity\":%d}"
     (name |> escape)
     (type' |> escape)
     (unique |> escape)
+    arity
 
 showStatExpr :: SExpr -> String
-showStatExpr (SVar name type' unique params) =
+showStatExpr (SVar name type' unique arity) =
   printf
-    "{\"exprKind\":\"Var\",\"varName\":\"%s\",\"varType\":\"%s\",\"varUnique\":\"%s\",\"varParams\":[%s]}"
+    "{\"exprKind\":\"Var\",\"varName\":\"%s\",\"varType\":\"%s\",\"varUnique\":\"%s\",\"varArity\":%d}"
     (name |> escape)
     (type' |> escape)
     (unique |> escape)
-    (params |> map (\s -> "\"" ++ s |> escape ++ "\"") |> concatWithComma)
+    arity
 showStatExpr (SLit value type') =
   printf
     "{\"exprKind\":\"Lit\",\"litValue\":\"%s\",\"litType\":\"%s\"}"
