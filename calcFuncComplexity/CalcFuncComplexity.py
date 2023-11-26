@@ -2,9 +2,10 @@ from .preprocess.Api import Func
 from .preprocess.PromoteStatLambdas import promoteStatLambdas
 from .preprocess.GenConstraints import genConstraintList
 
+from .simplify.Simplify import simplifyConstraints
+
 from .solve.BuildDepGraph import buildDepGraph
 from .solve.TopoSort import topoSortDepGraph
-from .solve.BuiltinConstraints import applyBuiltinConstraints
 from .solve.Solve import solve
 
 
@@ -19,28 +20,31 @@ def calcCompl(funcListData):
 def runSolve(funcList):
     promoteStatLambdas(funcList)
 
-    constraintList = genConstraintList(funcList)
     log("[Raw Constraints]")
+    constraintList = genConstraintList(funcList)
     for con in constraintList:
         log(con)
 
+    log("\n[Simplified Constraints]")
+    simplifyConstraints(constraintList)
+    for con in constraintList:
+        log(con)
+
+    log("\n[Complexity Dependency Info]")
     depNodeDict = buildDepGraph(constraintList)
-    log("\n[Symbol Dependency Info]")
     for _, node in depNodeDict.items():
         log(node)
 
-    (reductionSeq, recConstrList) = topoSortDepGraph(depNodeDict)
-    applyBuiltinConstraints(reductionSeq)
-    applyBuiltinConstraints(recConstrList)
     log("\n[Reduction Sequence]")
+    (reductionSeq, recConstrList) = topoSortDepGraph(depNodeDict)
     for con in reductionSeq:
         log(con.lhs)
     log("\n[Recursive Constraints]")
     for con in recConstrList:
         log(con.lhs)
 
-    solveResult = solve(reductionSeq, recConstrList)
     log("\n[Solve Result]")
+    solveResult = solve(reductionSeq, recConstrList)
     for con in solveResult:
         log(con)
 

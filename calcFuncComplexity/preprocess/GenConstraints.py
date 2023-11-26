@@ -36,6 +36,7 @@ def genConstraintList(funcList: List[Func]) -> List[Constraint]:
         ]
         complSymbol = makeComplSymbol(func.funcName)
         complValue = makeLambda(paramSymbols, calcFuncCompl(func))
+        # Replace param-var-symbols(v_x, f_x) with param-symbols(pi_x)
         constraintList.append(Constraint(complSymbol, complValue))
 
     return constraintList
@@ -71,7 +72,7 @@ def calcExprCompl(expr: Expr, curFunc: Func):
 
 def calcVarCompl(var: Var):
     # Complexity of var `f` is an lambda `λp1. ... λpn. T(p1,...,pn)`
-    paramCount = var.varParamCount
+    paramCount = var.varArity
     if paramCount > 0:
         name = var.varName
         lamParams = [makeLambdaParamSymbol() for _ in range(paramCount)]
@@ -103,9 +104,9 @@ def calcAppCompl(app: App, curFunc: Func):
 
 def getSymbolExpr(expr: Expr):
     if var := expr.matchVar():
-        if var.varParamCount > 0:
+        if var.varArity > 0:
             func = makeFuncSymbol(var.varName)
-            lamParams = [makeLambdaParamSymbol() for _ in range(var.varParamCount)]
+            lamParams = [makeLambdaParamSymbol() for _ in range(var.varArity)]
             return makeLambda(lamParams, func(*lamParams))
         else:
             return makeVarSymbol(var.varName)

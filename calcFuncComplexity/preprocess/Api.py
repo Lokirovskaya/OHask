@@ -61,6 +61,7 @@ class Param:
         self.paramName: str = data["paramUnique"]
         self.paramDisplayName: str = data["paramName"]
         self.paramType: str = data["paramType"]
+        self.paramArity: int = data["paramArity"]
 
 
 def makeExpr(data: Dict[str, Any]) -> Expr:
@@ -127,7 +128,7 @@ class Var(Expr):
         varName: Optional[str] = None,
         varDisplayName: Optional[str] = None,
         varType: Optional[str] = None,
-        varParamTypes: Optional[List[str]] = None,
+        varArity: Optional[int] = None,
     ):
         if varName != None:
             self.varName: str = varName
@@ -144,12 +145,10 @@ class Var(Expr):
         else:
             self.varType: str = data["varType"]
 
-        if varParamTypes != None:
-            self.varParamTypes: List[str] = varParamTypes
+        if varArity != None:
+            self.varArity: int = varArity
         else:
-            self.varParamTypes: List[str] = data["varParams"]
-
-        self.varParamCount: int = len(self.varParamTypes)
+            self.varArity: List[str] = data["varArity"]
 
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, Var):
