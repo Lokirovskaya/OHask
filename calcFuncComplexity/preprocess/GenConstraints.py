@@ -7,6 +7,9 @@ from .SymbolMaker import (
     makeLambdaParamSymbol,
     makeParamSymbol,
     makeVarSymbol,
+    makeFuncSymbol,
+    makeExternalSymbol,
+    makeLitSymbol,
 )
 from .Api import Func, Expr, Var, App, Case
 from sympy import Function, Symbol, symbols
@@ -81,7 +84,7 @@ def calcVarCompl(var: Var):
             constraintList.append(
                 Constraint(
                     funcCompl,
-                    makeLambda(paramSymbols, Symbol("external")),
+                    makeLambda(paramSymbols, makeExternalSymbol()),
                 )
             )
 
@@ -93,9 +96,31 @@ def calcVarCompl(var: Var):
 def calcAppCompl(app: App, curFunc: Func):
     appExprCompl = calcExprCompl(app.appExpr, curFunc)
     appArgCompl = calcExprCompl(app.appArg, curFunc)
-    # appArg = makeVarSymbol(app.appArg.varName)
-    appArg = symbols("var")
+    appArg = getSymbolExpr(app.appArg)
+    print(appArg)
     return 1 + appArgCompl + appExprCompl.rcall(appArg)
+
+
+def getSymbolExpr(expr: Expr):
+    if var := expr.matchVar():
+        if var.varParamCount > 0:
+            func = makeFuncSymbol(var.varName)
+            lamParams = [makeLambdaParamSymbol() for _ in range(var.varParamCount)]
+            return makeLambda(lamParams, func(*lamParams))
+        else:
+            return makeVarSymbol(var.varName)
+    elif lit := expr.matchLit():
+        return makeLitSymbol(lit.litValue, lit.litType)
+    elif app := expr.matchApp():
+        func = getSymbolExpr(app.appExpr)
+        arg = getSymbolExpr(app.appArg)
+        return func(arg)
+    elif case_ := expr.matchCase():
+        return 0  # todo
+    elif expr.matchLam():
+        assert False, "All lambdas should be promoted."
+    else:
+        assert False
 
 
 def calcCaseCompl(case_: Case, curFunc: Func):

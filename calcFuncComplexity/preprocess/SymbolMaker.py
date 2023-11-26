@@ -2,12 +2,6 @@ from sympy import Symbol, Function
 from typing import List
 from .ZEncode import zEncode
 
-# Symbol naming convention:
-# O_f: Complexity of function f
-# s_v: Scale of var v
-# p+idx_f: Scale of idx-th param of function f. idx starts from 0
-# lp+uuid: Lambda param, chosen fresh, i.e. with uuid
-
 
 def makeComplSymbol(funcName: str) -> Function:
     return Function("T_" + zEncode(funcName))
@@ -15,6 +9,10 @@ def makeComplSymbol(funcName: str) -> Function:
 
 def makeVarSymbol(varName: str) -> Symbol:
     return Symbol("v_" + zEncode(varName))
+
+
+def makeFuncSymbol(funcName: str) -> Function:
+    return Function("f_" + zEncode(funcName))
 
 
 def makeParamSymbol(funcName: str, idx: int) -> Symbol:
@@ -29,3 +27,11 @@ def makeLambdaParamSymbol() -> Symbol:
     s = Symbol("lp" + str(idx))
     idx += 1
     return s
+
+
+def makeExternalSymbol() -> Symbol:
+    return Symbol("external")
+
+
+def makeLitSymbol(litVal, litType):
+    return Symbol("lit")  # todo

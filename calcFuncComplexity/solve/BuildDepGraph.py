@@ -23,7 +23,7 @@ def buildDepGraph(constraintList: List[Constraint]) -> Dict[str, DepGraphNode]:
         funcOccurs = [
             node
             for node in preorder_traversal(rhs)
-            if isinstance(node, Function) and node.name != "MaxCompl"
+            if isinstance(node, Function) and node.name.startswith("T_")
         ]
         # lhs depends on every funcs
         for func in funcOccurs:
