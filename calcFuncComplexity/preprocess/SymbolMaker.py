@@ -1,4 +1,4 @@
-from sympy import Symbol, Function
+from sympy import Symbol, Function, Wild, WildFunction
 from typing import List
 from .ZEncode import zEncode
 
@@ -7,16 +7,22 @@ def makeComplSymbol(funcName: str) -> Function:
     return Function("T_" + zEncode(funcName))
 
 
-def makeVarSymbol(varName: str) -> Symbol:
-    return Symbol("v_" + zEncode(varName))
+def makeVarSymbol(varName: str, isFunc: bool = False) -> Symbol | Function:
+    if isFunc:
+        return Function("f_" + zEncode(varName))
+    else:
+        return Symbol("v_" + zEncode(varName))
 
 
-def makeFuncSymbol(funcName: str) -> Function:
-    return Function("f_" + zEncode(funcName))
+def makeParamSymbol(funcName: str, idx: int, isFunc: bool = False) -> Symbol | Function:
+    if isFunc:
+        return Function(f"p{idx}_f_{zEncode(funcName)}")
+    else:
+        return Symbol(f"p{idx}_v_{zEncode(funcName)}")
 
 
-def makeParamSymbol(funcName: str, idx: int) -> Symbol:
-    return Symbol(f"p{idx}_{zEncode(funcName)}")
+def makeExternalParamSymbol(funcName: str, idx: int) -> Symbol:
+    return Symbol(f"p{idx}_ext_{zEncode(funcName)}")
 
 
 idx = 0

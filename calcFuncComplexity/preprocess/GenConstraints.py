@@ -6,16 +6,18 @@ from .SymbolMaker import (
     makeComplSymbol,
     makeLambdaParamSymbol,
     makeParamSymbol,
+    makeExternalParamSymbol,
     makeVarSymbol,
-    makeFuncSymbol,
     makeExternalSymbol,
     makeLitSymbol,
 )
 from .Api import Func, Expr, Var, App, Case
-from sympy import Function, Symbol, symbols
 
 constraintList: List[Constraint]
 curConstrNames: Set[str]
+
+# Replace param-var-symbols(v_x or f_x) with param-symbols(pi_x)
+# varParamMap: Dict[str, ]
 
 
 # List of equations
@@ -31,14 +33,29 @@ def genConstraintList(funcList: List[Func]) -> List[Constraint]:
         curConstrNames.add(func.funcName)
 
     for func in funcList:
+        funcCompl = calcFuncCompl(func)
+
+        # Replace param-var-symbols(v_x or f_x) with param-symbols(pi_x)
         paramSymbols = [
-            makeParamSymbol(func.funcName, i) for i in range(len(func.funcParams))
+            makeVarSymbol(param.paramName, isFunc=(param.paramArity > 0))
+            for param in func.funcParams
         ]
-        complSymbol = makeComplSymbol(func.funcName)
-        complValue = makeLambda(paramSymbols, calcFuncCompl(func))
-        # Replace param-var-symbols(v_x, f_x) with param-symbols(pi_x)
+        indexedParamSymbol = [
+            makeParamSymbol(func.funcName, i, isFunc=(param.paramArity > 0))
+            for i, param in enumerate(func.funcParams)
+        ]
+        assert len(indexedParamSymbol) == len(paramSymbols)
+        for i in range(func.funcParamCount):
+            funcCompl = funcCompl.replace(paramSymbols[i], indexedParamSymbol[i])
+
+        # make constraint
+        # Constraint of a function looks like:
+        #   T_f = λp0. λp1. expr
+        complSymbol = makeComplSymbol(func.funcName)  # lhs
+        complValue = makeLambda(indexedParamSymbol, funcCompl)  # rhs
         constraintList.append(Constraint(complSymbol, complValue))
 
+    print("ok")
     return constraintList
 
 
@@ -81,7 +98,7 @@ def calcVarCompl(var: Var):
         # External function call
         if name not in curConstrNames:
             curConstrNames.add(name)
-            paramSymbols = [makeParamSymbol(name, i) for i in range(paramCount)]
+            paramSymbols = [makeExternalParamSymbol(name, i) for i in range(paramCount)]
             constraintList.append(
                 Constraint(
                     funcCompl,
@@ -98,14 +115,13 @@ def calcAppCompl(app: App, curFunc: Func):
     appExprCompl = calcExprCompl(app.appExpr, curFunc)
     appArgCompl = calcExprCompl(app.appArg, curFunc)
     appArg = getSymbolExpr(app.appArg)
-    print(appArg)
     return 1 + appArgCompl + appExprCompl.rcall(appArg)
 
 
 def getSymbolExpr(expr: Expr):
     if var := expr.matchVar():
         if var.varArity > 0:
-            func = makeFuncSymbol(var.varName)
+            func = makeVarSymbol(var.varName, isFunc=True)
             lamParams = [makeLambdaParamSymbol() for _ in range(var.varArity)]
             return makeLambda(lamParams, func(*lamParams))
         else:
@@ -133,7 +149,6 @@ def calcCaseCompl(case_: Case, curFunc: Func):
 
 def maxN(args: List[Any]):
     assert len(args) > 0
-    # max2 = MaxCompl("max")
     if len(args) == 1:
         return args[0]
     elif len(args) == 2:

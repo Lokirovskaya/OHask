@@ -52,9 +52,18 @@ class MyLambda(Lambda):
             expr = super().expr
             paramsComsumed = params[:argLen]
             paramsRemain = params[argLen:]
-            return MyLambda(paramsRemain, Lambda(paramsComsumed, expr)(*args))
+            return MyLambda(paramsRemain, MyLambda(paramsComsumed, expr)(*args))
 
         else:
             raise BadArgumentsError(
                 f"{self} takes {paramLen} argument(s) at most, but {argLen} given."
             )
+    
+    # Fix bug which raises exception when holding functional lambda params
+    def replace(self, query, value, **kwargs):
+        sig = list(self.signature)
+        for i in range(len(sig)):
+            if sig[i] == query:
+                sig[i] = value
+        sig = tuple(sig)
+        return MyLambda(sig, self.expr.replace(query, value, **kwargs))
