@@ -18,8 +18,8 @@ def squeezeConstTerms(constrList: List[Constraint]):
             return
 
         constTerms = findAllConstTerms(expr, params)
-        repDict = {t: 1 for t in constTerms}
-        constr.rhs = constr.rhs.xreplace(repDict)
+        for t in constTerms:
+            constr.substitute(t, 1)
 
 
 # Traversal on expr tree, find all T_f(args) where args fits (not isDependsOnParams(args))

@@ -62,19 +62,18 @@ def promote(lam: Lam) -> Tuple[Var, Func]:
     global idx
     uniqueName = ".lam" + str(idx)
     idx += 1
-    paramTypes = [param.paramType for param in lam.lamParams]
     var = Var(
         data={},
         varName=uniqueName,
         varDisplayName=uniqueName,
-        varType="",
-        varParamTypes=paramTypes,
+        varType="(lambda)",
+        varArity=lam.lamParamCount,
     )
     func = Func(
         data={},
         funcName=uniqueName,
         funcDisplayName=uniqueName,
-        funcType="",
+        funcType="(lambda)",
         funcParams=lam.lamParams,
         funcExpr=lam.lamExpr,
     )
