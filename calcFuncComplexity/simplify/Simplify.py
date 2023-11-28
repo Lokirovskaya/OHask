@@ -10,4 +10,4 @@ def simplifyConstraints(constrList: List[Constraint]):
     applyBuiltinConstraints(constrList)
     squeezeConstTerms(constrList)
     inlineConstFunctions(constrList)
-    removeUnusedConstraints(constrList)
+    # removeUnusedConstraints(constrList)
