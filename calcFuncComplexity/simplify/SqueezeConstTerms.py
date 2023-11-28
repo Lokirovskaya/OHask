@@ -8,7 +8,7 @@ from sympy.utilities.iterables import iterable
 
 
 # Complexity terms which are not depends on any function params are effectively constant.
-def removeConstTerms(constrList: List[Constraint]):
+def squeezeConstTerms(constrList: List[Constraint]):
     for constr in constrList:
         if isinstance(constr.rhs, MyLambda):
             params = list(constr.rhs.signature)
