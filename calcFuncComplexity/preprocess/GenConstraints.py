@@ -59,10 +59,7 @@ def genConstraintList(funcList: List[Func]) -> List[Constraint]:
 
 
 def makeLambda(params, expr):
-    if len(params) > 0:
-        return MyLambda(tuple(params), expr)
-    else:
-        return expr
+    return MyLambda(tuple(params), expr)
 
 
 def calcFuncCompl(func: Func):
