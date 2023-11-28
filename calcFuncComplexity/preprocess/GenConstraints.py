@@ -55,7 +55,6 @@ def genConstraintList(funcList: List[Func]) -> List[Constraint]:
         complValue = makeLambda(indexedParamSymbol, funcCompl)  # rhs
         constraintList.append(Constraint(complSymbol, complValue))
 
-    print("ok")
     return constraintList
 
 
