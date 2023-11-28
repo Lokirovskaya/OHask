@@ -14,7 +14,7 @@ def squeezeConstTerms(constrList: List[Constraint]):
             params = list(constr.rhs.signature)
             expr = constr.rhs.expr
         else:
-            constr.rhs = 1
+            assert False, f"Bad RHS type {type(constr.rhs)} in {constr.rhs}"
             return
 
         constTerms = findAllConstTerms(expr, params)

@@ -2,6 +2,7 @@ from typing import List
 from ..struct.Constraint import Constraint
 from ..struct.MyLambda import MyLambda
 from sympy.core.numbers import Integer, IntegerConstant
+from copy import deepcopy
 
 
 def inlineConstFunctions(constrList: List[Constraint]):
@@ -28,6 +29,13 @@ def inlineConstFunctions(constrList: List[Constraint]):
             newConstConstrs = []
         else:
             break
+
+    # Remove all const constraints from original constr-list
+    result = []
+    for constr in constrList:
+        if not isConst(constr.rhs):
+            result.append(constr)
+    constrList[:] = result
 
 
 def isConst(x):
