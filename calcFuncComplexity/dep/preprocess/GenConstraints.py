@@ -12,6 +12,7 @@ from .SymbolMaker import (
     makeLitSymbol,
 )
 from .Api import Func, Expr, Var, App, Case
+from ...Log import log
 
 constraintList: List[Constraint]
 curConstrNames: Set[str]
@@ -54,6 +55,11 @@ def genConstraintList(funcList: List[Func]) -> List[Constraint]:
         complSymbol = makeComplSymbol(func.funcName)  # lhs
         complValue = makeLambda(indexedParamSymbol, funcCompl)  # rhs
         constraintList.append(Constraint(complSymbol, complValue))
+        
+    log("[Raw Constraints]")
+    for con in constraintList:
+        log(con)
+    log()
 
     return constraintList
 
