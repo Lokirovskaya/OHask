@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Set
+from typing import Any, List, Set
 from ..struct.Constraint import Constraint
 from ..struct.MaxCompl import MaxCompl
 from ..struct.MyLambda import MyLambda

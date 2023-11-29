@@ -2,7 +2,6 @@ from typing import List
 from ..struct.Constraint import Constraint
 from ..struct.MyLambda import MyLambda
 from sympy.core.numbers import Integer, IntegerConstant
-from copy import deepcopy
 
 
 def inlineConstFunctions(constrList: List[Constraint]):

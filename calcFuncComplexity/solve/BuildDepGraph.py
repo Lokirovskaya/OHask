@@ -1,6 +1,6 @@
 from __future__ import annotations
 from sympy import Symbol, Function, preorder_traversal
-from typing import Any, List, Optional, Set, Dict
+from typing import List, Dict
 
 from ..struct.DepGraphNode import DepGraphNode
 from ..struct.Constraint import Constraint

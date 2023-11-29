@@ -1,6 +1,5 @@
 from sympy import Symbol
-from typing import List, Tuple, Dict
-from queue import SimpleQueue
+from typing import List
 
 from ..struct.Constraint import Constraint
 from ..struct.DepGraphNode import DepGraphNode

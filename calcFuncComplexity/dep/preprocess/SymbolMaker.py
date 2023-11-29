@@ -1,5 +1,4 @@
 from sympy import Symbol, Function, Wild, WildFunction
-from typing import List
 from .ZEncode import zEncode
 
 

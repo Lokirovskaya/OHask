@@ -1,6 +1,6 @@
 from __future__ import annotations
 from sympy import Function, Symbol, Expr
-from typing import Any, Optional
+from typing import Optional
 
 
 class Constraint:
@@ -14,7 +14,6 @@ class Constraint:
             return
         if hasattr(self.rhs, "replace"):
             self.rhs = self.rhs.replace(old, new)
-        pass
 
     def __str__(self) -> str:
         return f"{self.lhs} = {self.rhs}"
