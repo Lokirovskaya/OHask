@@ -1,7 +1,5 @@
 from typing import Any, List, Set
-from ..struct.Constraint import Constraint
-from ..struct.MaxCompl import MaxCompl
-from ..struct.MyLambda import MyLambda
+from ...struct import Constraint, MaxCompl, MyLambda
 from .SymbolMaker import (
     makeComplSymbol,
     makeLambdaParamSymbol,

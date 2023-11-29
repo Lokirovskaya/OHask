@@ -1,6 +1,5 @@
 from typing import List
-from ..struct.Constraint import Constraint
-from ..struct.MyLambda import MyLambda
+from ...struct import Constraint, MyLambda
 from sympy.core.numbers import Integer, IntegerConstant
 
 

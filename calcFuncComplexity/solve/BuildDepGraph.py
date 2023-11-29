@@ -2,8 +2,7 @@ from __future__ import annotations
 from sympy import Symbol, Function, preorder_traversal
 from typing import List, Dict
 
-from ..struct.DepGraphNode import DepGraphNode
-from ..struct.Constraint import Constraint
+from ...struct import DepGraphNode, Constraint
 
 
 def buildDepGraph(constraintList: List[Constraint]) -> Dict[str, DepGraphNode]:

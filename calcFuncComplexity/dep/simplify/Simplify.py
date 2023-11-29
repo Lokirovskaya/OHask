@@ -1,5 +1,5 @@
 from typing import List
-from ..struct.Constraint import Constraint
+from ...struct import Constraint
 from .ApplyBuiltinConstraints import applyBuiltinConstraints
 from .SqueezeConstTerms import squeezeConstTerms
 from .InlineConstFunctions import inlineConstFunctions

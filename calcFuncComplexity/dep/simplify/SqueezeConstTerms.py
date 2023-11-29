@@ -1,6 +1,5 @@
 from typing import List
-from ..struct.Constraint import Constraint
-from ..struct.MyLambda import MyLambda
+from ...struct import Constraint, MyLambda
 from sympy import Symbol, Function
 from sympy.core import postorder_traversal
 from sympy.core.function import UndefinedFunction

@@ -1,8 +1,7 @@
 from sympy import Symbol
 from typing import List
 
-from ..struct.Constraint import Constraint
-from ..struct.DepGraphNode import DepGraphNode
+from ...struct import Constraint, DepGraphNode
 
 
 def solve(

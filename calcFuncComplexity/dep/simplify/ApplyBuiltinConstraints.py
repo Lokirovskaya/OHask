@@ -1,5 +1,5 @@
 from typing import List
-from ..struct.Constraint import Constraint
+from ...struct import Constraint
 from ..preprocess.SymbolMaker import makeExternalSymbol
 from ..preprocess.ZEncode import zDecode
 
