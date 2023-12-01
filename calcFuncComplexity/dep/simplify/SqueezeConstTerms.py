@@ -23,13 +23,14 @@ def squeezeConstTerms(constrList: List[Constraint]):
 
 
 # Traversal on expr tree, find all T_f(args) where args fits (not isDependsOnParams(args))
-# Ensure there is no nesting T_f calls
 def findAllConstTerms(expr, params):
     result = set()
 
     def runExpr(expr, params):
         if isComplFunc(expr) and not isDependsOnParams(expr, params):
             result.add(expr)
+            # We ensure there is no nesting T_f calls
+            return
 
         if not iterable(expr.args):
             return
