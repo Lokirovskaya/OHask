@@ -40,3 +40,13 @@ def makeExternalSymbol() -> Symbol:
 
 def makeLitSymbol(litVal, litType):
     return Symbol("lit")  # todo
+
+
+def isComplFunc(s):
+    return isinstance(s, (UndefinedFunction, Function)) and s.name.startswith("T")
+
+
+def isParam(s):
+    return isinstance(s, (Symbol, UndefinedFunction, Function)) and s.name.startswith(
+        "p"
+    )

@@ -1,8 +1,8 @@
 from __future__ import annotations
 from sympy import Symbol, Function, preorder_traversal
 from typing import List, Dict
-
 from ...struct import DepGraphNode, Constraint
+from ..dep.preprocess.SymbolMaker import isComplFunc
 
 
 def buildDepGraph(constraintList: List[Constraint]) -> Dict[str, DepGraphNode]:
@@ -19,11 +19,7 @@ def buildDepGraph(constraintList: List[Constraint]) -> Dict[str, DepGraphNode]:
     for cons in constraintList:
         lhs = cons.lhs
         rhs = cons.rhs
-        funcOccurs = [
-            node
-            for node in preorder_traversal(rhs)
-            if isinstance(node, Function) and node.name.startswith("T_")
-        ]
+        funcOccurs = [node for node in preorder_traversal(rhs) if isComplFunc(node)]
         # lhs depends on every funcs
         for func in funcOccurs:
             depNodeDict[lhs.name].addDepSymNode(depNodeDict[func.name])

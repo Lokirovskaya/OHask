@@ -1,5 +1,6 @@
 from typing import List
 from ...struct import Constraint, MyLambda
+from ..preprocess.SymbolMaker import isComplFunc, isParam
 from sympy import Symbol, Function
 from sympy.core import postorder_traversal
 from sympy.core.function import UndefinedFunction
@@ -47,11 +48,3 @@ def isDependsOnParams(expr, params):
     return False
 
 
-def isComplFunc(s):
-    return isinstance(s, (UndefinedFunction, Function)) and s.name.startswith("T")
-
-
-def isParam(s):
-    return isinstance(s, (Symbol, UndefinedFunction, Function)) and s.name.startswith(
-        "p"
-    )
