@@ -1,4 +1,5 @@
-from sympy import Symbol, Function, Wild, WildFunction
+from sympy import Symbol, Function
+from sympy.core.function import UndefinedFunction
 from .ZEncode import zEncode
 
 
@@ -43,10 +44,18 @@ def makeLitSymbol(litVal, litType):
 
 
 def isComplFunc(s):
-    return isinstance(s, (UndefinedFunction, Function)) and s.name.startswith("T")
+    return isinstance(s, (UndefinedFunction, Function)) and s.name.startswith("T_")
 
 
 def isParam(s):
     return isinstance(s, (Symbol, UndefinedFunction, Function)) and s.name.startswith(
         "p"
     )
+
+
+def isVar(s):
+    return isinstance(s, Symbol) and s.name.startswith("v_")
+
+
+def isLit(s):
+    return isinstance(s, Symbol) and s.name == "lit"
