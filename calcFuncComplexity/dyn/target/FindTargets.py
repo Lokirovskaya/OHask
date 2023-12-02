@@ -1,17 +1,23 @@
 from typing import List
 from sympy.utilities.iterables import iterable
-from ...struct import Constraint
-from ...dep.preprocess.SymbolMaker import isComplFunc, isVar, isLit
+from ...struct import Constraint, MyLambda
+from ...dep.preprocess.SymbolMaker import isComplFunc, isVar, isLit, isParam
 from .Target import Target
+from ...Log import log
 
 
 def findTargets(constrList: List[Constraint]) -> List[Target]:
     result = []
-    
+
     for constr in constrList:
         unknownExprs = findUnknownExprs(constr.rhs)
         result += [Target(expr=expr, belongs=constr) for expr in unknownExprs]
-        
+
+    log("[Expressions For Dynamic Analysis]")
+    for target in result:
+        log(target)
+    log()
+
     return result
 
 
@@ -20,9 +26,14 @@ def findTargets(constrList: List[Constraint]) -> List[Target]:
 def findUnknownExprs(expr):
     result = set()
 
+    def isTrivial(s):
+        return isParam(s) or isVar(s) or isLit(s) or isinstance(s, MyLambda)
+
     def runExpr(expr):
-        if isComplFunc(expr) and not isVar(expr) and not isLit(expr):
-            result.update(expr.args)
+        if isComplFunc(expr):
+            for arg in expr.args:
+                if not isTrivial(arg):
+                    result.add(arg)
             return  # no nesting T_f func
 
         if not iterable(expr.args):
