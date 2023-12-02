@@ -1,6 +1,7 @@
 from sympy import Symbol, Function
 from sympy.core.function import UndefinedFunction
 from .ZEncode import zEncode
+from ...struct import Literal
 
 
 def makeComplSymbol(funcName: str) -> Function:
@@ -39,23 +40,23 @@ def makeExternalSymbol() -> Symbol:
     return Symbol("external")
 
 
-def makeLitSymbol(litVal, litType):
-    return Symbol("lit")  # todo
+def makeLitSymbol(litVal, litType) -> Literal:
+    return Literal(name=zEncode("lit_" + str(litVal)), litValue=litVal, litType=litType)
 
 
-def isComplFunc(s):
+def isComplFunc(s) -> bool:
     return isinstance(s, (UndefinedFunction, Function)) and s.name.startswith("T_")
 
 
-def isParam(s):
+def isParam(s) -> bool:
     return isinstance(s, (Symbol, UndefinedFunction, Function)) and s.name.startswith(
         "p"
     )
 
 
-def isVar(s):
+def isVar(s) -> bool:
     return isinstance(s, Symbol) and s.name.startswith("v_")
 
 
-def isLit(s):
-    return isinstance(s, Symbol) and s.name == "lit"
+def isLit(s) -> bool:
+    return isinstance(s, Literal)
