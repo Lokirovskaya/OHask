@@ -17,13 +17,13 @@ def makeVarSymbol(varName: str, isFunc: bool = False) -> Symbol | Function:
 
 def makeParamSymbol(funcName: str, idx: int, isFunc: bool = False) -> Symbol | Function:
     if isFunc:
-        return Function(f"p{idx}_f_{zEncode(funcName)}")
+        return Function(f"p{idx}f_{zEncode(funcName)}")
     else:
-        return Symbol(f"p{idx}_v_{zEncode(funcName)}")
+        return Symbol(f"p{idx}v_{zEncode(funcName)}")
 
 
 def makeExternalParamSymbol(funcName: str, idx: int) -> Symbol:
-    return Symbol(f"p{idx}_ext_{zEncode(funcName)}")
+    return Symbol(f"p{idx}ext_{zEncode(funcName)}")
 
 
 idx = 0
