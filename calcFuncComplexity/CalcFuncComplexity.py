@@ -1,4 +1,4 @@
-from .Log import newLog
+from calcFuncComplexity.util.log import newLog
 from .dep.GetDependencyInfo import getDependencyInfo
 from .dyn.DynamicAnalysis import runDynamicAnalysis
 

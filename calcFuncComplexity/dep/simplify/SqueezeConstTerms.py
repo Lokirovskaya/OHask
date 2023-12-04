@@ -1,6 +1,6 @@
 from typing import List
-from ...struct import Constraint, MyLambda
-from ..preprocess.SymbolMaker import isComplFunc, isParam
+from calcFuncComplexity.struct import Constraint, MyLambda
+from calcFuncComplexity.util.symbol import isComplFunc, isParam
 from sympy import Symbol, Function
 from sympy.core import postorder_traversal
 from sympy.core.function import UndefinedFunction

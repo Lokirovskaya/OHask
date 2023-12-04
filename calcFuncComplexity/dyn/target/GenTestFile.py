@@ -1,8 +1,7 @@
 from typing import List
 from .Target import Target
 import datetime
-from ...dep.preprocess.ZEncode import zDecode
-from ...dep.preprocess.SymbolMaker import isLit
+from calcFuncComplexity.util.symbol import isLit, isParam, decodeTail, decodeParam
 from sympy.utilities.iterables import iterable
 
 
@@ -28,7 +27,7 @@ def genTargetHaskell(target) -> str:
     def runExpr(expr, noParen=False):
         def inner(expr):
             nonlocal result
-            name = getRealName(expr.name)
+            name = getRealName(expr)
 
             if name in ignoreFuncs:
                 runExpr(expr.args[0], noParen=True)
@@ -36,6 +35,11 @@ def genTargetHaskell(target) -> str:
 
             elif isLit(expr):
                 result += expr.litValue.rstrip("#")
+
+            elif isParam(expr):
+                funcName, idx, isFunc = decodeParam(expr)
+                funcRealName = funcName.split('.')[0]
+                result += f"__p{idx}_{funcRealName}"
 
             else:
                 # Surround the var name by `()` to satisfy infix functions
@@ -57,8 +61,7 @@ def genTargetHaskell(target) -> str:
     return result
 
 
-def getRealName(s: str) -> str:
-    tail = s.split("_")[-1]
-    decName = zDecode(tail)
-    realName = decName.split(".")[0]
+def getRealName(s) -> str:
+    tail = decodeTail(s)
+    realName = tail.split(".")[0]
     return realName

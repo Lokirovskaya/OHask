@@ -1,9 +1,9 @@
 from typing import List
-from ...struct import Constraint
+from calcFuncComplexity.struct import Constraint
 from .ApplyBuiltinConstraints import applyBuiltinConstraints
 from .SqueezeConstTerms import squeezeConstTerms
 from .InlineConstFunctions import inlineConstFunctions
-from ...Log import log
+from calcFuncComplexity.util.log import log
 
 
 def simplifyConstraints(constrList: List[Constraint]):

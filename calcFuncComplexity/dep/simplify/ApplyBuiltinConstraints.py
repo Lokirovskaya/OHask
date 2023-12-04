@@ -1,34 +1,30 @@
 from typing import List
-from ...struct import Constraint
-from ..preprocess.SymbolMaker import makeExternalSymbol
-from ..preprocess.ZEncode import zDecode
+from calcFuncComplexity.struct import Constraint
+from calcFuncComplexity.util.symbol import makeExternalPlaceholder, decodeComplFunc
 
 
-extSym = makeExternalSymbol()
+extSym = makeExternalPlaceholder()
 
 
 def applyBuiltinConstraints(constrList: List[Constraint]):
     result = []
-    
+
     for constr in constrList:
         if constr.rhs.expr == extSym:
-            realName = getRealName(constr.lhs.name)
+            realName = getRealName(constr.lhs)
             if compl := findBuiltin(realName):
                 constr.substitute(extSym, compl)
             # Not a built-in function, remove from constraints
             else:
                 continue
         result.append(constr)
-    
+
     constrList[:] = result
-            
 
 
 def getRealName(s):
-    assert s.startswith("T_")
-    encName = s[2:]
-    decName = zDecode(encName)
-    realName = decName.split(".")[0]
+    funcName = decodeComplFunc(s)
+    realName = funcName.split(".")[0]
     return realName
 
 

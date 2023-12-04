@@ -1,9 +1,9 @@
 from typing import List
 from sympy.utilities.iterables import iterable
-from ...struct import Constraint, MyLambda
-from ...dep.preprocess.SymbolMaker import isComplFunc, isVar, isLit, isParam
+from calcFuncComplexity.struct import Constraint, MyLambda
+from calcFuncComplexity.util.symbol import isComplFunc, isVar, isLit, isParam
+from calcFuncComplexity.util.log import log
 from .Target import Target
-from ...Log import log
 
 
 def findTargets(constrList: List[Constraint]) -> List[Target]:
