@@ -18,43 +18,42 @@ def genTestFile(targetList: List[Target], filePath: str):
             f.write(genTargetHaskell(target) + "\n\n")
 
 
-literalFuncs = ["I#", "C#", "IS", "fromInteger"]
+ignoreFuncs = ["I#", "C#", "IS", "fromInteger"]
 
 
 def genTargetHaskell(target) -> str:
     result = f"-- {target}\n"
-    result += f"expr{target.id} = "
-    first = True
+    result += f"__expr{target.id} = "
 
-    def runExpr(expr):
+    def runExpr(expr, noParen=False):
         def inner(expr):
             nonlocal result
             name = getRealName(expr.name)
 
-            if name in literalFuncs:
-                lit = expr.args[0]
-                assert isLit(lit), f"Expr {lit} is not a Literal"
-                result += lit.litValue.rstrip("#")
+            if name in ignoreFuncs:
+                runExpr(expr.args[0], noParen=True)
                 return
 
-            # Surround the var name by `()` to satisfy infix functions
-            result += "(" + name + ")"
+            elif isLit(expr):
+                result += expr.litValue.rstrip("#")
+
+            else:
+                # Surround the var name by `()` to satisfy infix functions
+                result += "(" + name + ")"
 
             if iterable(expr.args):
                 for arg in expr.args:
                     runExpr(arg)
 
         nonlocal result
-        nonlocal first
-        if first:
-            first = False
+        if noParen:
             inner(expr)
         else:
             result += "("
             inner(expr)
             result += ")"
 
-    runExpr(target.expr)
+    runExpr(target.expr, noParen=True)
     return result
 
 
