@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional
 
 from sympy import O
 
-# Structure of stat info, for detail, see ./funcAppStat/gen/StatInfo.hs
+# Structure of stat info, for detail, see ./funcInfoStat/gen/StatInfo.hs
 
 
 class Func:

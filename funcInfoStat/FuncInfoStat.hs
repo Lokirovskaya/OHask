@@ -2,7 +2,7 @@
 
 {-# HLINT ignore "Use lambda-case" #-}
 {-# HLINT ignore "Use uncurry" #-}
-module FuncAppStat (plugin) where
+module FuncInfoStat (plugin) where
 
 import Data.IORef (IORef, modifyIORef', newIORef, readIORef)
 import ExprTree
@@ -20,15 +20,9 @@ plugin =
 
 install :: [CommandLineOption] -> [CoreToDo] -> CoreM [CoreToDo]
 install _ todos = do
-  let myPass = CoreDoPluginPass "Function Application Stat" pass
+  let myPass = CoreDoPluginPass "Function Information Stat" pass
   -- return $ [CoreDoPrintCore, myPass] ++ todos
   return $ myPass : todos
-
--- insertAfterIf :: (a -> Bool) -> a -> [a] -> [a]
--- insertAfterIf _ _ [] = []
--- insertAfterIf predict e (x : xs)
---   | predict x = x : e : xs
---   | otherwise = x : insertAfterIf predict e xs
 
 treeOutputFile :: String
 treeOutputFile = "stat/tree.txt"

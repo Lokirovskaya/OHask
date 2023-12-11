@@ -12,15 +12,13 @@ cradle:
       config:
         cradle:
           cabal:
-            - path: "./funcAppStat/util"
+            - path: "./funcInfoStat/util"
               component: "lib:Util"
-            - path: "./funcAppStat/gen"
+            - path: "./funcInfoStat/gen"
               component: "lib:Gen"
-            - path: "./funcAppStat/output"
+            - path: "./funcInfoStat/output"
               component: "lib:Output"
-            - path: "./funcAppStat"
-              component: "lib:FuncAppStat"
-            - path: "./run"
-              component: "exe:Stat"
-            - path: "./dynAnalysis"
-              component: "exe:DynAnalysis"
+            - path: "./funcInfoStat"
+              component: "lib:FuncInfoStat"
+            - path: "./dynExec"
+              component: "exe:DynExec"

@@ -23,7 +23,7 @@ library Util
     exposed-modules:  
         Util
     build-depends:    base ^>=4.17.2.0
-    hs-source-dirs:   funcAppStat/util
+    hs-source-dirs:   funcInfoStat/util
 
 
 library Gen
@@ -35,7 +35,7 @@ library Gen
         StatInfo,
         StatInfoGen
     build-depends:    Util, base ^>=4.17.2.0, ghc
-    hs-source-dirs:   funcAppStat/gen
+    hs-source-dirs:   funcInfoStat/gen
 
 
 library Output
@@ -45,23 +45,23 @@ library Output
         StatInfoBriefOutput,
         StatInfoJsonOutput
     build-depends:    Util, Gen, base ^>=4.17.2.0
-    hs-source-dirs:   funcAppStat/output
+    hs-source-dirs:   funcInfoStat/output
 
 
-library FuncAppStat
+library FuncInfoStat
     import:           common-options
     exposed-modules:  
-        FuncAppStat
+        FuncInfoStat
     build-depends:    Gen, Output, base ^>=4.17.2.0, ghc
-    hs-source-dirs:   funcAppStat
+    hs-source-dirs:   funcInfoStat
 
 
 executable Stat
     import:           common-options
     main-is:          Run.hs
-    build-depends:    FuncAppStat, base ^>=4.17.2.0
+    build-depends:    FuncInfoStat, base ^>=4.17.2.0
     ghc-options:      -O0 
-                      -fplugin=FuncAppStat
+                      -fplugin=FuncInfoStat
                       -w
     hs-source-dirs:   run
 
@@ -69,9 +69,9 @@ executable Stat
 
 -- Dynamic Analysis --
 
-executable DynAnalysis
+executable DynExec
     import:           common-options
     main-is:          Main.hs
     build-depends:    base ^>=4.17.2.0
     ghc-options:      -O1
-    hs-source-dirs:   dynAnalysis
+    hs-source-dirs:   dynExec
