@@ -16,6 +16,8 @@ common common-options
     default-language: Haskell2010
 
 
+-- Function Application Statistic Plugin --
+
 library Util
     import:           common-options
     exposed-modules:  
@@ -54,7 +56,7 @@ library FuncAppStat
     hs-source-dirs:   funcAppStat
 
 
-executable Run
+executable Stat
     import:           common-options
     main-is:          Run.hs
     build-depends:    FuncAppStat, base ^>=4.17.2.0
@@ -62,3 +64,14 @@ executable Run
                       -fplugin=FuncAppStat
                       -w
     hs-source-dirs:   run
+
+
+
+-- Dynamic Analysis --
+
+executable DynAnalysis
+    import:           common-options
+    main-is:          Main.hs
+    build-depends:    base ^>=4.17.2.0
+    ghc-options:      -O1
+    hs-source-dirs:   dynAnalysis

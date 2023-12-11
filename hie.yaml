@@ -1,0 +1,26 @@
+cradle:
+  multi:
+    - path: "./run"
+      config:
+        cradle:
+          none:
+    - path: "./test"
+      config:
+        cradle:
+          none:
+    - path: "./"
+      config:
+        cradle:
+          cabal:
+            - path: "./funcAppStat/util"
+              component: "lib:Util"
+            - path: "./funcAppStat/gen"
+              component: "lib:Gen"
+            - path: "./funcAppStat/output"
+              component: "lib:Output"
+            - path: "./funcAppStat"
+              component: "lib:FuncAppStat"
+            - path: "./run"
+              component: "exe:Stat"
+            - path: "./dynAnalysis"
+              component: "exe:DynAnalysis"

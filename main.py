@@ -55,7 +55,7 @@ if runCabal:
 
     print(f"{BOLD}{YELLOW}=== Analysing Haskell File ==={END}")
 
-    r = sp.run(["cabal", "build"])
+    r = sp.run(["cabal", "build", "Stat"])
 
     if r.returncode != 0:
         print(f"{RED}Error Occurred ({r.returncode}){END}\n")
