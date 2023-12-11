@@ -22,7 +22,8 @@ library Util
     import:           common-options
     exposed-modules:  
         Util
-    build-depends:    base ^>=4.17.2.0
+    build-depends:    
+        base ^>=4.17.2.0
     hs-source-dirs:   funcInfoStat/util
 
 
@@ -34,7 +35,10 @@ library Gen
         FindSubFuncs,
         StatInfo,
         StatInfoGen
-    build-depends:    Util, base ^>=4.17.2.0, ghc
+    build-depends:    
+        Util,
+        base ^>=4.17.2.0,
+        ghc ^>=9.4.7
     hs-source-dirs:   funcInfoStat/gen
 
 
@@ -44,7 +48,10 @@ library Output
         ExprTreeOutput,
         StatInfoBriefOutput,
         StatInfoJsonOutput
-    build-depends:    Util, Gen, base ^>=4.17.2.0
+    build-depends:    
+        Util,
+        Gen,
+        base ^>=4.17.2.0
     hs-source-dirs:   funcInfoStat/output
 
 
@@ -52,17 +59,24 @@ library FuncInfoStat
     import:           common-options
     exposed-modules:  
         FuncInfoStat
-    build-depends:    Gen, Output, base ^>=4.17.2.0, ghc
+    build-depends:    
+        Gen, 
+        Output, 
+        base ^>=4.17.2.0, 
+        ghc ^>=9.4.7
     hs-source-dirs:   funcInfoStat
 
 
 executable Stat
     import:           common-options
     main-is:          Run.hs
-    build-depends:    FuncInfoStat, base ^>=4.17.2.0
-    ghc-options:      -O0 
-                      -fplugin=FuncInfoStat
-                      -w
+    build-depends:    
+        FuncInfoStat,
+        base ^>=4.17.2.0
+    ghc-options:      
+        -O0 
+        -w
+        -fplugin=FuncInfoStat
     hs-source-dirs:   run
 
 
@@ -72,6 +86,9 @@ executable Stat
 executable DynExec
     import:           common-options
     main-is:          Main.hs
-    build-depends:    base ^>=4.17.2.0
-    ghc-options:      -O1
+    build-depends:    
+        base ^>=4.17.2.0,
+        QuickCheck ^>=2.14.3
+    ghc-options:      
+        -O1
     hs-source-dirs:   dynExec
