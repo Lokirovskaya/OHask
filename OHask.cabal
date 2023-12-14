@@ -67,6 +67,16 @@ library FuncInfoStat
     hs-source-dirs:   funcInfoStat
 
 
+library FindImports
+    import:           common-options
+    exposed-modules:  
+        FindImports
+    build-depends:    
+        base ^>=4.17.2.0, 
+        ghc ^>=9.4.7
+    hs-source-dirs:   findImports
+
+
 executable Stat
     import:           common-options
     main-is:          Run.hs
@@ -82,6 +92,17 @@ executable Stat
 
 
 -- Dynamic Analysis --
+
+library DynExprs
+    import:           common-options
+    exposed-modules:  
+        DynExprs
+    other-modules:
+        Run
+    build-depends:    
+        base ^>=4.17.2.0
+    hs-source-dirs:   run
+
 
 executable DynExec
     import:           common-options
