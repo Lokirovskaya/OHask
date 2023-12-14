@@ -82,10 +82,12 @@ executable Stat
     main-is:          Run.hs
     build-depends:    
         FuncInfoStat,
+        FindImports,
         base ^>=4.17.2.0
     ghc-options:      
         -O0 
         -w
+        -fplugin=FindImports
         -fplugin=FuncInfoStat
     hs-source-dirs:   run
 
@@ -100,7 +102,8 @@ library DynExprs
     other-modules:
         Run
     build-depends:    
-        base ^>=4.17.2.0
+        base ^>=4.17.2.0,
+        ghc-prim ^>=0.9.1
     hs-source-dirs:   run
 
 

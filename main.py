@@ -50,11 +50,20 @@ if runCabal:
         curDatetime = str(datetime.datetime.now())
         f.write("-- " + curDatetime + "\n" + srcContent)
 
-    # Run cabal
+    # Clear essential files
+    def createEmpty(path):
+        with open(path, "w"):
+            pass
+
     os.makedirs("stat", exist_ok=True)
+    createEmpty("stat/calc_log.txt")
+    createEmpty("stat/imports.txt")
+    createEmpty("stat/stat_brief.txt")
+    createEmpty("stat/stat.json")
+    createEmpty("stat/tree.txt")
 
+    # Run cabal
     print(f"{BOLD}{YELLOW}=== Analysing Haskell File ==={END}")
-
     r = sp.run(["cabal", "build", "Stat"])
 
     if r.returncode != 0:

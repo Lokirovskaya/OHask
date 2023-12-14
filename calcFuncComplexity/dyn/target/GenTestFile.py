@@ -12,11 +12,26 @@ def genTestFile(targetList: List[Target], filePath: str):
         f.write(f"-- {curDatetime}\n")
         f.write("{-# OPTIONS_GHC -w #-}\n")
         f.write("{-# HLINT ignore #-}\n")
+        f.write("module DynExprs where\n")
+
+        imports = loadImports()
+        for s in imports:
+            f.write(f"import {s}")
+
         f.write("\n")
 
         for target in targetList:
             fillInputVarList(target)
             f.write(genTargetHaskell(target) + "\n\n")
+
+
+def loadImports() -> List[str]:
+    with open("stat/imports.txt", "r") as f:
+        imports = f.readlines()
+        imports = set(imports)
+        imports = filter(lambda s: len(s) > 0, imports)
+        imports = list(imports)
+    return imports
 
 
 def fillInputVarList(target):

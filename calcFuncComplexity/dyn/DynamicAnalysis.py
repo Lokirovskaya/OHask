@@ -6,4 +6,4 @@ from .target.GenTestFile import genTestFile
 
 def runDynamicAnalysis(constrList: List[Constraint]):
     targets = findTargets(constrList)
-    genTestFile(targets, "run/Dyn.hs")
+    genTestFile(targets, "run/DynExprs.hs")
