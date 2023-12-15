@@ -142,9 +142,14 @@ def getSymbolExpr(expr: Expr):
 
 def calcCaseCompl(case_: Case, curFunc: Func):
     caseExprCompl = calcExprCompl(case_.caseExpr, curFunc)
-    caseAltsCompl = [calcExprCompl(alt, curFunc) for alt in case_.caseAlts]
-    maxAltCompl = maxN(caseAltsCompl)
-    return caseExprCompl + maxAltCompl
+    # Most of the case-exprs have at least 1 case-alt, 
+    # but some GHC-inserted exception handling exprs may not.
+    if case_.caseAltCount > 0:
+        caseAltsCompl = [calcExprCompl(alt, curFunc) for alt in case_.caseAlts]
+        maxAltCompl = maxN(caseAltsCompl)
+        return caseExprCompl + maxAltCompl
+    else:
+        return caseExprCompl
 
 
 def maxN(args: List[Any]):
