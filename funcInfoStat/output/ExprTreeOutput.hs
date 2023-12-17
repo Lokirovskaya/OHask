@@ -67,6 +67,9 @@ showExprRec expr layer
     innerLayerStr =
       case expr of
         VarNode var -> showVar var
+        BindVarNode var -> showVar var
+        LamVarNode var -> showVar var
+        OtherNode -> ""
         LitNode lit -> showLit lit
         _ -> foldl' (++) "" $ map oneChildStr (getChildren expr)
       where
