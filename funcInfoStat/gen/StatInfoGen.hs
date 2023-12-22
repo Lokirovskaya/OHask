@@ -6,6 +6,7 @@ module StatInfoGen where
 import Data.Foldable (Foldable (foldl'))
 import ExprTree
 import FindSubFuncs
+import qualified GHC.Plugins as GHC
 import StatInfo
 import Util
 
@@ -28,13 +29,13 @@ genOneStatFunc func =
       sfuncParams = map genStatParam $ func |> subFuncParams
     }
 
-genStatParam :: VarNodeInfo -> SParam
+genStatParam :: VarNodeInfo -> SVar
 genStatParam param =
-  SParam
-    { sparamName = param |> varName,
-      sparamType = param |> varType,
-      sparamUnique = param |> varUnique,
-      sparamArity = param |> varArity
+  SVar
+    { svarName = param |> varName,
+      svarType = param |> varType,
+      svarUnique = param |> varUnique,
+      svarArity = param |> varArity
     }
 
 isTyConFunc :: String -> Bool
@@ -46,12 +47,7 @@ genStatExpr (VarNode var)
   | isTyConFunc $ var |> varName =
       SNothing
   | otherwise =
-      SVar
-        { svarName = var |> varName,
-          svarType = var |> varType,
-          sVarUnique = var |> varUnique,
-          svarArity = var |> varArity
-        }
+      SVarExpr $ genStatVarFromInfo var
 genStatExpr (LitNode lit) =
   SLit
     { slitValue = lit |> litValue,
@@ -62,22 +58,42 @@ genStatExpr (AppNode (AppExprNode appExpr) (AppArgNode arg)) =
     { sappExpr = genStatExpr appExpr,
       sappArg = genStatExpr arg -- Could be SNothing
     }
+-- ignore CaseVarNode
 genStatExpr (CaseNode (CaseExprNode caseExpr) _ (CaseAltsNode caseAlts)) =
   SCase
     { scaseExpr = genStatExpr caseExpr,
-      scaseAlts = map genStatExpr caseAlts
+      scaseAlts = map genStatAlt caseAlts
     }
 genStatExpr lamNode@(LamNode _ _) =
   SLam
     { slamParams = map genStatParam $ getParamList lamNode,
       slamExpr = genStatExpr $ stripParams lamNode
     }
-genStatExpr (AltNode _ _ expr) =
-  genStatExpr expr
 genStatExpr (LetNode _ (LetExprNode expr)) =
   genStatExpr expr
 genStatExpr _ =
   SNothing
+
+genStatVarFromInfo :: VarNodeInfo -> SVar
+genStatVarFromInfo var =
+  SVar
+    { svarName = var |> varName,
+      svarType = var |> varType,
+      svarUnique = var |> varUnique,
+      svarArity = var |> varArity
+    }
+
+genStatAlt :: ExprNode -> SAlt
+genStatAlt (AltNode (AltConNode con) (AltVarsNode vars) (AltExprNode expr)) =
+  let castToVar :: ExprNode -> VarNodeInfo
+      castToVar (VarNode var) = var
+      castToVar _ = GHC.panic "Bad Var"
+   in SAlt
+        { saltCon = con,
+          saltVars = map (genStatVarFromInfo . castToVar) vars,
+          saltExpr = genStatExpr expr
+        }
+genStatAlt _ = GHC.panic "Bad Alt"
 
 -- Simplify until no change occurs
 simplifyStatExpr :: SExpr -> SExpr
@@ -98,9 +114,19 @@ simplifyStatExpr expr =
        in (SApp simplExpr simplArg, change)
     simpl (SCase expr' alts) =
       let (simplExpr, changeExpr) = simpl expr'
-          ss = map simpl alts
-          simplAlts = map fst ss
-          changeAlts = map snd ss
+          simplAlt :: SAlt -> (SAlt, Bool)
+          simplAlt alt =
+            let (simplAltExpr, changeAltExpr) = simpl (saltExpr alt)
+             in ( SAlt
+                    { saltCon = saltCon alt,
+                      saltVars = saltVars alt,
+                      saltExpr = simplAltExpr
+                    },
+                  changeAltExpr
+                )
+          simplAltsResult = map simplAlt alts
+          simplAlts = map fst simplAltsResult
+          changeAlts = map snd simplAltsResult
           change = changeExpr || foldl' (||) False changeAlts
        in (SCase simplExpr simplAlts, change)
     simpl (SLam params expr') =

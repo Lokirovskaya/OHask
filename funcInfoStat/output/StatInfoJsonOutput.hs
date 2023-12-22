@@ -20,8 +20,8 @@ showStatFuncInfo sfunc =
     (sfunc |> sfuncParams |> map showStatParam |> concatWithComma)
     (sfunc |> sfuncExpr |> showStatExpr)
 
-showStatParam :: SParam -> String
-showStatParam (SParam name type' unique arity) =
+showStatParam :: SVar -> String
+showStatParam (SVar name type' unique arity) =
   printf
     "{\"paramName\":\"%s\",\"paramType\":\"%s\",\"paramUnique\":\"%s\",\"paramArity\":%d}"
     (name |> escape)
@@ -30,7 +30,7 @@ showStatParam (SParam name type' unique arity) =
     arity
 
 showStatExpr :: SExpr -> String
-showStatExpr (SVar name type' unique arity) =
+showStatExpr (SVarExpr (SVar name type' unique arity)) =
   printf
     "{\"exprKind\":\"Var\",\"varName\":\"%s\",\"varType\":\"%s\",\"varUnique\":\"%s\",\"varArity\":%d}"
     (name |> escape)
@@ -51,7 +51,8 @@ showStatExpr (SCase expr alts) =
   printf
     "{\"exprKind\":\"Case\",\"caseExpr\":%s,\"caseAlts\":[%s]}"
     (showStatExpr expr)
-    (map showStatExpr alts |> concatWithComma)
+    -- (map showStatExpr alts |> concatWithComma)
+    ""
 showStatExpr (SLam params expr) =
   printf
     "{\"exprKind\":\"Lam\",\"lamParams\":[%s],\"lamExpr\":%s}"

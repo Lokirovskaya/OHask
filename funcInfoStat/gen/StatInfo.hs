@@ -9,23 +9,24 @@ data SFunc = SFunc
     sfuncType :: String,
     sfuncUnique :: String,
     sfuncExpr :: SExpr,
-    sfuncParams :: [SParam]
+    sfuncParams :: [SVar]
   }
 
-data SParam = SParam
-  { sparamName :: String,
-    sparamType :: String,
-    sparamUnique :: String,
-    sparamArity :: Int
+data SVar = SVar
+  { svarName :: String,
+    svarType :: String,
+    svarUnique :: String,
+    svarArity :: Int
+  }
+
+data SAlt = SAlt
+  { saltCon :: String,
+    saltVars :: [SVar],
+    saltExpr :: SExpr
   }
 
 data SExpr
-  = SVar
-      { svarName :: String,
-        svarType :: String,
-        sVarUnique :: String,
-        svarArity :: Int
-      }
+  = SVarExpr SVar
   | SLit
       { slitValue :: String,
         slitType :: String
@@ -36,11 +37,10 @@ data SExpr
       }
   | SCase
       { scaseExpr :: SExpr,
-        scaseAlts :: [SExpr]
+        scaseAlts :: [SAlt]
       }
   | SLam
-      { 
-        slamParams :: [SParam],
+      { slamParams :: [SVar],
         slamExpr :: SExpr
       }
   | SNothing
