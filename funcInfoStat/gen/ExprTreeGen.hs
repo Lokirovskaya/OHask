@@ -16,8 +16,8 @@ getExprNode dflags expr =
     -- App (Expr b) (Arg b)
     App expr' arg ->
       AppNode
-        (AppArgNode $ getExprNode dflags arg)
         (AppExprNode $ getExprNode dflags expr')
+        (AppArgNode $ getExprNode dflags arg)
     -- Lam b (Expr b)
     Lam var expr' ->
       LamNode
@@ -26,12 +26,13 @@ getExprNode dflags expr =
     -- Let (Bind b) (Expr b)
     Let bind expr' ->
       LetNode
-        (LetExprNode $ getExprNode dflags expr')
         (LetBindNode $ getBindNode dflags bind)
-    -- Case (Expr b) _b _Type [Alt b]
-    Case expr' _ _ alts ->
+        (LetExprNode $ getExprNode dflags expr')
+    -- Case (Expr b) b _Type [Alt b]
+    Case expr' var _ alts ->
       CaseNode
         (CaseExprNode $ getExprNode dflags expr')
+        (CaseVarNode $ getVarInfo dflags var)
         (CaseAltsNode $ getAltsNode dflags alts)
     -- Cast (Expr b) _CoercionR
     Cast expr' _ ->
@@ -90,8 +91,13 @@ getBindNode dflags (Rec bindList) =
       )
       bindList
 
--- Alt AltCon [b] (Expr b)
--- We only care about the final (Expr b) part
 getAltsNode :: DynFlags -> [Alt CoreBndr] -> [ExprNode]
-getAltsNode dflags =
-  map (\(Alt _ _ expr') -> OneCaseAltNode $ getExprNode dflags expr')
+getAltsNode dflags = map (getAltNode dflags)
+
+-- Alt AltCon [b] (Expr b)
+getAltNode :: DynFlags -> Alt CoreBndr -> ExprNode
+getAltNode dflags (Alt guard vars expr') =
+  AltNode
+    (AltGuardNode OtherNode)
+    (AltVarsNode $ map (VarNode . getVarInfo dflags) vars)
+    (AltExprNode $ getExprNode dflags expr')

@@ -39,13 +39,16 @@ data ExprNode
   | OneBindNode ExprNode ExprNode
   | BindVarNode VarNodeInfo
   | BindExprNode ExprNode
-  | -- Case (Expr b) _b _Type [Alt b]
-    CaseNode ExprNode ExprNode
+  | -- Case (Expr b) b _Type [Alt b]
+    CaseNode ExprNode ExprNode ExprNode
   | CaseExprNode ExprNode
+  | CaseVarNode VarNodeInfo
   | CaseAltsNode [ExprNode]
-  | -- Alt _AltCon _[b] (Expr b)
-    -- We only care about the final (Expr b) part
-    OneCaseAltNode ExprNode
+  | -- Alt AltCon [b] (Expr b)
+    AltNode ExprNode ExprNode ExprNode
+  | AltGuardNode ExprNode
+  | AltVarsNode [ExprNode]
+  | AltExprNode ExprNode
   | -- Cast (Expr b) _CoercionR
     CastNode ExprNode
   | CastExprNode ExprNode
@@ -75,10 +78,14 @@ getChildren expr =
     OneBindNode e1 e2 -> [e1, e2]
     BindVarNode _ -> []
     BindExprNode e -> [e]
-    CaseNode e1 e2 -> [e1, e2]
+    CaseNode e1 e2 e3 -> [e1, e2, e3]
     CaseExprNode e -> [e]
+    CaseVarNode _ -> []
     CaseAltsNode eList -> eList
-    OneCaseAltNode e -> [e]
+    AltNode e1 e2 e3 -> [e1, e2, e3]
+    AltGuardNode e -> [e]
+    AltVarsNode eList -> eList
+    AltExprNode e -> [e]
     CastNode e -> [e]
     CastExprNode e -> [e]
     TickNode e -> [e]

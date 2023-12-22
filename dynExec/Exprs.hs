@@ -2,13 +2,17 @@ module Exprs where
 
 import RandomGen
 
-exprs = (add1, minus10, const5, add2)
+class Len a where
+  len :: a -> Int
+
+instance Len Int where
+  len x = x
 
 add1 = \x -> x + 1
 test_add1 = do
   x <- randInt
   let r = add1 x 
-  return r
+  return $ len r
 
 minus10 = \x -> x - 10
 

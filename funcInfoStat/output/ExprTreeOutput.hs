@@ -26,6 +26,7 @@ showExprRec expr layer
     (parenL, parenR) = case expr of
       RecBindsNode _ -> ("[", "]")
       CaseAltsNode _ -> ("[", "]")
+      AltVarsNode _ -> ("[", "]")
       _ -> ("(", ")")
     nodeName = case expr of
       VarNode _ -> "Var"
@@ -44,21 +45,27 @@ showExprRec expr layer
       OneBindNode _ _ -> "OneBind"
       BindVarNode _ -> "BindVar"
       BindExprNode _ -> "BindExpr"
-      CaseNode _ _ -> "Case"
+      CaseNode {} -> "Case"
+      CaseVarNode _ -> "CaseVar"
       CaseExprNode _ -> "CaseExpr"
       CaseAltsNode _ -> "CaseAlts"
-      OneCaseAltNode _ -> "OneCaseAlt"
+      AltNode {} -> "Alt"
+      AltGuardNode _ -> "AltGuard"
+      AltVarsNode _ -> "AltVars"
+      AltExprNode _ -> "AltExpr"
       CastNode _ -> "Cast"
       CastExprNode _ -> "CastExpr"
       TickNode _ -> "Tick"
       TickExprNode _ -> "TickExpr"
       OtherNode -> ""
+    showVar :: VarNodeInfo -> String
     showVar var =
       printf
         "%s %s :: %s"
         (showVarKind $ var |> varKind)
         (var |> ExprTree.varName)
         (var |> ExprTree.varType)
+    showLit :: LitNodeInfo -> String
     showLit lit =
       printf
         "%s :: %s"

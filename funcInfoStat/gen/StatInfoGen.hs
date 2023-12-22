@@ -57,12 +57,12 @@ genStatExpr (LitNode lit) =
     { slitValue = lit |> litValue,
       slitType = lit |> litType
     }
-genStatExpr (AppNode (AppArgNode arg) (AppExprNode appExpr)) =
+genStatExpr (AppNode (AppExprNode appExpr) (AppArgNode arg)) =
   SApp
     { sappExpr = genStatExpr appExpr,
       sappArg = genStatExpr arg -- Could be SNothing
     }
-genStatExpr (CaseNode (CaseExprNode caseExpr) (CaseAltsNode caseAlts)) =
+genStatExpr (CaseNode (CaseExprNode caseExpr) _ (CaseAltsNode caseAlts)) =
   SCase
     { scaseExpr = genStatExpr caseExpr,
       scaseAlts = map genStatExpr caseAlts
@@ -72,9 +72,9 @@ genStatExpr lamNode@(LamNode _ _) =
     { slamParams = map genStatParam $ getParamList lamNode,
       slamExpr = genStatExpr $ stripParams lamNode
     }
-genStatExpr (OneCaseAltNode expr) =
+genStatExpr (AltNode _ _ expr) =
   genStatExpr expr
-genStatExpr (LetNode (LetExprNode expr) _) =
+genStatExpr (LetNode _ (LetExprNode expr)) =
   genStatExpr expr
 genStatExpr _ =
   SNothing

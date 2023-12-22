@@ -8,7 +8,7 @@ from calcFuncComplexity.util.log import log
 
 def simplifyConstraints(constrList: List[Constraint]):
     applyBuiltinConstraints(constrList)
-    squeezeConstTerms(constrList)
+    # squeezeConstTerms(constrList)
     inlineConstFunctions(constrList)
 
     log("[Simplified Constraints]")
