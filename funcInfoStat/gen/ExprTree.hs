@@ -46,7 +46,7 @@ data ExprNode
   | CaseAltsNode [ExprNode]
   | -- Alt AltCon [b] (Expr b)
     AltNode ExprNode ExprNode ExprNode
-  | AltGuardNode ExprNode
+  | AltConNode String
   | AltVarsNode [ExprNode]
   | AltExprNode ExprNode
   | -- Cast (Expr b) _CoercionR
@@ -83,7 +83,7 @@ getChildren expr =
     CaseVarNode _ -> []
     CaseAltsNode eList -> eList
     AltNode e1 e2 e3 -> [e1, e2, e3]
-    AltGuardNode e -> [e]
+    AltConNode _ -> []
     AltVarsNode eList -> eList
     AltExprNode e -> [e]
     CastNode e -> [e]

@@ -50,7 +50,7 @@ showExprRec expr layer
       CaseExprNode _ -> "CaseExpr"
       CaseAltsNode _ -> "CaseAlts"
       AltNode {} -> "Alt"
-      AltGuardNode _ -> "AltGuard"
+      AltConNode _ -> "AltCon"
       AltVarsNode _ -> "AltVars"
       AltExprNode _ -> "AltExpr"
       CastNode _ -> "Cast"
@@ -76,6 +76,7 @@ showExprRec expr layer
         VarNode var -> showVar var
         BindVarNode var -> showVar var
         LamVarNode var -> showVar var
+        AltConNode s -> s
         OtherNode -> ""
         LitNode lit -> showLit lit
         _ -> foldl' (++) "" $ map oneChildStr (getChildren expr)

@@ -15,6 +15,9 @@ build-type:         Simple
 common common-options
     default-language: Haskell2010
     ghc-options:      -Wall
+    build-depends:    
+        base ^>=4.17.2.0,
+        text ^>=2.0.2
 
 
 -- Function Application Statistic Plugin --
@@ -23,8 +26,6 @@ library Util
     import:           common-options
     exposed-modules:  
         Util
-    build-depends:    
-        base ^>=4.17.2.0
     hs-source-dirs:   funcInfoStat/util
 
 
@@ -38,7 +39,6 @@ library Gen
         StatInfoGen
     build-depends:    
         Util,
-        base ^>=4.17.2.0,
         ghc ^>=9.4.7
     hs-source-dirs:   funcInfoStat/gen
 
@@ -51,8 +51,7 @@ library Output
         StatInfoJsonOutput
     build-depends:    
         Util,
-        Gen,
-        base ^>=4.17.2.0
+        Gen
     hs-source-dirs:   funcInfoStat/output
 
 
@@ -63,7 +62,6 @@ library FuncInfoStat
     build-depends:    
         Gen, 
         Output, 
-        base ^>=4.17.2.0, 
         ghc ^>=9.4.7
     hs-source-dirs:   funcInfoStat
 
@@ -73,7 +71,6 @@ library FindImports
     exposed-modules:  
         FindImports
     build-depends:    
-        base ^>=4.17.2.0, 
         ghc ^>=9.4.7
     hs-source-dirs:   findImports
 
@@ -84,7 +81,6 @@ executable Stat
     build-depends:    
         FuncInfoStat,
         FindImports,
-        base ^>=4.17.2.0
     ghc-options:      
         -O0 
         -w
@@ -103,7 +99,6 @@ library DynExprs
     other-modules:
         Run
     build-depends:    
-        base ^>=4.17.2.0,
         ghc-prim ^>=0.9.1
     hs-source-dirs:   run
 
@@ -112,7 +107,6 @@ executable DynExec
     import:           common-options
     main-is:          Main.hs
     build-depends:    
-        base ^>=4.17.2.0,
         QuickCheck ^>=2.14.3
     ghc-options:      
         -O1
