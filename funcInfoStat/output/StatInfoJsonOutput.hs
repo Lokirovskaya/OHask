@@ -51,11 +51,27 @@ showStatExpr (SCase expr alts) =
   printf
     "{\"exprKind\":\"Case\",\"caseExpr\":%s,\"caseAlts\":[%s]}"
     (showStatExpr expr)
-    -- (map showStatExpr alts |> concatWithComma)
-    ""
+    (map showStatAlt alts |> concatWithComma)
 showStatExpr (SLam params expr) =
   printf
     "{\"exprKind\":\"Lam\",\"lamParams\":[%s],\"lamExpr\":%s}"
     (map showStatParam params |> concatWithComma)
     (showStatExpr expr)
 showStatExpr SNothing = "null"
+
+showStatAlt :: SAlt -> String
+showStatAlt (SAlt con vars expr) =
+  printf
+    "{\"caseCon\":\"%s\",\"caseVars\":[%s],\"caseExpr\":%s}"
+    (con |> escape)
+    (map showAltVar vars |> concatWithComma)
+    (showStatExpr expr)
+  where
+    showAltVar :: SVar -> String
+    showAltVar (SVar name type' unique arity) =
+      printf
+        "{\"varName\":\"%s\",\"varType\":\"%s\",\"varUnique\":\"%s\",\"varArity\":%d}"
+        (name |> escape)
+        (type' |> escape)
+        (unique |> escape)
+        arity
