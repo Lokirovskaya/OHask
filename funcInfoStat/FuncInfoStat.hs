@@ -67,8 +67,9 @@ runOneBind dflags statRef bndr expr = do
           { ExprTree.varName = funcName,
             ExprTree.varType = funcType,
             ExprTree.varUnique = funcName ++ "." ++ funcUnique,
-            varKind = IdentKind, -- Will not be use
-            varArity = -1 -- Will not be use
+            ExprTree.varModule = Just "Main",
+            ExprTree.varKind = IdentKind, -- Will not be use
+            ExprTree.varArity = -1 -- Will not be use
           }
   let exprNode = getExprNode dflags expr
   -- tree output

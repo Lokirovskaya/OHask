@@ -15,6 +15,7 @@ data SFunc = SFunc
 data SVar = SVar
   { svarName :: String,
     svarType :: String,
+    svarModule :: Maybe String,
     svarUnique :: String,
     svarArity :: Int
   }

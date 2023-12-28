@@ -17,26 +17,39 @@ showStatFuncInfo sfunc =
     (sfunc |> sfuncName |> escape)
     (sfunc |> sfuncType |> escape)
     (sfunc |> sfuncUnique |> escape)
-    (sfunc |> sfuncParams |> map showStatParam |> concatWithComma)
+    (sfunc |> sfuncParams |> map showStatVar |> concatWithComma)
     (sfunc |> sfuncExpr |> showStatExpr)
 
-showStatParam :: SVar -> String
-showStatParam (SVar name type' unique arity) =
-  printf
-    "{\"paramName\":\"%s\",\"paramType\":\"%s\",\"paramUnique\":\"%s\",\"paramArity\":%d}"
-    (name |> escape)
-    (type' |> escape)
-    (unique |> escape)
-    arity
+showStatVarFields :: SVar -> String
+showStatVarFields
+  ( SVar
+      { svarName = name,
+        svarType = type',
+        svarModule = module',
+        svarUnique = unique,
+        svarArity = arity
+      }
+    ) =
+    printf
+      "\"varName\":\"%s\",\"varType\":\"%s\",\"varModule\":%s,\"varUnique\":\"%s\",\"varArity\":%d"
+      (name |> escape)
+      (type' |> escape)
+      (showModule module')
+      (unique |> escape)
+      arity
+  where
+    showModule :: Maybe String -> String
+    showModule (Just s) = "\"" ++ s |> escape ++ "\""
+    showModule Nothing = "null"
+
+showStatVar :: SVar -> String 
+showStatVar var = "{" ++ showStatVarFields var ++ "}"
 
 showStatExpr :: SExpr -> String
-showStatExpr (SVarExpr (SVar name type' unique arity)) =
+showStatExpr (SVarExpr var) =
   printf
-    "{\"exprKind\":\"Var\",\"varName\":\"%s\",\"varType\":\"%s\",\"varUnique\":\"%s\",\"varArity\":%d}"
-    (name |> escape)
-    (type' |> escape)
-    (unique |> escape)
-    arity
+    "{\"exprKind\":\"Var\",%s}"
+    (showStatVarFields var)
 showStatExpr (SLit value type') =
   printf
     "{\"exprKind\":\"Lit\",\"litValue\":\"%s\",\"litType\":\"%s\"}"
@@ -55,7 +68,7 @@ showStatExpr (SCase expr alts) =
 showStatExpr (SLam params expr) =
   printf
     "{\"exprKind\":\"Lam\",\"lamParams\":[%s],\"lamExpr\":%s}"
-    (map showStatParam params |> concatWithComma)
+    (map showStatVar params |> concatWithComma)
     (showStatExpr expr)
 showStatExpr SNothing = "null"
 
@@ -64,14 +77,5 @@ showStatAlt (SAlt con vars expr) =
   printf
     "{\"caseCon\":\"%s\",\"caseVars\":[%s],\"caseExpr\":%s}"
     (con |> escape)
-    (map showAltVar vars |> concatWithComma)
+    (map showStatVar vars |> concatWithComma)
     (showStatExpr expr)
-  where
-    showAltVar :: SVar -> String
-    showAltVar (SVar name type' unique arity) =
-      printf
-        "{\"varName\":\"%s\",\"varType\":\"%s\",\"varUnique\":\"%s\",\"varArity\":%d}"
-        (name |> escape)
-        (type' |> escape)
-        (unique |> escape)
-        arity

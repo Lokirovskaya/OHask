@@ -6,6 +6,7 @@ data VarNodeInfo = VarNodeInfo
   { varName :: String,
     varType :: String,
     varUnique :: String,
+    varModule :: Maybe String,
     varKind :: VarKind,
     varArity :: Int
   }

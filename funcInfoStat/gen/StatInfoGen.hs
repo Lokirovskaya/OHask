@@ -26,16 +26,7 @@ genOneStatFunc func =
       sfuncType = func |> subFuncType,
       sfuncUnique = func |> subFuncUnique,
       sfuncExpr = genStatExpr (func |> subFuncExpr) |> simplifyStatExpr,
-      sfuncParams = map genStatParam $ func |> subFuncParams
-    }
-
-genStatParam :: VarNodeInfo -> SVar
-genStatParam param =
-  SVar
-    { svarName = param |> varName,
-      svarType = param |> varType,
-      svarUnique = param |> varUnique,
-      svarArity = param |> varArity
+      sfuncParams = map genStatVarFromInfo (func |> subFuncParams)
     }
 
 isTyConFunc :: String -> Bool
@@ -66,7 +57,7 @@ genStatExpr (CaseNode (CaseExprNode caseExpr) _ (CaseAltsNode caseAlts)) =
     }
 genStatExpr lamNode@(LamNode _ _) =
   SLam
-    { slamParams = map genStatParam $ getParamList lamNode,
+    { slamParams = map genStatVarFromInfo $ getParamList lamNode,
       slamExpr = genStatExpr $ stripParams lamNode
     }
 genStatExpr (LetNode _ (LetExprNode expr)) =
@@ -79,6 +70,7 @@ genStatVarFromInfo var =
   SVar
     { svarName = var |> varName,
       svarType = var |> varType,
+      svarModule = var |> varModule,
       svarUnique = var |> varUnique,
       svarArity = var |> varArity
     }

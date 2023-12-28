@@ -25,7 +25,7 @@ showStatExpr expr =
     body :: String
     body =
       case expr of
-        SVarExpr (SVar name _ _ _) -> name
+        SVarExpr (SVar {svarName = name}) -> name
         SLit value _ -> value |> squeeze '\n'
         SApp expr' arg ->
           printf

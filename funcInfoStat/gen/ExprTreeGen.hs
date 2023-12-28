@@ -47,7 +47,9 @@ getExprNode dflags expr =
 getVarInfo :: GHC.DynFlags -> GHC.Var -> VarNodeInfo
 getVarInfo dflags var =
   let name = GHC.showSDoc dflags $ GHC.ppr $ GHC.varName var
-      unique = GHC.showSDoc dflags $ GHC.ppr $ GHC.varUnique var
+      type' = GHC.showSDoc dflags $ GHC.ppr $ GHC.varType var
+      realUnique = GHC.showSDoc dflags $ GHC.ppr $ GHC.varUnique var
+      module' = GHC.showSDoc dflags . GHC.ppr <$> GHC.nameModule_maybe (GHC.varName var)
       kind
         | GHC.isId var = IdentKind
         | GHC.isTcTyVar var = TcTyVarKind
@@ -59,8 +61,9 @@ getVarInfo dflags var =
           |> length -- count
    in VarNodeInfo
         { varName = name,
-          varType = GHC.showSDoc dflags $ GHC.ppr $ GHC.varType var,
-          varUnique = name ++ "." ++ unique,
+          varType = type',
+          varUnique = name ++ "." ++ realUnique,
+          varModule = module',
           varKind = kind,
           varArity = arity
         }

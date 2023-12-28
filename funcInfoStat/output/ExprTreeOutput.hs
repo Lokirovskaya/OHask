@@ -4,6 +4,7 @@ import Data.Foldable (Foldable (foldl'))
 import ExprTree
 import Text.Printf (printf)
 import Util
+import Data.Maybe (fromMaybe)
 
 -- Pretty printer
 showExprNode :: ExprNode -> String
@@ -61,10 +62,13 @@ showExprRec expr layer
     showVar :: VarNodeInfo -> String
     showVar var =
       printf
-        "%s %s :: %s"
-        (showVarKind $ var |> varKind)
+        "%s.%s :: %s, kind: %s, unique: %s, arity: %d"
+        (fromMaybe "" (ExprTree.varModule var))
         (var |> ExprTree.varName)
         (var |> ExprTree.varType)
+        (var |> varKind |> showVarKind)
+        (var |> ExprTree.varUnique)
+        (var |> ExprTree.varArity)
     showLit :: LitNodeInfo -> String
     showLit lit =
       printf
@@ -74,11 +78,12 @@ showExprRec expr layer
     innerLayerStr =
       case expr of
         VarNode var -> showVar var
-        BindVarNode var -> showVar var
+        LitNode lit -> showLit lit
         LamVarNode var -> showVar var
+        BindVarNode var -> showVar var
+        CaseVarNode var -> showVar var
         AltConNode s -> s
         OtherNode -> ""
-        LitNode lit -> showLit lit
         _ -> foldl' (++) "" $ map oneChildStr (getChildren expr)
       where
         oneChildStr e = showExprRec e (layer + 1)
