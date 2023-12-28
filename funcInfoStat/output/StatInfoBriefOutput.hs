@@ -17,29 +17,54 @@ showStatFuncInfo sfunc =
     (sfunc |> sfuncExpr |> showStatExpr)
 
 showStatExpr :: SExpr -> String
-showStatExpr (SVarExpr (SVar name _ _ _)) = name
-showStatExpr (SLit value _) = value |> squeeze '\n'
-showStatExpr (SApp expr arg) =
-  printf
-    "(%s) (%s)"
-    (showStatExpr expr)
-    (showStatExpr arg)
-showStatExpr (SCase expr alts) =
-  printf
-    "(case (%s) of %s)"
-    (showStatExpr expr)
-    (map showStatAlt alts |> concatWith " ")
-showStatExpr (SLam params expr) =
-  printf
-    "\\%s -> (%s)"
-    (params |> map svarName |> concatWith ", ")
-    (showStatExpr expr)
-showStatExpr SNothing = "^"
+showStatExpr expr =
+  if needParen
+    then "(" ++ body ++ ")"
+    else body
+  where
+    body :: String
+    body =
+      case expr of
+        SVarExpr (SVar name _ _ _) -> name
+        SLit value _ -> value |> squeeze '\n'
+        SApp expr' arg ->
+          printf
+            "%s %s"
+            (showStatExpr expr')
+            (showStatExpr arg)
+        SCase expr' alts ->
+          printf
+            "case %s of %s"
+            (showStatExpr expr')
+            (map showStatAlt alts |> concatWith " ")
+        SLam params expr' ->
+          printf
+            "\\%s -> %s"
+            (params |> map svarName |> concatWith " ")
+            (showStatExpr expr')
+        SNothing -> "^"
+    needParen :: Bool
+    needParen =
+      case expr of
+        SVarExpr _ -> False
+        SLit _ _ -> False
+        SNothing -> False
+        _ -> True
 
 showStatAlt :: SAlt -> String
-showStatAlt alt =
-  printf
-    "| %s %s -> (%s)"
-    (saltCon alt)
-    (map svarName (saltVars alt) |> concatWith " ")
-    (showStatExpr (saltExpr alt))
+showStatAlt (SAlt con vars expr) =
+  if hasVars
+    then
+      printf
+        "| %s %s -> %s"
+        con
+        (map svarName vars |> concatWith " ")
+        (showStatExpr expr)
+    else
+      printf
+        "| %s -> %s"
+        con
+        (showStatExpr expr)
+  where
+    hasVars :: Bool
+    hasVars = not (null vars)
