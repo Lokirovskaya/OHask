@@ -12,7 +12,7 @@ getExprNode dflags expr =
     -- Var Id
     GHC.Var var -> VarNode $ getVarInfo dflags var
     -- Lit Literal
-    GHC.Lit lit -> LitNode $ getLitStr dflags lit
+    GHC.Lit lit -> LitNode $ getLitInfo dflags lit
     -- App (Expr b) (Arg b)
     GHC.App expr' arg ->
       AppNode
@@ -49,7 +49,7 @@ getVarInfo dflags var =
   let name = GHC.showSDoc dflags $ GHC.ppr $ GHC.varName var
       type' = GHC.showSDoc dflags $ GHC.ppr $ GHC.varType var
       realUnique = GHC.showSDoc dflags $ GHC.ppr $ GHC.varUnique var
-      module' = GHC.showSDoc dflags . GHC.ppr <$> GHC.nameModule_maybe (GHC.varName var)
+      module' = getModuleName dflags $ GHC.varName var
       kind
         | GHC.isId var = IdentKind
         | GHC.isTcTyVar var = TcTyVarKind
@@ -68,13 +68,16 @@ getVarInfo dflags var =
           varArity = arity
         }
 
-getLitStr :: GHC.DynFlags -> GHC.Literal -> LitNodeInfo
-getLitStr dflags lit =
+getLitInfo :: GHC.DynFlags -> GHC.Literal -> LitNodeInfo
+getLitInfo dflags lit =
   let litTypeStr = GHC.showSDoc dflags $ GHC.ppr $ GHC.literalType lit
    in LitNodeInfo
         { litValue = GHC.showSDoc dflags $ GHC.pprLiteral id lit,
           litType = litTypeStr
         }
+
+getModuleName :: GHC.DynFlags -> GHC.Name -> Maybe String
+getModuleName dflags name = GHC.showSDoc dflags . GHC.ppr <$> GHC.nameModule_maybe name
 
 -- NonRec b (Expr b)
 -- Rec [(b, Expr b)]
@@ -101,6 +104,17 @@ getAltsNode dflags = map (getAltNode dflags)
 getAltNode :: GHC.DynFlags -> GHC.Alt GHC.CoreBndr -> ExprNode
 getAltNode dflags (GHC.Alt con vars expr') =
   AltNode
-    (AltConNode $ GHC.showSDoc dflags $ GHC.ppr con)
+    (AltConNode $ getCon con)
     (AltVarsNode $ map (VarNode . getVarInfo dflags) vars)
     (AltExprNode $ getExprNode dflags expr')
+  where
+    getCon :: GHC.AltCon -> AltConNodeInfo
+    getCon (GHC.DataAlt dataCon) =
+      let name = GHC.dataConName dataCon
+          nameStr = GHC.showSDoc dflags $ GHC.ppr name
+          module' = getModuleName dflags name
+       in AltConNodeInfo {conName = nameStr, conModule = module'}
+    getCon (GHC.LitAlt litCon) =
+      let litStr = GHC.showSDoc dflags $ GHC.ppr litCon
+       in AltConNodeInfo {conName = litStr, conModule = Nothing}
+    getCon GHC.DEFAULT = AltConNodeInfo {conName = "_", conModule = Nothing}

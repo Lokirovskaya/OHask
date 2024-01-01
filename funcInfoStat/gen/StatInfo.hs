@@ -21,9 +21,15 @@ data SVar = SVar
   }
 
 data SAlt = SAlt
-  { saltCon :: String,
+  { saltCon :: SCon,
     saltVars :: [SVar],
     saltExpr :: SExpr
+  }
+
+data SCon = SCon
+  {
+    sconName :: String,
+    sconModule :: Maybe String
   }
 
 data SExpr

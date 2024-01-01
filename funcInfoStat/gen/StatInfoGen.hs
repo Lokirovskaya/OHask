@@ -80,8 +80,13 @@ genStatAlt (AltNode (AltConNode con) (AltVarsNode vars) (AltExprNode expr)) =
   let castToVar :: ExprNode -> VarNodeInfo
       castToVar (VarNode var) = var
       castToVar _ = GHC.panic "Bad Var"
+      scon =
+        SCon
+          { sconName = con |> conName,
+            sconModule = con |> conModule
+          }
    in SAlt
-        { saltCon = con,
+        { saltCon = scon,
           saltVars = map (genStatVarFromInfo . castToVar) vars,
           saltExpr = genStatExpr expr
         }

@@ -16,6 +16,12 @@ data LitNodeInfo = LitNodeInfo
     litType :: String
   }
 
+data AltConNodeInfo = AltConNodeInfo
+  {
+    conName :: String,
+    conModule :: Maybe String
+  }
+
 data ExprNode
   = -- Var Id
     VarNode VarNodeInfo
@@ -47,7 +53,7 @@ data ExprNode
   | CaseAltsNode [ExprNode]
   | -- Alt AltCon [b] (Expr b)
     AltNode ExprNode ExprNode ExprNode
-  | AltConNode String
+  | AltConNode AltConNodeInfo
   | AltVarsNode [ExprNode]
   | AltExprNode ExprNode
   | -- Cast (Expr b) _CoercionR

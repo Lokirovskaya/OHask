@@ -37,10 +37,10 @@ showStatVarFields
       (showModule module')
       (unique |> escape)
       arity
-  where
-    showModule :: Maybe String -> String
-    showModule (Just s) = "\"" ++ s |> escape ++ "\""
-    showModule Nothing = "null"
+
+showModule :: Maybe String -> String
+showModule (Just s) = "\"" ++ s |> escape ++ "\""
+showModule Nothing = "null"
 
 showStatVar :: SVar -> String 
 showStatVar var = "{" ++ showStatVarFields var ++ "}"
@@ -75,7 +75,15 @@ showStatExpr SNothing = "null"
 showStatAlt :: SAlt -> String
 showStatAlt (SAlt con vars expr) =
   printf
-    "{\"caseCon\":\"%s\",\"caseVars\":[%s],\"caseExpr\":%s}"
-    (con |> escape)
+    "{\"caseCon\":%s,\"caseVars\":[%s],\"caseExpr\":%s}"
+    conStr
     (map showStatVar vars |> concatWithComma)
     (showStatExpr expr)
+  where
+    conStr :: String
+    conStr =
+      printf
+      "{\"conName\":\"%s\",\"conModule\":%s}"
+      (con |> sconName |> escape)
+      (showModule (con |> sconModule))
+

@@ -1,10 +1,10 @@
 module ExprTreeOutput (showExprNode, showVarKind) where
 
 import Data.Foldable (Foldable (foldl'))
+import Data.Maybe (fromMaybe)
 import ExprTree
 import Text.Printf (printf)
 import Util
-import Data.Maybe (fromMaybe)
 
 -- Pretty printer
 showExprNode :: ExprNode -> String
@@ -62,19 +62,25 @@ showExprRec expr layer
     showVar :: VarNodeInfo -> String
     showVar var =
       printf
-        "%s.%s :: %s, kind: %s, unique: %s, arity: %d"
-        (fromMaybe "" (ExprTree.varModule var))
+        "Name(%s) Type(%s) Module(%s) Kind(%s) Unique(%s) Arity(%d)"
         (var |> ExprTree.varName)
         (var |> ExprTree.varType)
+        (fromMaybe "" $ ExprTree.varModule var)
         (var |> varKind |> showVarKind)
         (var |> ExprTree.varUnique)
         (var |> ExprTree.varArity)
     showLit :: LitNodeInfo -> String
     showLit lit =
       printf
-        "%s :: %s"
+        "Value(%s) Type(%s)"
         (lit |> ExprTree.litValue)
         (lit |> ExprTree.litType)
+    showAltCon :: AltConNodeInfo -> String
+    showAltCon con =
+      printf
+        "Name(%s) Module(%s)"
+        (con |> ExprTree.conName)
+        (fromMaybe "" $ ExprTree.conModule con)
     innerLayerStr =
       case expr of
         VarNode var -> showVar var
@@ -82,7 +88,7 @@ showExprRec expr layer
         LamVarNode var -> showVar var
         BindVarNode var -> showVar var
         CaseVarNode var -> showVar var
-        AltConNode s -> s
+        AltConNode con -> showAltCon con
         OtherNode -> ""
         _ -> foldl' (++) "" $ map oneChildStr (getChildren expr)
       where

@@ -57,13 +57,13 @@ showStatAlt (SAlt con vars expr) =
     then
       printf
         "| %s %s -> %s"
-        con
+        (con |> sconName)
         (map svarName vars |> concatWith " ")
         (showStatExpr expr)
     else
       printf
         "| %s -> %s"
-        con
+        (con |> sconName)
         (showStatExpr expr)
   where
     hasVars :: Bool
