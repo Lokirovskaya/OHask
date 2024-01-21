@@ -76,7 +76,7 @@ showStatExpr SNothing = "null"
 showStatAlt :: SAlt -> String
 showStatAlt (SAlt con vars expr) =
   printf
-    "{\"caseCon\":%s,\"caseVars\":[%s],\"caseExpr\":%s}"
+    "{\"altCon\":%s,\"altVars\":[%s],\"altExpr\":%s}"
     conStr
     (map showStatVar vars |> concatWithComma)
     (showStatExpr expr)

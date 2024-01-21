@@ -23,9 +23,6 @@ for arg in sys.argv[1:]:
     elif arg == "--compl":
         runComplCalc = True
         hasOptArg = True
-if srcPath == "":
-    print("Error: No src path provided.")
-    exit(-1)
 if not hasOptArg:
     runCabal = True
     runComplCalc = True
@@ -40,7 +37,10 @@ END = "\x1b[0m"
 
 if runCabal:
     # Copy to run/Run.hs
-    srcPath = sys.argv[1]
+    if srcPath == "":
+        print("Error: No src path provided.")
+        exit(-1)
+
     with open(srcPath, "r") as f:
         srcContent = f.read()
 
@@ -76,19 +76,14 @@ if runCabal:
 if runComplCalc:
     print(f"{BOLD}{YELLOW}=== Solving Complexity ==={END}")
 
-    # Read json
-    try:
-        import ujson as json
-    except ImportError:
-        print("Package ujson not found, use vanilla json.")
-        import json
+    # calc func complexity
+    # from calcFuncComplexity.CalcFuncComplexity import calcCompl
+    # calcCompl(funcListData)
+    import ujson
+    from calcComplexity import calcComplexity
 
     with open("stat/stat.json", "r") as f:
-        funcListData = json.load(f)
-
-    # calc func complexity
-    from calcFuncComplexity.CalcFuncComplexity import calcCompl
-
-    calcCompl(funcListData)
+        funcsData = ujson.load(f)
+    calcComplexity(funcsData)
 
     print(f"{GREEN}Success{END}\n")
