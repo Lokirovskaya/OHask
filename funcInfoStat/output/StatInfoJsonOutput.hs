@@ -13,10 +13,11 @@ showStatInfoJson stat =
 showStatFuncInfo :: SFunc -> String
 showStatFuncInfo sfunc =
   printf
-    "{\"funcName\":\"%s\",\"funcType\":\"%s\",\"funcUnique\":\"%s\",\"funcParams\":[%s],\"funcExpr\":%s}"
+    "{\"funcName\":\"%s\",\"funcType\":\"%s\",\"funcUnique\":\"%s\",\"funcParentUnique\":%s,\"funcParams\":[%s],\"funcExpr\":%s}"
     (sfunc |> sfuncName |> escape)
     (sfunc |> sfuncType |> escape)
     (sfunc |> sfuncUnique |> escape)
+    (strOrNull $ sfunc |> sfuncParentUnique)
     (sfunc |> sfuncParams |> map showStatVar |> concatWithComma)
     (sfunc |> sfuncExpr |> showStatExpr)
 
@@ -34,15 +35,15 @@ showStatVarFields
       "\"varName\":\"%s\",\"varType\":\"%s\",\"varModule\":%s,\"varUnique\":\"%s\",\"varArity\":%d"
       (name |> escape)
       (type' |> escape)
-      (showModule module')
+      (strOrNull module')
       (unique |> escape)
       arity
 
-showModule :: Maybe String -> String
-showModule (Just s) = "\"" ++ s |> escape ++ "\""
-showModule Nothing = "null"
+strOrNull :: Maybe String -> String
+strOrNull (Just s) = "\"" ++ s |> escape ++ "\""
+strOrNull Nothing = "null"
 
-showStatVar :: SVar -> String 
+showStatVar :: SVar -> String
 showStatVar var = "{" ++ showStatVarFields var ++ "}"
 
 showStatExpr :: SExpr -> String
@@ -83,7 +84,6 @@ showStatAlt (SAlt con vars expr) =
     conStr :: String
     conStr =
       printf
-      "{\"conName\":\"%s\",\"conModule\":%s}"
-      (con |> sconName |> escape)
-      (showModule (con |> sconModule))
-
+        "{\"conName\":\"%s\",\"conModule\":%s}"
+        (con |> sconName |> escape)
+        (strOrNull (con |> sconModule))

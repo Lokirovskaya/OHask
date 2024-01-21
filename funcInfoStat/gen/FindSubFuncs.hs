@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Avoid lambda using `infix`" #-}
 module FindSubFuncs where
 
 import Data.Foldable (Foldable (foldl'))
@@ -9,7 +12,8 @@ data SubFunc = SubFunc
     subFuncType :: String,
     subFuncUnique :: String,
     subFuncParams :: [VarNodeInfo],
-    subFuncExpr :: ExprNode
+    subFuncExpr :: ExprNode,
+    subFuncParent :: Maybe SubFunc
   }
 
 -- find all sub-functions, filter type construction func
@@ -23,29 +27,33 @@ findSubFuncList rootFunc rootExpr = filterTyCon $ findFuncs rootFunc rootExpr
 -- find all sub-functions
 -- OneBind(...)
 findFuncs :: VarNodeInfo -> ExprNode -> [SubFunc]
-findFuncs rootFunc rootExpr =
+findFuncs rootFuncVar rootExpr =
   -- The root func is also a sub func
-  SubFunc
-    { subFuncName = rootFunc |> varName,
-      subFuncType = rootFunc |> varType,
-      subFuncUnique = rootFunc |> varUnique,
-      subFuncParams = getParamList rootExpr,
-      subFuncExpr = stripParams rootExpr
-    }
-    : findInside (stripParams rootExpr)
+  let rootSubFunc =
+        SubFunc
+          { subFuncName = rootFuncVar |> varName,
+            subFuncType = rootFuncVar |> varType,
+            subFuncUnique = rootFuncVar |> varUnique,
+            subFuncParams = getParamList rootExpr,
+            subFuncExpr = stripParams rootExpr,
+            subFuncParent = Nothing
+          }
+   in rootSubFunc : findInside (stripParams rootExpr) rootSubFunc
   where
-    findInside :: ExprNode -> [SubFunc]
-    findInside (OneBindNode (BindVarNode var) (BindExprNode expr)) =
-      SubFunc
-        { subFuncName = var |> varName,
-          subFuncType = var |> varType,
-          subFuncUnique = var |> varUnique,
-          subFuncParams = getParamList expr,
-          subFuncExpr = stripParams expr
-        }
-        : findInside (stripParams expr)
-    findInside expr =
-      foldl' (++) [] $ map findInside (getChildren expr)
+    findInside :: ExprNode -> SubFunc -> [SubFunc]
+    findInside (OneBindNode (BindVarNode var) (BindExprNode expr)) curFunc =
+      let subFunc =
+            SubFunc
+              { subFuncName = var |> varName,
+                subFuncType = var |> varType,
+                subFuncUnique = var |> varUnique,
+                subFuncParams = getParamList expr,
+                subFuncExpr = stripParams expr,
+                subFuncParent = Just curFunc
+              }
+       in subFunc : findInside (stripParams expr) subFunc
+    findInside expr curFunc =
+      foldl' (++) [] $ map (\node -> findInside node curFunc) (getChildren expr)
 
 -- If a function has params, the root node of its ExprTree should be Lam
 -- Lam(LamVar(p1), LamExpr(LamVar(p2), LamExpr(...)))

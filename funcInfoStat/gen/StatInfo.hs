@@ -9,7 +9,8 @@ data SFunc = SFunc
     sfuncType :: String,
     sfuncUnique :: String,
     sfuncExpr :: SExpr,
-    sfuncParams :: [SVar]
+    sfuncParams :: [SVar],
+    sfuncParentUnique :: Maybe String
   }
 
 data SVar = SVar
