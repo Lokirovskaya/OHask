@@ -66,25 +66,14 @@ library FuncInfoStat
     hs-source-dirs:   funcInfoStat
 
 
-library FindImports
-    import:           common-options
-    exposed-modules:  
-        FindImports
-    build-depends:    
-        ghc ^>=9.4.7
-    hs-source-dirs:   findImports
-
-
 executable Stat
     import:           common-options
     main-is:          Run.hs
     build-depends:    
-        FuncInfoStat,
-        FindImports,
+        FuncInfoStat
     ghc-options:      
         -O0 
         -w
-        -fplugin=FindImports
         -fplugin=FuncInfoStat
     hs-source-dirs:   run
 
