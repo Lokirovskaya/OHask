@@ -75,4 +75,5 @@ class Alt:
         self.altConName = altConName
         self.altConModule = altConModule
         self.altConVars = altConVars
+        self.altConVarCount = len(altConVars)
         self.altExpr = altExpr

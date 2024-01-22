@@ -3,8 +3,19 @@ from typing import List
 from calcComplexity.Config import LOG_PATH
 from calcComplexity.constraint import Constraint
 import calcComplexity.constraint.Symbols as symbol
-from calcComplexity.haskellStruct import Alt, App, Case, Expr, Func, Lit, Var
+from calcComplexity.haskellStruct import (
+    Alt,
+    App,
+    Case,
+    Expr,
+    Func,
+    Lit,
+    Var,
+    simplePrintExpr,
+)
 import calcComplexity.untypedLambdaCalculus as lam
+
+exprSymbolList: List[lam.Var] = []
 
 
 def genConstraints(funcList: List[Func]) -> List[Constraint]:
@@ -19,6 +30,11 @@ def genConstraints(funcList: List[Func]) -> List[Constraint]:
         f.write("[Constraints]\n")
         for constr in constrList:
             f.write(str(constr) + "\n")
+        f.write("\n[Exprs]\n")
+        for exprSym in exprSymbolList:
+            f.write(
+                exprSym.name + " == " + simplePrintExpr(exprSym.kwargs["expr"]) + "\n"
+            )
 
     return constrList
 
@@ -57,6 +73,7 @@ def calcAppCompl(app: App) -> lam.Expr:
     exprCompl = calcExprCompl(app.appExpr)
     argCompl = calcExprCompl(app.appArg)
     argExprSymbol = symbol.expr(app.appArg)
+    exprSymbolList.append(argExprSymbol)  # Record all expr symbols
     return add(symbol.constant(), add(argCompl, exprCompl(argExprSymbol)))
 
 
