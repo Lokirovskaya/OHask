@@ -1,6 +1,6 @@
-from calcComplexity.genDependencies import buildStruct
+from calcComplexity.genConstraints import buildStruct, genConstraints
 
 
 def calcComplexity(funcsData):
     funcList = buildStruct(funcsData)
-    print(funcList)
+    constrList = genConstraints(funcList)

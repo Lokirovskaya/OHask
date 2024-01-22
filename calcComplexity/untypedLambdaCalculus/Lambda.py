@@ -2,22 +2,6 @@ from __future__ import annotations
 
 
 class Expr:
-    def appOne(self, arg: Expr) -> Expr:
-        if isinstance(self, Var) and self.isValue:
-            return self  # Application on value has no effect
-
-        elif isinstance(self, Abstr):
-            return self.expr.subst(old=self.var, new=arg)
-
-        else:
-            return App(self, arg)
-
-    def app(self, *args) -> Expr:
-        ans = self
-        for arg in args:
-            ans = ans.appOne(arg)
-        return ans
-
     def subst(self, old: Var, new: Expr) -> Expr:
         if isinstance(self, Var):
             if self.isValue:
@@ -44,6 +28,25 @@ class Expr:
         else:
             assert isinstance(self, UnevalSubst)
             return UnevalSubst(self, old, new)
+
+    def appOne(self, arg: Expr) -> Expr:
+        if isinstance(self, Var) and self.isValue:
+            return self  # Application on value has no effect
+
+        elif isinstance(self, Abstr):
+            return self.expr.subst(old=self.var, new=arg)
+
+        else:
+            return App(self, arg)
+
+    def app(self, *args) -> Expr:
+        ans = self
+        for arg in args:
+            ans = ans.appOne(arg)
+        return ans
+
+    def __call__(self, *args, **kwargs) -> Expr:
+        return self.app(*args)
 
 
 # A simple variable
@@ -78,7 +81,7 @@ class Abstr(Expr):
         self.expr = expr
 
     def __str__(self) -> str:
-        return f"λ{self.var}. {tryAddParen(self.expr)}"
+        return rf"\{self.var}. {tryAddParen(self.expr)}"
 
 
 # Application, x y

@@ -1,5 +1,5 @@
 from typing import Sequence
-from Lambda import *
+from .Lambda import *
 
 
 def currying(varList: Sequence[Var], expr: Expr) -> Expr:

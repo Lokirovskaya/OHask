@@ -1,13 +1,24 @@
-from typing import Any, List
+from typing import Any, Dict, List
 
 from calcComplexity.haskellStruct import Alt, App, Case, Expr, Func, Lit, Var
 
 
-funcList: List[Func] = []
-
 def buildStruct(funcsData: List[Any]) -> List[Func]:
+    funcList = []
+    unique2FuncDict: Dict[str, Func] = {}
+
     for funcData in funcsData:
-        funcList.append(buildFunc(funcData))
+        unique = funcData["funcUnique"]
+        func = buildFunc(funcData)
+        funcList.append(func)
+        unique2FuncDict[unique] = func
+
+    # Fill field funcParent
+    for unique, func in unique2FuncDict.items():
+        parentUnique = func.funcParentUnique
+        if parentUnique != None:
+            func.funcParent = unique2FuncDict[parentUnique]
+
     return funcList
 
 
@@ -16,6 +27,7 @@ def buildFunc(funcData) -> Func:
         funcName=funcData["funcName"],
         funcType=funcData["funcType"],
         funcUnique=funcData["funcUnique"],
+        funcParentUnique=funcData["funcParentUnique"],
         funcParams=[buildVar(paramData) for paramData in funcData["funcParams"]],
         funcExpr=buildExpr(funcData["funcExpr"]),
     )

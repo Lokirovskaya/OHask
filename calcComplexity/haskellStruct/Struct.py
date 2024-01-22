@@ -10,12 +10,14 @@ class Func:
         funcName: str,
         funcType: str,
         funcUnique: str,
+        funcParentUnique: Optional[str],
         funcParams: List[Var],
         funcExpr: Expr,
     ) -> None:
         self.funcName = funcName
         self.funcType = funcType
         self.funcUnique = funcUnique
+        self.funcParentUnique = funcParentUnique
         self.funcParams = funcParams
         self.funcParamCount = len(funcParams)
         self.funcExpr = funcExpr
