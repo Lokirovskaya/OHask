@@ -62,7 +62,7 @@ getVarInfo dflags var =
    in VarNodeInfo
         { varName = name,
           varType = type',
-          varUnique = name ++ "." ++ realUnique,
+          varUnique = name ++ "#" ++ realUnique,
           varModule = module',
           varKind = kind,
           varArity = arity
