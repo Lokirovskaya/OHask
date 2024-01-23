@@ -66,7 +66,7 @@ runOneBind dflags statRef bndr expr = do
         VarNodeInfo
           { ExprTree.varName = funcName,
             ExprTree.varType = funcType,
-            ExprTree.varUnique = funcName ++ "." ++ funcUnique,
+            ExprTree.varUnique = funcName ++ "#" ++ funcUnique,
             ExprTree.varModule = Just "Main",
             ExprTree.varKind = IdentKind, -- Will not be use
             ExprTree.varArity = -1 -- Will not be use
