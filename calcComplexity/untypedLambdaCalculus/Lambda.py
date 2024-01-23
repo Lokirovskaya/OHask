@@ -91,6 +91,17 @@ class App(Expr):
         self.arg = arg
 
     def __str__(self) -> str:
+        # # Trick, make result more readable
+        # if (
+        #     isinstance(self.expr, App)
+        #     and isinstance(self.expr.expr, Var)
+        #     and self.expr.expr.name == "+"
+        # ):
+        #     lhs = self.expr.arg
+        #     rhs = self.arg
+        #     return tryAddParen(lhs) + " + " + tryAddParen(rhs)
+        # else:
+        #     return tryAddParen(self.expr) + " " + tryAddParen(self.arg)
         return tryAddParen(self.expr) + " " + tryAddParen(self.arg)
 
 
