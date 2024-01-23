@@ -7,4 +7,4 @@ def calcComplexity(funcsData):
         pass
 
     funcList = buildStruct(funcsData)
-    constrList = genConstraints(funcList)
+    constrList, exprSymbolList = genConstraints(funcList)

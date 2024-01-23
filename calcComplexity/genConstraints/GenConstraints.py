@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 from calcComplexity.Config import LOG_PATH
 from calcComplexity.constraint import Constraint
@@ -11,7 +11,7 @@ from .VarDep import findVarDep
 exprSymbolList: List[lam.Var] = []
 
 
-def genConstraints(funcList: List[Func]) -> List[Constraint]:
+def genConstraints(funcList: List[Func]) -> Tuple[List[Constraint], List[lam.Var]]:
     constrList = []
     for func in funcList:
         complSymbol = symbol.complexity(func.funcUnique)
@@ -27,7 +27,7 @@ def genConstraints(funcList: List[Func]) -> List[Constraint]:
 
     findVarDep(funcList, exprSymbolList)
 
-    return constrList
+    return constrList, exprSymbolList
 
 
 def calcExprCompl(expr: Expr) -> lam.Expr:
