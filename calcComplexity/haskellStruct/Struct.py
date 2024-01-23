@@ -26,7 +26,13 @@ class Func:
 
 
 class Expr:
-    pass
+    def __str__(self) -> str:
+        from .SimplePrinter import simplePrintExpr
+
+        return simplePrintExpr(self)
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
 
 class Var(Expr):
@@ -49,6 +55,9 @@ class Lit(Expr):
     def __init__(self, litValue: str, litType: str) -> None:
         self.litValue = litValue
         self.litType = litType
+
+    def __str__(self) -> str:
+        return super().__str__()
 
 
 class App(Expr):

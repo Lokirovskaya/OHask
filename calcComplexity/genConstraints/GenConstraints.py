@@ -11,7 +11,6 @@ from calcComplexity.haskellStruct import (
     Func,
     Lit,
     Var,
-    simplePrintExpr,
 )
 import calcComplexity.untypedLambdaCalculus as lam
 
@@ -32,9 +31,8 @@ def genConstraints(funcList: List[Func]) -> List[Constraint]:
             f.write(str(constr) + "\n")
         f.write("\n[Exprs]\n")
         for exprSym in exprSymbolList:
-            f.write(
-                exprSym.name + " == " + simplePrintExpr(exprSym.kwargs["expr"]) + "\n"
-            )
+            exprInfo = exprSym.kwargs["exprInfo"]
+            f.write(exprSym.name + ": " + str(exprInfo) + "\n")
 
     return constrList
 

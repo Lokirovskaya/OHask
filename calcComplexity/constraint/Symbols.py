@@ -1,3 +1,4 @@
+from calcComplexity.constraint import ExprInfo
 import calcComplexity.haskellStruct as haskell
 from calcComplexity.untypedLambdaCalculus import Var
 
@@ -35,4 +36,5 @@ def complexity(name: str) -> Var:
 def expr(expr: haskell.Expr) -> Var:
     global uuidExpr
     uuidExpr += 1
-    return Var(f"e{uuidExpr}", isValue=False, expr=expr)
+    exprInfo = ExprInfo(expr)
+    return Var(f"e{uuidExpr}", isValue=False, exprInfo=exprInfo)
