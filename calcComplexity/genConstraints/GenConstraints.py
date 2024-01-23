@@ -3,16 +3,10 @@ from typing import List
 from calcComplexity.Config import LOG_PATH
 from calcComplexity.constraint import Constraint
 import calcComplexity.constraint.Symbols as symbol
-from calcComplexity.haskellStruct import (
-    Alt,
-    App,
-    Case,
-    Expr,
-    Func,
-    Lit,
-    Var,
-)
+from calcComplexity.haskellStruct import Alt, App, Case, Expr, Func, Lit, Var
 import calcComplexity.untypedLambdaCalculus as lam
+
+from .VarDep import findVarDep
 
 exprSymbolList: List[lam.Var] = []
 
@@ -25,14 +19,13 @@ def genConstraints(funcList: List[Func]) -> List[Constraint]:
         constr = Constraint(complSymbol, compl)
         constrList.append(constr)
 
-    with open(LOG_PATH, "w+") as f:
+    with open(LOG_PATH, "a") as f:
         f.write("[Constraints]\n")
         for constr in constrList:
             f.write(str(constr) + "\n")
-        f.write("\n[Exprs]\n")
-        for exprSym in exprSymbolList:
-            exprInfo = exprSym.kwargs["exprInfo"]
-            f.write(exprSym.name + ": " + str(exprInfo) + "\n")
+        f.write("\n")
+
+    findVarDep(funcList, exprSymbolList)
 
     return constrList
 
