@@ -13,7 +13,7 @@ criticalVarSet: Set[haskell.Var] = set()
 def findVarDep(funcList: List[haskell.Func], exprSymbolList: List[lam.Var]):
     for func in funcList:
         criticalVarSet.update(func.funcParams)
-        buildDepGraph(func.funcExpr)
+        buildDepGraph(func)
 
     with open(LOG_PATH, "a") as f:
         f.write("[Var Dependencies]\n")
@@ -21,6 +21,11 @@ def findVarDep(funcList: List[haskell.Func], exprSymbolList: List[lam.Var]):
             f.write(f"{var} -> {dep.dependsOn}\n")
         f.write("\n")
 
+    # fill the field ExprInfo.dependsOn
+    for exprSym in exprSymbolList:
+        fillExprDepInfo(exprSym.kwargs["exprInfo"])
+
+    with open(LOG_PATH, "a") as f:
         f.write("[Exprs]\n")
         for exprSym in exprSymbolList:
             exprInfo = exprSym.kwargs["exprInfo"]
@@ -29,10 +34,14 @@ def findVarDep(funcList: List[haskell.Func], exprSymbolList: List[lam.Var]):
 
 
 # Node of dep graph
-# Var dep relations are only determined by pattern match exprs.
-#   case {v1, v2} of
-#     Con v3 v4 -> _
-# Expr above tells relations that v3->{v1, v2} and v4->{v1, v2}.
+# Var dep relations are only determined by:
+#   1. Pattern match exprs,
+#        case {v1, v2} of
+#          Con v3 v4 -> _
+#      Expr above tells relations that v3->{v1, v2} and v4->{v1, v2}.
+#   2. Zero-param function,
+#        f = x v
+#      Expr above tells relations that f->{x, v}.
 # Note: Var itself is not included in set `dependsOn` (but it should be)
 class VarDep:
     def __init__(self, var: haskell.Var) -> None:
@@ -49,8 +58,13 @@ def addRelations(src: haskell.Var, dstSet: Set[haskell.Var]):
     var2VarDepDict[src].dependsOn.update(dstSet)
 
 
-def buildDepGraph(expr: haskell.Expr):
-    for case_ in haskell.preOrderTraversal(expr):
+def buildDepGraph(func: haskell.Func):
+    # Zero-param function
+    if func.funcParamCount == 0:
+        addRelations(func.varLike, haskell.getAllVars(func.funcExpr))
+
+    # Pattern match exprs
+    for case_ in haskell.preOrderTraversal(func.funcExpr):
         if not isinstance(case_, haskell.Case):
             continue
 
@@ -59,3 +73,21 @@ def buildDepGraph(expr: haskell.Expr):
             for conVar in alt.altConVars:
                 # conVar->{caseExprVars}
                 addRelations(conVar, caseExprVars)
+
+
+# Find all vars which dominate the var, recursively
+def findAllDeps(var: haskell.Var) -> Set[haskell.Var]:
+    if var not in var2VarDepDict:
+        return {var}
+    else:
+        ans = {var}.union(var2VarDepDict[var].dependsOn)
+        for dep in var2VarDepDict[var].dependsOn:
+            ans.update(findAllDeps(dep))
+        return ans
+
+
+def fillExprDepInfo(exprInfo: ExprInfo):
+    for var in exprInfo.varSet:
+        allDeps = findAllDeps(var)
+        depsAlsoCritical = allDeps.intersection(criticalVarSet)
+        exprInfo.dependsOn.update(depsAlsoCritical)

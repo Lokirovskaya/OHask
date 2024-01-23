@@ -23,6 +23,23 @@ class Func:
         self.funcExpr = funcExpr
         # to be filled in genDependencies/BuildStruct.py
         self.funcParent: Optional[Func] = None
+        # var-like function
+        self.varLike = Var(
+            varName=funcName,
+            varType=funcType,
+            varModule=None,  # todo: precise module detect
+            varUnique=funcUnique,
+            varArity=len(funcParams),
+        )
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Func):
+            return self.funcUnique == other.funcUnique
+        else:
+            return False
+
+    def __hash__(self):
+        return hash(self.funcUnique)
 
 
 class Expr:
@@ -49,6 +66,15 @@ class Var(Expr):
         self.varModule = varModule
         self.varUnique = varUnique
         self.varArity = varArity
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Var):
+            return self.varUnique == other.varUnique
+        else:
+            return False
+
+    def __hash__(self):
+        return hash(self.varUnique)
 
 
 class Lit(Expr):
