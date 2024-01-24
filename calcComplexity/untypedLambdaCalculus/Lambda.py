@@ -48,6 +48,15 @@ class Expr:
     def __call__(self, *args, **kwargs) -> Expr:
         return self.app(*args)
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Expr):
+            return self == other
+        else:
+            return False
+
+    def __hash__(self):
+        return hash(self)
+
 
 # A simple variable
 # If var x is a value, (λz. x)(y) == x
@@ -83,6 +92,15 @@ class Abstr(Expr):
     def __str__(self) -> str:
         return rf"\{self.var}. {tryAddParen(self.expr)}"
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Abstr):
+            return self.var == other.var and self.expr == other.expr
+        else:
+            return False
+
+    def __hash__(self):
+        return hash((self.var, self.expr))
+
 
 # Application, x y
 class App(Expr):
@@ -104,6 +122,15 @@ class App(Expr):
         #     return tryAddParen(self.expr) + " " + tryAddParen(self.arg)
         return tryAddParen(self.expr) + " " + tryAddParen(self.arg)
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, App):
+            return self.expr == other.expr and self.arg == other.arg
+        else:
+            return False
+
+    def __hash__(self):
+        return hash((self.expr, self.arg))
+
 
 # Unevaluated Substitution, expr[old -> new]
 class UnevalSubst(Expr):
@@ -114,6 +141,19 @@ class UnevalSubst(Expr):
 
     def __str__(self) -> str:
         return f"{tryAddParen(self.expr)}[{self.old} -> {tryAddParen(self.new)}]"
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, UnevalSubst):
+            return (
+                self.old == other.old
+                and self.new == other.new
+                and self.expr == other.expr
+            )
+        else:
+            return False
+
+    def __hash__(self):
+        return hash((self.old, self.new, self.expr))
 
 
 def tryAddParen(expr: Expr) -> str:

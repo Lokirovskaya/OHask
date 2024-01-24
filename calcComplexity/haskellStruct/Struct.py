@@ -85,11 +85,29 @@ class Lit(Expr):
     def __str__(self) -> str:
         return super().__str__()
 
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Lit):
+            return self.litValue == other.litValue and self.litType == other.litType
+        else:
+            return False
+
+    def __hash__(self):
+        return hash(self.litValue)
+
 
 class App(Expr):
     def __init__(self, appExpr: Expr, appArg: Expr) -> None:
         self.appExpr = appExpr
         self.appArg = appArg
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, App):
+            return self.appExpr == other.appExpr and self.appArg == other.appArg
+        else:
+            return False
+
+    def __hash__(self):
+        return hash((self.appExpr, self.appArg))
 
 
 class Case(Expr):
@@ -97,6 +115,15 @@ class Case(Expr):
         self.caseExpr = caseExpr
         self.caseAlts = caseAlts
         self.caseAltCount = len(caseAlts)
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Case):
+            return self.caseExpr == other.caseExpr and self.caseAlts == other.caseAlts
+        else:
+            return False
+
+    def __hash__(self):
+        return hash((self.caseExpr, self.caseAlts))
 
 
 class Alt:
@@ -112,3 +139,16 @@ class Alt:
         self.altConVars = altConVars
         self.altConVarCount = len(altConVars)
         self.altExpr = altExpr
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, Alt):
+            return (
+                self.altConName == other.altConName
+                and self.altConVars == other.altConVars
+                and self.altExpr == other.altExpr
+            )
+        else:
+            return False
+
+    def __hash__(self):
+        return hash((self.altConName, self.altConVars, self.altExpr))
