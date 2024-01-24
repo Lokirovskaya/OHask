@@ -123,7 +123,7 @@ class Case(Expr):
             return False
 
     def __hash__(self):
-        return hash((self.caseExpr, self.caseAlts))
+        return hash((self.caseExpr, self.caseAlts[-1]))
 
 
 class Alt:
@@ -151,4 +151,6 @@ class Alt:
             return False
 
     def __hash__(self):
-        return hash((self.altConName, self.altConVars, self.altExpr))
+        return hash(
+            (self.altConName, self.altConVars[0], self.altConVars[-1], self.altExpr)
+        )

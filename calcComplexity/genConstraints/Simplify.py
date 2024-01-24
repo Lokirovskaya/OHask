@@ -1,15 +1,16 @@
-from typing import List
+from typing import Dict, List
 
 from calcComplexity.Config import LOG_PATH
 from calcComplexity.constraint import Constraint, ExprSymbol
 import calcComplexity.constraint.Symbols as symbols
-from calcComplexity.haskellStruct.Struct import Var
 import calcComplexity.untypedLambdaCalculus as lam
+import calcComplexity.haskellStruct as haskell
 
 
 def simplify(constrList: List[Constraint], exprSymbolList: List[ExprSymbol]):
     # Remember to update exprSymbolList in every simplification funcs
     replaceConstSymbols(constrList, exprSymbolList)
+    mergeIdenticalExprs(constrList, exprSymbolList)
 
     with open(LOG_PATH, "a") as f:
         f.write("[Simplified Constraints]\n")
@@ -37,3 +38,20 @@ def replaceConstSymbols(constrList: List[Constraint], exprSymbolList: List[ExprS
         lam.replaceVarDict(constr.rhs, replDict)  # type: ignore
 
     exprSymbolList[:] = newExprSymbolList
+
+
+def mergeIdenticalExprs(constrList: List[Constraint], exprSymbolList: List[ExprSymbol]):
+    replDict: Dict[ExprSymbol, ExprSymbol] = {}
+
+    expr2SymDict: Dict[haskell.Expr, ExprSymbol] = {}
+    for sym in exprSymbolList:
+        if sym.exprInfo.expr not in expr2SymDict:
+            expr2SymDict[sym.exprInfo.expr] = sym
+        else:
+            # replace curSym to prevSym
+            replDict[sym] = expr2SymDict[sym.exprInfo.expr]
+
+    for constr in constrList:
+        lam.replaceVarDict(constr.rhs, replDict)  # type: ignore
+
+    exprSymbolList[:] = filter(lambda sym: sym not in replDict, exprSymbolList)
