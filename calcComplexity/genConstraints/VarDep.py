@@ -1,7 +1,7 @@
 from typing import Dict, List, Set
 
 from calcComplexity.Config import LOG_PATH
-from calcComplexity.constraint import ExprInfo
+from calcComplexity.constraint import ExprInfo, ExprSymbol
 import calcComplexity.haskellStruct as haskell
 import calcComplexity.untypedLambdaCalculus as lam
 
@@ -10,7 +10,7 @@ criticalVarSet: Set[haskell.Var] = set()
 
 
 # fill the field ExprInfo.dependsOn
-def findVarDep(funcList: List[haskell.Func], exprSymbolList: List[lam.Var]):
+def findVarDep(funcList: List[haskell.Func], exprSymbolList: List[ExprSymbol]):
     for func in funcList:
         criticalVarSet.update(func.funcParams)
         buildDepGraph(func)
@@ -23,13 +23,12 @@ def findVarDep(funcList: List[haskell.Func], exprSymbolList: List[lam.Var]):
 
     # fill the field ExprInfo.dependsOn
     for exprSym in exprSymbolList:
-        fillExprDepInfo(exprSym.kwargs["exprInfo"])
+        fillExprDepInfo(exprSym.exprInfo)
 
     with open(LOG_PATH, "a") as f:
         f.write("[Exprs]\n")
         for exprSym in exprSymbolList:
-            exprInfo = exprSym.kwargs["exprInfo"]
-            f.write(exprSym.name + ": " + str(exprInfo) + "\n")
+            f.write(exprSym.name + ": " + str(exprSym.exprInfo) + "\n")
         f.write("\n")
 
 

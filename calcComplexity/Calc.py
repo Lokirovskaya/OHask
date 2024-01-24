@@ -1,4 +1,4 @@
-from calcComplexity.genConstraints import buildStruct, genConstraints
+from calcComplexity.genConstraints import buildStruct, genConstraints, simplify
 from .Config import LOG_PATH
 
 
@@ -8,3 +8,4 @@ def calcComplexity(funcsData):
 
     funcList = buildStruct(funcsData)
     constrList, exprSymbolList = genConstraints(funcList)
+    simplify(constrList, exprSymbolList)

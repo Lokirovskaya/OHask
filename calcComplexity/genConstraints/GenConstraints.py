@@ -1,17 +1,17 @@
 from typing import List, Tuple
 
 from calcComplexity.Config import LOG_PATH
-from calcComplexity.constraint import Constraint
+from calcComplexity.constraint import Constraint, ExprSymbol
 import calcComplexity.constraint.Symbols as symbol
 from calcComplexity.haskellStruct import Alt, App, Case, Expr, Func, Lit, Var
 import calcComplexity.untypedLambdaCalculus as lam
 
 from .VarDep import findVarDep
 
-exprSymbolList: List[lam.Var] = []
+exprSymbolList: List[ExprSymbol] = []
 
 
-def genConstraints(funcList: List[Func]) -> Tuple[List[Constraint], List[lam.Var]]:
+def genConstraints(funcList: List[Func]) -> Tuple[List[Constraint], List[ExprSymbol]]:
     constrList = []
     for func in funcList:
         complSymbol = symbol.complexity(func.funcUnique)

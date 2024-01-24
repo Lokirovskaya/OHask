@@ -33,8 +33,15 @@ def complexity(name: str) -> Var:
     return Var(f"T_{name}", isValue=False)
 
 
-def expr(expr: haskell.Expr) -> Var:
+class ExprSymbol(Var):
+    def __init__(
+        self, name: str, exprInfo: ExprInfo, isValue: bool = True, **kwargs
+    ) -> None:
+        super().__init__(name, isValue, **kwargs)
+        self.exprInfo = exprInfo
+
+
+def expr(expr: haskell.Expr) -> ExprSymbol:
     global uuidExpr
     uuidExpr += 1
-    exprInfo = ExprInfo(expr)
-    return Var(f"e{uuidExpr}", isValue=False, exprInfo=exprInfo)
+    return ExprSymbol(f"e{uuidExpr}", isValue=False, exprInfo=ExprInfo(expr))
