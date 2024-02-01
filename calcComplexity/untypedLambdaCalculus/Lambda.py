@@ -56,6 +56,9 @@ class Expr:
 
     def __hash__(self):
         return hash(self)
+    
+    def __repr__(self) -> str:
+        return str(self)
 
 
 # A simple variable
