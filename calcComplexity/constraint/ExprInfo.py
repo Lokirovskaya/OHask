@@ -1,7 +1,7 @@
-from typing import List, Set
+from typing import Set
+
 import calcComplexity.haskellStruct as haskell
-from calcComplexity.haskellStruct import getAllVars, simplePrintExpr
-import calcComplexity.untypedLambdaCalculus as lam
+from calcComplexity.haskellStruct import getAllVars
 
 
 class ExprInfo:

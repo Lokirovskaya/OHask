@@ -19,7 +19,7 @@ def simplify(constrList: List[Constraint], exprSymbolList: List[ExprSymbol]):
         f.write("\n")
         f.write("[Simplified Exprs]\n")
         for exprSym in exprSymbolList:
-            f.write(exprSym.name + ": " + str(exprSym.exprInfo) + "\n")
+            f.write(exprSym.name + " = " + str(exprSym.exprInfo.expr) + "\n")
         f.write("\n")
 
 

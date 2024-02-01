@@ -3,7 +3,6 @@ from typing import Dict, List, Set
 from calcComplexity.Config import LOG_PATH
 from calcComplexity.constraint import ExprInfo, ExprSymbol
 import calcComplexity.haskellStruct as haskell
-import calcComplexity.untypedLambdaCalculus as lam
 
 # Params of all funcs
 criticalVarSet: Set[haskell.Var] = set()

@@ -3,7 +3,7 @@ from typing import List, Tuple
 from calcComplexity.Config import LOG_PATH
 from calcComplexity.constraint import Constraint, ExprSymbol
 import calcComplexity.constraint.Symbols as symbol
-from calcComplexity.haskellStruct import Alt, App, Case, Expr, Func, Lit, Var
+from calcComplexity.haskellStruct import App, Case, Expr, Func, Lit, Var
 import calcComplexity.untypedLambdaCalculus as lam
 
 from .VarDep import findVarDep
