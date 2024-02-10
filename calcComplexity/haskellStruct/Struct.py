@@ -45,6 +45,7 @@ class Func:
 class Expr:
     def __str__(self) -> str:
         from .SimplePrinter import simplePrintExpr
+        from .HaskellPrinter import haskellPrintExpr
 
         return simplePrintExpr(self)
 
@@ -66,11 +67,6 @@ class Var(Expr):
         self.varModule = varModule
         self.varUnique = varUnique
         self.varArity = varArity
-
-        # Var definition expr str
-        # It is a str repr of a valid haskell expr
-        # Filled in genConstraints/VarDef.py
-        self.varDef: Optional[str] = None
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Var):

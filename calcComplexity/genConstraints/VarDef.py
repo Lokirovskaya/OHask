@@ -9,8 +9,16 @@
 #        f = e
 #      Expr above tells the definition of var f is e.
 
+from typing import Dict
 import calcComplexity.haskellStruct as haskell
 
 
-def addDefExpr(var: haskell.Var):
-    pass
+defOfVar: Dict[haskell.Var, str] = {}
+
+
+def addDefExpr(var: haskell.Var, expr: haskell.Expr):
+    sexpr = haskell.haskellPrintExpr
+
+
+def getDef(var: haskell.Var) -> str:
+    return defOfVar[var]

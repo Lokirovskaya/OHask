@@ -23,3 +23,11 @@ def getAllVars(expr: Expr) -> Set[Var]:
         if isinstance(var, Var):
             varSet.add(var)
     return varSet
+
+
+def isOuterVar(var: Var) -> bool:
+    return var.varModule != None and var.varModule != "Main"
+
+
+def isInternalVar(var: Var) -> bool:
+    return var.varName in [":", "[]", "+", "-", "*"]
