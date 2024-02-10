@@ -6,7 +6,7 @@ import calcComplexity.constraint.Symbols as symbol
 from calcComplexity.haskellStruct import App, Case, Expr, Func, Lit, Var
 import calcComplexity.untypedLambdaCalculus as lam
 
-from .VarDep import findVarDep
+from .FillDepAndDef import fillDepAndDef
 
 exprSymbolList: List[ExprSymbol] = []
 
@@ -25,7 +25,7 @@ def genConstraints(funcList: List[Func]) -> Tuple[List[Constraint], List[ExprSym
             f.write(str(constr) + "\n")
         f.write("\n")
 
-    findVarDep(funcList, exprSymbolList)
+    fillDepAndDef(funcList, exprSymbolList)
 
     return constrList, exprSymbolList
 

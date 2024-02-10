@@ -12,8 +12,7 @@ class ExprInfo:
         # Vars that the expr depends on
         # Note: Most of var dependencies are not listed here.
         #       We only take into account critical vars such as function params.
-        self.dependsOn: Set[haskell.Var] = set()
-        
+        self.dependsOnCrit: Set[haskell.Var] = set()
 
     def __str__(self) -> str:
-        return f"expr={self.expr}, varSet={self.varSet}, dependsOn={self.dependsOn}"
+        return f"expr={self.expr}, varSet={self.varSet}, dependsOn={self.dependsOnCrit}"

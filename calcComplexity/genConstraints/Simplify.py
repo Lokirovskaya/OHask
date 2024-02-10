@@ -27,7 +27,7 @@ def replaceConstSymbols(constrList: List[Constraint], exprSymbolList: List[ExprS
     constExprSyms: List[ExprSymbol] = []
     newExprSymbolList = []
     for sym in exprSymbolList:
-        if len(sym.exprInfo.dependsOn) == 0:
+        if len(sym.exprInfo.dependsOnCrit) == 0:
             constExprSyms.append(sym)
         else:
             newExprSymbolList.append(sym)

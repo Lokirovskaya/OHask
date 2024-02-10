@@ -16,7 +16,7 @@ class Group:
 def makeGroups(exprSymList: List[ExprSymbol]) -> List[Group]:
     vars2GroupDict: Dict[Tuple[haskell.Var, ...], Group] = {}
     for sym in exprSymList:
-        tupDep = tuple(sym.exprInfo.dependsOn)
+        tupDep = tuple(sym.exprInfo.dependsOnCrit)
         if tupDep in vars2GroupDict:
             group = vars2GroupDict[tupDep]
             group.exprSymList.append(sym)

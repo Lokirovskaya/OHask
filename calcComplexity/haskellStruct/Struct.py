@@ -1,7 +1,7 @@
 # See OHask/funcInfoStat/gen/StatInfo.hs
 
 from __future__ import annotations
-from typing import List, Optional
+from typing import List, Optional, Set
 
 
 class Func:
@@ -66,6 +66,11 @@ class Var(Expr):
         self.varModule = varModule
         self.varUnique = varUnique
         self.varArity = varArity
+
+        # Var definition expr str
+        # It is a str repr of a valid haskell expr
+        # Filled in genConstraints/VarDef.py
+        self.varDef: Optional[str] = None
 
     def __eq__(self, other) -> bool:
         if isinstance(other, Var):
