@@ -1,4 +1,4 @@
-from calcComplexity.genConstraints import buildStruct, genConstraints, simplify
+from calcComplexity.genConstraints import buildStruct, genConstraints
 from calcComplexity.runDynExec import makeGroups
 from .Config import LOG_PATH
 
@@ -9,6 +9,5 @@ def calcComplexity(funcsData):
 
     funcList = buildStruct(funcsData)
     constrList, exprSymbolList = genConstraints(funcList)
-    simplify(constrList, exprSymbolList)
 
     groupList = makeGroups(exprSymbolList)

@@ -7,6 +7,7 @@ from calcComplexity.haskellStruct import App, Case, Expr, Func, Lit, Var
 import calcComplexity.untypedLambdaCalculus as lam
 
 from .FillDepAndDef import fillDepAndDef
+from .Simplify import simplify
 
 exprSymbolList: List[ExprSymbol] = []
 
@@ -26,6 +27,8 @@ def genConstraints(funcList: List[Func]) -> Tuple[List[Constraint], List[ExprSym
         f.write("\n")
 
     fillDepAndDef(funcList, exprSymbolList)
+
+    simplify(constrList, exprSymbolList)
 
     return constrList, exprSymbolList
 

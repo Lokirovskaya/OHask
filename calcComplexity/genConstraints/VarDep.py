@@ -28,7 +28,7 @@ def addDepEdges(u: Var, vs: Iterable[Var]):
         addDepEdge(u, v)
 
 
-def getImmediateDeps(v: Var) -> Set[Var]:
+def _getImmediateDeps(v: Var) -> Set[Var]:
     if v in nextOf:
         return nextOf[v]
     else:
@@ -40,7 +40,7 @@ def getAllDeps(v: Var) -> Set[Var]:
 
     def dfs(v: Var):
         ans.add(v)
-        for vnext in getImmediateDeps(v):
+        for vnext in _getImmediateDeps(v):
             if v != vnext:
                 dfs(vnext)
 

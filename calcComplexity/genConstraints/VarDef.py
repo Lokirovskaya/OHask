@@ -16,8 +16,46 @@ import calcComplexity.haskellStruct as haskell
 defOfVar: Dict[haskell.Var, str] = {}
 
 
+def _addDef(var: haskell.Var, s: str):
+    assert var not in defOfVar or defOfVar[var] == s, f"Conflict def of var: {var}"
+    defOfVar[var] = s
+
+
 def addDefExpr(var: haskell.Var, expr: haskell.Expr):
-    sexpr = haskell.haskellPrintExpr
+    exprStr = haskell.haskellPrintExpr(expr)
+    defStr = f"Just ({exprStr})"
+    _addDef(var, defStr)
+
+
+def addDefCase(case_: haskell.Case):
+    exprStr = haskell.haskellPrintExpr(case_.caseExpr)
+    for alt in case_.caseAlts:
+        if alt.altConVarCount > 0:
+            for idx, var in enumerate(alt.altConVars):
+                defStr = makePatternDefStr(
+                    exprStr=exprStr,
+                    conStr=alt.altConName,
+                    conIdx=idx,
+                    conCount=alt.altConVarCount,
+                )
+                _addDef(var, defStr)
+
+
+# var = case expr of {Con t _ _ -> t}
+def makePatternDefStr(exprStr: str, conStr: str, conIdx: int, conCount: int) -> str:
+    tmpStr = "t"
+
+    if conCount == 1:
+        conVarsStr = tmpStr
+    else:
+        assert conCount > 1
+        l = ["_"] * conCount
+        l[conIdx] = tmpStr
+        conVarsStr = " ".join(l)
+
+    return (
+        f"case ({exprStr}) of {{({conStr}) {conVarsStr} -> Just {tmpStr}; _ -> Nothing}}"
+    )
 
 
 def getDef(var: haskell.Var) -> str:
