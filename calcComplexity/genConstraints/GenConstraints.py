@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from calcComplexity.Config import LOG_PATH
+from calcComplexity.Log import logln
 from calcComplexity.constraint import Constraint, ExprSymbol
 import calcComplexity.constraint.Symbols as symbol
 from calcComplexity.haskellStruct import App, Case, Expr, Func, Lit, Var
@@ -20,11 +20,10 @@ def genConstraints(funcList: List[Func]) -> Tuple[List[Constraint], List[ExprSym
         constr = Constraint(complSymbol, compl)
         constrList.append(constr)
 
-    with open(LOG_PATH, "a") as f:
-        f.write("[Constraints]\n")
-        for constr in constrList:
-            f.write(str(constr) + "\n")
-        f.write("\n")
+    logln("[Constraints]")
+    for constr in constrList:
+        logln(str(constr))
+    logln()
 
     fillDepAndDef(funcList, exprSymbolList)
 

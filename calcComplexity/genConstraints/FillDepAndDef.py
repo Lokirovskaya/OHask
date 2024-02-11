@@ -1,6 +1,6 @@
 from typing import Dict, List, Set
 
-from calcComplexity.Config import LOG_PATH
+from calcComplexity.Log import logln
 from calcComplexity.constraint import ExprInfo, ExprSymbol
 import calcComplexity.haskellStruct as haskell
 from . import VarDep as varDep
@@ -21,16 +21,15 @@ def fillDepAndDef(funcList: List[haskell.Func], exprSymbolList: List[ExprSymbol]
     for exprSym in exprSymbolList:
         fillExprDepInfo(exprSym.exprInfo)
 
-    with open(LOG_PATH, "a") as f:
-        f.write("[Exprs]\n")
-        for exprSym in exprSymbolList:
-            f.write(f"{exprSym.name}: {exprSym.exprInfo}\n")
-        f.write("\n")
+    logln("[Exprs]")
+    for exprSym in exprSymbolList:
+        logln(f"{exprSym.name}: {exprSym.exprInfo}")
+    logln()
 
-        f.write("[Var Defs]\n")
-        for var, s in varDef.defOfVar.items():
-            f.write(f"{var} = {s}\n")
-        f.write("\n")
+    logln("[Var Defs]")
+    for var, s in varDef.defOfVar.items():
+        logln(f"{var} = {s}")
+    logln()
 
 
 # Theory detail: See VarDep.py & VarDef.py

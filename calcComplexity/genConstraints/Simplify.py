@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from calcComplexity.Config import LOG_PATH
+from calcComplexity.Log import logln
 from calcComplexity.constraint import Constraint, ExprSymbol
 import calcComplexity.constraint.Symbols as symbols
 import calcComplexity.untypedLambdaCalculus as lam
@@ -12,15 +12,14 @@ def simplify(constrList: List[Constraint], exprSymbolList: List[ExprSymbol]):
     replaceConstSymbols(constrList, exprSymbolList)
     mergeIdenticalExprs(constrList, exprSymbolList)
 
-    with open(LOG_PATH, "a") as f:
-        f.write("[Simplified Constraints]\n")
-        for constr in constrList:
-            f.write(str(constr) + "\n")
-        f.write("\n")
-        f.write("[Simplified Exprs]\n")
-        for exprSym in exprSymbolList:
-            f.write(exprSym.name + " = " + str(exprSym.exprInfo.expr) + "\n")
-        f.write("\n")
+    logln("[Simplified Constraints]")
+    for constr in constrList:
+        logln(str(constr))
+    logln()
+    logln("[Simplified Exprs]")
+    for exprSym in exprSymbolList:
+        logln(exprSym.name + " = " + str(exprSym.exprInfo.expr))
+    logln()
 
 
 def replaceConstSymbols(constrList: List[Constraint], exprSymbolList: List[ExprSymbol]):

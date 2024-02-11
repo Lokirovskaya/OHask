@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from calcComplexity.Config import LOG_PATH
+from calcComplexity.Log import logln
 from calcComplexity.haskellStruct import Alt, App, Case, Expr, Func, Lit, Var
 
 
@@ -20,15 +20,15 @@ def buildStruct(funcsData: List[Any]) -> List[Func]:
         if parentUnique != None:
             func.funcParent = unique2FuncDict[parentUnique]
 
-    with open(LOG_PATH, "a") as f:
-        f.write("[Funcs]\n")
-        for func in funcList:
-            if func.funcParamCount == 0:
-                f.write(f"{func.funcUnique} = {func.funcExpr}\n")
-            else:
-                paramsStr = " ".join(map(str, func.funcParams))
-                f.write(f"{func.funcUnique} {paramsStr} = {func.funcExpr}\n")
-        f.write("\n")
+    logln("[Funcs]")
+    for func in funcList:
+        if func.funcParamCount == 0:
+            logln(f"{func.funcUnique} = {func.funcExpr}")
+        else:
+            paramsStr = " ".join(map(str, func.funcParams))
+            logln(f"{func.funcUnique} {paramsStr} = {func.funcExpr}")
+    logln()
+
     return funcList
 
 

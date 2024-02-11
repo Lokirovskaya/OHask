@@ -1,6 +1,6 @@
 from typing import Dict, List, Set, Tuple
 
-from calcComplexity.Config import LOG_PATH
+from calcComplexity.Log import logln
 from calcComplexity.constraint.Symbols import ExprSymbol
 import calcComplexity.haskellStruct as haskell
 import calcComplexity.genConstraints.VarDep as varDep
@@ -31,12 +31,11 @@ def makeGroups(exprSymList: List[ExprSymbol]) -> List[Group]:
 
     groupList = list(vars2GroupDict.values())
 
-    with open(LOG_PATH, "a") as f:
-        f.write("[Dyn Exec Groups]\n")
-        for i, group in enumerate(groupList):
-            f.write(
-                f"group{i}: paramVars={group.paramVars}, exprs={group.exprSymList}, domVars={group.domVars}\n"
-            )
-        f.write("\n")
+    logln("[Dyn Exec Groups]")
+    for i, group in enumerate(groupList):
+        logln(
+            f"group{i}: paramVars={group.paramVars}, exprs={group.exprSymList}, domVars={group.domVars}"
+        )
+    logln()
 
     return groupList
