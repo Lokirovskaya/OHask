@@ -1,7 +1,7 @@
 # Generates valid haskell expr str
 
 from .Struct import *
-from .Util import isOuterVar, isInternalVar
+from .Util import isOuterVar, isBuiltinVar
 
 
 def haskellPrintExpr(expr: Expr) -> str:
@@ -22,7 +22,7 @@ def printExpr(expr: Expr) -> str:
 
 
 def printVar(var: Var) -> str:
-    if isInternalVar(var):
+    if isBuiltinVar(var):
         return var.varName
     elif isOuterVar(var):
         assert var.varModule != None

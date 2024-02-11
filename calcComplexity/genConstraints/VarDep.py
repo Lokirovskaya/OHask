@@ -14,6 +14,7 @@ from calcComplexity.haskellStruct import Var
 # Represented by adjacency set
 
 nextOf: Dict[Var, Set[Var]] = {}
+backward: Dict[Var, Set[Var]] = {}
 
 
 def addDepEdge(u: Var, v: Var):
@@ -21,6 +22,11 @@ def addDepEdge(u: Var, v: Var):
         nextOf[u] = {v}
     else:
         nextOf[u].add(v)
+
+    if v not in backward:
+        backward[v] = {u}
+    else:
+        backward[v].add(u)
 
 
 def addDepEdges(u: Var, vs: Iterable[Var]):
@@ -41,6 +47,26 @@ def getAllDeps(v: Var) -> Set[Var]:
     def dfs(v: Var):
         ans.add(v)
         for vnext in _getImmediateDeps(v):
+            if v != vnext:
+                dfs(vnext)
+
+    dfs(v)
+    return ans
+
+
+def _getImmediateDoms(v: Var) -> Set[Var]:
+    if v in backward:
+        return backward[v]
+    else:
+        return set()
+
+
+def getAllDoms(v: Var) -> Set[Var]:
+    ans = set()
+
+    def dfs(v: Var):
+        ans.add(v)
+        for vnext in _getImmediateDoms(v):
             if v != vnext:
                 dfs(vnext)
 

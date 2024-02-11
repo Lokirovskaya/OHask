@@ -29,5 +29,5 @@ def isOuterVar(var: Var) -> bool:
     return var.varModule != None and var.varModule != "Main"
 
 
-def isInternalVar(var: Var) -> bool:
+def isBuiltinVar(var: Var) -> bool:
     return var.varName in [":", "[]", "+", "-", "*"]
