@@ -53,6 +53,11 @@ def makePatternDefStr(exprStr: str, conStr: str, conIdx: int, conCount: int) -> 
         l[conIdx] = tmpStr
         conVarsStr = " ".join(l)
 
+    # tackle with type constructor (,) (,,) ...
+    # the real names of them are just commas, without parens
+    if len(conStr) >= 3 and conStr[0] == "(" and conStr[-1] == ")":
+        conStr = conStr[1:-1]
+
     return (
         f"case ({exprStr}) of {{({conStr}) {conVarsStr} -> Just {tmpStr}; _ -> Nothing}}"
     )

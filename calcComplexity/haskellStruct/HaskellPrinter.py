@@ -48,12 +48,18 @@ def printAlts(alts: List[Alt]) -> str:
 
 
 def printAlt(alt: Alt) -> str:
+    # tackle with type constructor (,) (,,) ...
+    # the real names of them are just commas, without parens
+    conName = alt.altConName
+    if len(conName) >= 3 and conName[0] == "(" and conName[-1] == ")":
+        conName = conName[1:-1]
+
     if alt.altConVarCount == 0:
-        return f"{alt.altConName} -> {tryAddParen(alt.altExpr)}"
+        return f"({conName}) -> {tryAddParen(alt.altExpr)}"
     else:
         varNameList = map(printVar, alt.altConVars)
         s = " ".join(varNameList)
-        return f"{alt.altConName} {s} -> {tryAddParen(alt.altExpr)}"
+        return f"({conName}) {s} -> {tryAddParen(alt.altExpr)}"
 
 
 def tryAddParen(expr: Expr) -> str:
