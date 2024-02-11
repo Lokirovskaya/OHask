@@ -1,5 +1,5 @@
 from calcComplexity.genConstraints import buildStruct, genConstraints
-from calcComplexity.runDynExec import makeGroups
+from calcComplexity.runDynExec import makeGroups, genHaskellProgram
 
 
 def calcComplexity(funcsData):
@@ -7,3 +7,4 @@ def calcComplexity(funcsData):
     constrList, exprSymbolList = genConstraints(funcList)
 
     groupList = makeGroups(exprSymbolList)
+    genHaskellProgram(groupList)
