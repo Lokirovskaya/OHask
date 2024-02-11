@@ -7,4 +7,4 @@ def calcComplexity(funcsData):
     constrList, exprSymbolList = genConstraints(funcList)
 
     groupList = makeGroups(exprSymbolList)
-    genHaskellProgram(groupList)
+    genHaskellProgram(funcList, groupList)

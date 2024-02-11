@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
 from calcComplexity.Log import logln
-from calcComplexity.haskellStruct import Alt, App, Case, Expr, Func, Lit, Var
+from calcComplexity.haskellStruct import Alt, App, Case, Expr, Func, Lit, Var, addImport
 
 
 def buildStruct(funcsData: List[Any]) -> List[Func]:
@@ -60,10 +60,14 @@ def buildExpr(exprData) -> Expr:
 
 
 def buildVar(varData) -> Var:
+    module = varData["varModule"]
+    if module != None and module != "Main":
+        addImport(module)
+        
     return Var(
         varName=varData["varName"],
         varType=varData["varType"],
-        varModule=varData["varModule"],
+        varModule=module,
         varUnique=varData["varUnique"],
         varArity=varData["varArity"],
     )

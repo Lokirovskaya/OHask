@@ -5,13 +5,47 @@ import calcComplexity.genConstraints.VarDef as varDef
 import calcComplexity.haskellStruct as haskell
 
 
-def genHaskellProgram(groupList: List[Group]):
-    text = ""
+def genHaskellProgram(funcList: List[haskell.Func], groupList: List[Group]):
+    text = header() + "\n"
+
+    for func in funcList:
+        text += showFunc(func) + "\n"
+    
     for i, group in enumerate(groupList):
         text += showGroup(group, f"g{i}") + "\n"
 
     with open("./run/DynExprs.hs", "w") as f:
         f.write(text)
+
+
+def header() -> str:
+    ans = ""
+    options = [
+        "{-# LANGUAGE MagicHash #-}",
+        "{-# LANGUAGE EmptyCase #-}",
+        "{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}",
+        "{-# OPTIONS_GHC -Wno-unused-imports #-}",
+        "{-# OPTIONS_GHC -Wno-unused-local-binds #-}",
+        "{-# OPTIONS_GHC -Wno-overlapping-patterns #-}",
+        "{-# OPTIONS_GHC -Wno-missing-signatures #-}",
+        "{-# OPTIONS_GHC -Wno-unused-matches #-}",
+        "{-# OPTIONS_GHC -Wno-name-shadowing #-}",
+        "{-# HLINT ignore #-}",
+    ]
+    ans = "\n".join(options) + "\n\n"
+
+    for imp in haskell.imports:
+        ans += f"import qualified {imp}\n"
+
+    return ans
+
+
+def showFunc(func: haskell.Func) -> str:
+    if func.funcParamCount == 0:
+        return f"{func.funcUnique} = {hask(func.funcExpr)}\n"
+    else:
+        paramsStr = " ".join(map(hask, func.funcParams))
+        return f"{func.funcUnique} {paramsStr} = {hask(func.funcExpr)}\n"
 
 
 def showGroup(group: Group, groupName: str) -> str:
