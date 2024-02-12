@@ -37,7 +37,7 @@ def printCase(case_: Case) -> str:
 
 
 def printAlts(alts: List[Alt]) -> str:
-    return ";".join([printAlt(alt) for alt in alts])
+    return "; ".join([printAlt(alt) for alt in alts])
 
 
 def printAlt(alt: Alt) -> str:

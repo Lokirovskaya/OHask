@@ -29,5 +29,22 @@ def isOuterVar(var: Var) -> bool:
     return var.varModule != None and var.varModule != "Main"
 
 
+# Tackle with type constructor (,) (,,) ...
+# They are not real identifier, so a lot of workaround is required
+def isTupleConstructorName(varName: str) -> bool:
+    if len(varName) == 3:
+        return varName == "(,)"
+    else:
+        return (
+            len(varName) >= 3
+            and varName[0] == "("
+            and varName[-1] == ")"
+            and all(map(lambda c: c == ",", varName[1:-1]))
+        )
+
+
+builtinVars = [":", "[]", "+", "-", "*"]
+
+
 def isBuiltinVar(var: Var) -> bool:
-    return var.varName in [":", "[]", "+", "-", "*"]
+    return var.varName in builtinVars or isTupleConstructorName(var.varName)

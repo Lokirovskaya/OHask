@@ -1,7 +1,7 @@
 # Generates valid haskell expr str
 
 from .Struct import *
-from .Util import isOuterVar, isBuiltinVar
+from .Util import isOuterVar, isBuiltinVar, isTupleConstructorName
 
 
 def haskellPrintExpr(expr: Expr) -> str:
@@ -44,22 +44,25 @@ def printCase(case_: Case) -> str:
 
 
 def printAlts(alts: List[Alt]) -> str:
-    return ";".join([printAlt(alt) for alt in alts])
+    return "; ".join([printAlt(alt) for alt in alts])
 
 
 def printAlt(alt: Alt) -> str:
-    # tackle with type constructor (,) (,,) ...
-    # the real names of them are just commas, without parens
-    conName = alt.altConName
-    if len(conName) >= 3 and conName[0] == "(" and conName[-1] == ")":
-        conName = conName[1:-1]
+    ans = ""
 
-    if alt.altConVarCount == 0:
-        return f"({conName}) -> {tryAddParen(alt.altExpr)}"
+    if isTupleConstructorName(alt.altConName):
+        ans += alt.altConName
     else:
+        ans += "(" + alt.altConName + ")"
+
+    if alt.altConVarCount > 0:
         varNameList = map(printVar, alt.altConVars)
         s = " ".join(varNameList)
-        return f"({conName}) {s} -> {tryAddParen(alt.altExpr)}"
+        ans += " " + s
+
+    ans += f" -> {tryAddParen(alt.altExpr)}"
+
+    return ans
 
 
 def tryAddParen(expr: Expr) -> str:
