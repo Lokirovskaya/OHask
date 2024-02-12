@@ -26,7 +26,7 @@ genOneStatFunc func =
       sfuncType = func |> subFuncType,
       sfuncUnique = func |> subFuncUnique,
       sfuncExpr = genStatExpr (func |> subFuncExpr) |> simplifyStatExpr,
-      sfuncParams = map genStatVarFromInfo (func |> subFuncParams),
+      sfuncParams = removeTyConParams $ map genStatVarFromInfo (func |> subFuncParams),
       sfuncParentUnique = parentUnique
     }
   where
@@ -34,6 +34,8 @@ genOneStatFunc func =
       case func |> subFuncParent of
         Just subFunc -> Just $ subFunc |> subFuncUnique
         Nothing -> Nothing
+    removeTyConParams :: [SVar] -> [SVar]
+    removeTyConParams = filter (not . isTyConFunc . svarName)
 
 isTyConFunc :: String -> Bool
 isTyConFunc ('$' : _ : _) = True
