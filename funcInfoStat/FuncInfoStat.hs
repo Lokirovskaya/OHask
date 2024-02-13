@@ -42,6 +42,7 @@ pass guts = do
   -- IORef of stat result
   statRef <- liftIO $ newIORef ([] :: Stat)
   -- Run plugin pass
+  liftIO $ putStrLn "\ESC[34mStat Plugin Loaded\ESC[0m"
   modguts <- bindsOnlyPass (mapM (runBind dflags statRef)) guts
   -- Output stat info
   stat <- liftIO $ readIORef statRef
