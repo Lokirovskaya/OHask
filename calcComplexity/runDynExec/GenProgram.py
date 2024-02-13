@@ -4,25 +4,26 @@ from calcComplexity.runDynExec import Group
 import calcComplexity.genConstraints.VarDef as varDef
 import calcComplexity.haskellStruct as haskell
 
+ident = "  "
+
 
 def genHaskellProgram(funcList: List[haskell.Func], groupList: List[Group]):
-    text = header() + "\n"
+    text = showPragmasAndImports() + "\n"
 
-    for func in funcList:
-        text += showFunc(func) + "\n"
-    
     for i, group in enumerate(groupList):
         text += showGroup(group, f"g{i}") + "\n"
 
-    with open("./run/DynExprs.hs", "w") as f:
+    with open("./tmp/dynExprs/DynExprs.hs", "w") as f:
         f.write(text)
 
 
-def header() -> str:
+def showPragmasAndImports() -> str:
     ans = ""
     options = [
         "{-# LANGUAGE MagicHash #-}",
         "{-# LANGUAGE EmptyCase #-}",
+        "{-# LANGUAGE UnboxedTuples #-}",
+        "{-# LANGUAGE RankNTypes #-}",
         "{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}",
         "{-# OPTIONS_GHC -Wno-unused-imports #-}",
         "{-# OPTIONS_GHC -Wno-unused-local-binds #-}",
@@ -31,6 +32,8 @@ def header() -> str:
         "{-# OPTIONS_GHC -Wno-unused-matches #-}",
         "{-# OPTIONS_GHC -Wno-name-shadowing #-}",
         "{-# HLINT ignore #-}",
+        "",
+        "module DynExprs where",
     ]
     ans = "\n".join(options) + "\n\n"
 
@@ -40,17 +43,38 @@ def header() -> str:
     return ans
 
 
-def showFunc(func: haskell.Func) -> str:
-    if func.funcParamCount == 0:
-        return f"{func.funcUnique} = {hask(func.funcExpr)}\n"
-    else:
-        paramsStr = " ".join(map(hask, func.funcParams))
-        return f"{func.funcUnique} {paramsStr} = {hask(func.funcExpr)}\n"
+# # Show all funcs with sub-func relations
+# def showFuncs(funcs: List[haskell.Func]) -> str:
+#     ans = ""
+
+#     def runSubFunc(func: haskell.Func, layer: int):
+#         nonlocal ans
+#         ans += ident * layer + showFuncSig(func)
+#         ans += ident * layer + showFuncDef(func)
+#         if len(func.funcChildren) > 0:
+#             ans += ident * (layer + 1) + "where\n"
+#             for sub in func.funcChildren:
+#                 runSubFunc(sub, layer + 2)
+
+#     for func in funcs:
+#         if func.funcParent == None:
+#             runSubFunc(func, 0)
+
+#     return ans
+
+# def showFuncSig(func:haskell.Func) -> str:
+#     return f"{func.funcUnique} :: {func.funcType}\n"
+
+# def showFuncDef(func: haskell.Func) -> str:
+#     if func.funcParamCount == 0:
+#         return f"{func.funcUnique} = {hask(func.funcExpr)}\n"
+#     else:
+#         paramsStr = " ".join(map(hask, func.funcParams))
+#         return f"{func.funcUnique} {paramsStr} = {hask(func.funcExpr)}\n"
 
 
 def showGroup(group: Group, groupName: str) -> str:
     ans = ""
-    ident = "  "
 
     # group decl
     varsStr = " ".join([hask(var) for var in group.paramVars])

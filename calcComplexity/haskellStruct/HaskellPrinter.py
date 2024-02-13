@@ -1,7 +1,7 @@
 # Generates valid haskell expr str
 
 from .Struct import *
-from .Util import isOuterVar, isBuiltinVar, isTupleConstructorName
+from .Util import isBuiltinVar, isTupleConstructorName
 
 
 def haskellPrintExpr(expr: Expr) -> str:
@@ -24,8 +24,9 @@ def printExpr(expr: Expr) -> str:
 def printVar(var: Var) -> str:
     if isBuiltinVar(var):
         return var.varName
-    elif isOuterVar(var):
-        assert var.varModule != None
+    elif var.varModule == "Main":  # todo: specify module name
+        return "MainTmp." + var.varName
+    elif var.varModule != None:
         return var.varModule + "." + var.varName
     else:
         return var.varUnique

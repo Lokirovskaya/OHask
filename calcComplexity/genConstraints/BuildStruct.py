@@ -14,11 +14,13 @@ def buildStruct(funcsData: List[Any]) -> List[Func]:
         funcList.append(func)
         unique2FuncDict[unique] = func
 
-    # Fill field funcParent
+    # Fill field funcParent & funcChildren
     for unique, func in unique2FuncDict.items():
         parentUnique = func.funcParentUnique
         if parentUnique != None:
-            func.funcParent = unique2FuncDict[parentUnique]
+            parent = unique2FuncDict[parentUnique]
+            func.funcParent = parent
+            parent.funcChildren.append(func)
 
     logln("[Funcs]")
     for func in funcList:
@@ -63,7 +65,7 @@ def buildVar(varData) -> Var:
     module = varData["varModule"]
     if module != None and module != "Main":
         addImport(module)
-        
+
     return Var(
         varName=varData["varName"],
         varType=varData["varType"],

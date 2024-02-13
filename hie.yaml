@@ -1,11 +1,5 @@
 cradle:
   multi:
-    # ignore run/
-    # - path: "./run"
-    #   config:
-    #     cradle:
-    #       none:
-    # ignore test/
     - path: "./test"
       config:
         cradle:
@@ -22,9 +16,9 @@ cradle:
               component: "lib:Output"
             - path: "./funcInfoStat"
               component: "lib:FuncInfoStat"
-            - path: "./findImports"
-              component: "lib:FindImports"
-            - path: "./run"
+            - path: "./tmp/mainTmp"
+              component: "lib:MainTmp"
+            - path: "./tmp/dynExprs"
               component: "lib:DynExprs"
             - path: "./dynExec"
               component: "exe:DynExec"

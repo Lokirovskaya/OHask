@@ -25,10 +25,6 @@ def getAllVars(expr: Expr) -> Set[Var]:
     return varSet
 
 
-def isOuterVar(var: Var) -> bool:
-    return var.varModule != None and var.varModule != "Main"
-
-
 # Tackle with type constructor (,) (,,) ...
 # They are not real identifier, so a lot of workaround is required
 def isTupleConstructorName(varName: str) -> bool:

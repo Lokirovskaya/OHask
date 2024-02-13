@@ -66,16 +66,17 @@ library FuncInfoStat
     hs-source-dirs:   funcInfoStat
 
 
-executable Stat
+library MainTmp
     import:           common-options
-    main-is:          Run.hs
+    exposed-modules:  
+        MainTmp
     build-depends:    
         FuncInfoStat
     ghc-options:      
         -O0 
         -w
         -fplugin=FuncInfoStat
-    hs-source-dirs:   run
+    hs-source-dirs:   tmp/mainTmp
 
 
 
@@ -85,11 +86,10 @@ library DynExprs
     import:           common-options
     exposed-modules:  
         DynExprs
-    other-modules:
-        Run
-    build-depends:    
-        ghc-prim ^>=0.9.1
-    hs-source-dirs:   run
+    build-depends:
+        ghc-prim ^>=0.9.1,
+        MainTmp
+    hs-source-dirs:   tmp/dynExprs
 
 
 executable DynExec

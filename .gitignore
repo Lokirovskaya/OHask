@@ -1,6 +1,6 @@
 dist-newstyle/
 dump/
-run/
+tmp/
 stat/
 __pycache__/
 .vscode/

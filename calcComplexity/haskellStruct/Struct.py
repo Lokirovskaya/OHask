@@ -23,6 +23,7 @@ class Func:
         self.funcExpr = funcExpr
         # to be filled in genDependencies/BuildStruct.py
         self.funcParent: Optional[Func] = None
+        self.funcChildren: List[Func] = []
         # var-like function
         self.varLike = Var(
             varName=funcName,
