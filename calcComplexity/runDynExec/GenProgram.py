@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Set
 
 from calcComplexity.runDynExec import Group
-import calcComplexity.genConstraints.VarDef as varDef
+from calcComplexity.genConstraints.VarDef import VarDef, getDef
 import calcComplexity.haskellStruct as haskell
 
 ident = "  "
@@ -43,36 +43,6 @@ def showPragmasAndImports() -> str:
     return ans
 
 
-# # Show all funcs with sub-func relations
-# def showFuncs(funcs: List[haskell.Func]) -> str:
-#     ans = ""
-
-#     def runSubFunc(func: haskell.Func, layer: int):
-#         nonlocal ans
-#         ans += ident * layer + showFuncSig(func)
-#         ans += ident * layer + showFuncDef(func)
-#         if len(func.funcChildren) > 0:
-#             ans += ident * (layer + 1) + "where\n"
-#             for sub in func.funcChildren:
-#                 runSubFunc(sub, layer + 2)
-
-#     for func in funcs:
-#         if func.funcParent == None:
-#             runSubFunc(func, 0)
-
-#     return ans
-
-# def showFuncSig(func:haskell.Func) -> str:
-#     return f"{func.funcUnique} :: {func.funcType}\n"
-
-# def showFuncDef(func: haskell.Func) -> str:
-#     if func.funcParamCount == 0:
-#         return f"{func.funcUnique} = {hask(func.funcExpr)}\n"
-#     else:
-#         paramsStr = " ".join(map(hask, func.funcParams))
-#         return f"{func.funcUnique} {paramsStr} = {hask(func.funcExpr)}\n"
-
-
 def showGroup(group: Group, groupName: str) -> str:
     ans = ""
 
@@ -89,42 +59,21 @@ def showGroup(group: Group, groupName: str) -> str:
     # Every letVar should have corresponding varDef
     letVars = domVars.difference(paramVars)
     if len(letVars) > 0:
-
         for var in letVars:
-            defStr = varDef.getDef(var)
+            varDef: VarDef = getDef(var)
+            # varDepVars = (varDef.vars /\ group.domVars) - group.paramVars
+            varDepVars = varDef.varSet.intersection(domVars).difference(paramVars)
             # `maybe` vars
-            ans += ident * 2 + f"mv'{hask(var)} = {defStr}\n"
+            ans += varValueGuard(2, f"mmv'{hask(var)}", varDepVars, varDef.defStr)
 
     # exprs to be dynamically executed
     for sym in group.exprSymList:
-        # exprDepVars = (expr.vars /\ group.domVars) - group.paramVars
-
         info = sym.exprInfo
+        # exprDepVars = (expr.vars /\ group.domVars) - group.paramVars
         exprDepVars = info.varSet.intersection(domVars).difference(paramVars)
-        symName = sym.name
+        mExprName = "me'" + sym.name
         exprStr = hask(info.expr)
-        if len(exprDepVars) == 0:
-            # `maybe` expr
-            ans += ident * 2 + f"me'{symName} = Just ({exprStr})\n"
-        else:
-            # If all exprDepVars of expr match `Just x`, the expr can be eval.
-            # Otherwise, return `Nothing` means unknown value.
-            # me'expr =
-            #   case (mv'v1, mv'v2) of
-            #     (Just v1, Just v2) -> Just (expr)
-            #     _ -> Nothing
-            ans += ident * 2 + f"me'{symName} =\n"
-            mvs = []
-            justs = []
-            for depVar in exprDepVars:
-                dvStr = hask(depVar)
-                mvs.append("mv'" + dvStr)
-                justs.append("Just " + dvStr)
-            mvsStr = ", ".join(mvs)
-            justsStr = ", ".join(justs)
-            ans += ident * 3 + f"case ({mvsStr}) of\n"
-            ans += ident * 4 + f"({justsStr}) -> Just ({exprStr})\n"
-            ans += ident * 4 + f"_ -> Nothing\n"
+        ans += varValueGuard(2, mExprName, exprDepVars, exprStr)
 
     ans += ident + "in\n"
 
@@ -132,6 +81,38 @@ def showGroup(group: Group, groupName: str) -> str:
     ans += ident * 2 + "expr\n"
 
     return ans
+
+
+# If all depVars has their value, the expr can be eval.
+# Otherwise, return `Nothing`, i.e. the expr is invalid.
+# For every var, it has 2-layer value validation check.
+# A var is valid, iff:
+#   1. All vars in the def of the var are valid
+#   2. The var *can* produce a valid value (see VarDef.py)
+# So you should do double pattern match before using a var. 
+# m'expr =
+#   case (m'v1, m'v2) of
+#     (Just (Just v1), Just (Just v2)) -> Just (expr)
+#     _ -> Nothing
+def varValueGuard(
+    baseIdent: int, mResultName: str, depVars: Set[haskell.Var], exprStr: str
+) -> str:
+    if len(depVars) == 0:
+        return ident * baseIdent + f"{mResultName} = Just ({exprStr})\n"
+    else:
+        ans = ident * baseIdent + mResultName + " =\n"
+        mdvs = []
+        justs = []
+        for dv in depVars:
+            dvStr = hask(dv)
+            mdvs.append(f"mmv'{dvStr}")
+            justs.append(f"Just (Just {dvStr})")
+        mvsStr = ", ".join(mdvs)
+        justsStr = ", ".join(justs)
+        ans += ident * (baseIdent + 1) + f"case ({mvsStr}) of\n"
+        ans += ident * (baseIdent + 2) + f"({justsStr}) -> Just ({exprStr})\n"
+        ans += ident * (baseIdent + 2) + f"_ -> Nothing\n"
+        return ans
 
 
 def hask(e: haskell.Expr) -> str:

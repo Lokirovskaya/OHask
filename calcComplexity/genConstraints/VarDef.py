@@ -9,26 +9,45 @@
 #        f = e
 #      Expr above tells the definition of var f is e.
 
-from typing import Dict
+from typing import Dict, Set
 import calcComplexity.haskellStruct as haskell
 
 
-defOfVar: Dict[haskell.Var, str] = {}
+class VarDef:
+    def __init__(self, defStr: str, varSet: Set[haskell.Var]) -> None:
+        self.defStr = defStr
+        self.varSet = varSet
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, VarDef):
+            return self.defStr == other.defStr
+        else:
+            return False
+
+    def __hash__(self) -> int:
+        return hash(self.defStr)
 
 
-def _addDef(var: haskell.Var, s: str):
-    assert var not in defOfVar or defOfVar[var] == s, f"Conflict def of var: {var}"
-    defOfVar[var] = s
+defOfVar: Dict[haskell.Var, VarDef] = {}
+
+
+def _addDef(var: haskell.Var, defStr: str, varSet: Set[haskell.Var]):
+    assert (
+        var not in defOfVar or defOfVar[var].defStr == defStr
+    ), f"Conflict def of var: {var}"
+    defOfVar[var] = VarDef(defStr, varSet)
 
 
 def addDefExpr(var: haskell.Var, expr: haskell.Expr):
     exprStr = haskell.haskellPrintExpr(expr)
     defStr = f"Just ({exprStr})"
-    _addDef(var, defStr)
+    varSet = haskell.getAllVars(expr)
+    _addDef(var, defStr, varSet)
 
 
 def addDefCase(case_: haskell.Case):
     exprStr = haskell.haskellPrintExpr(case_.caseExpr)
+    varSet = haskell.getAllVars(case_.caseExpr)
     for alt in case_.caseAlts:
         if alt.altConVarCount > 0:
             for idx, var in enumerate(alt.altConVars):
@@ -38,7 +57,7 @@ def addDefCase(case_: haskell.Case):
                     conIdx=idx,
                     conCount=alt.altConVarCount,
                 )
-                _addDef(var, defStr)
+                _addDef(var, defStr, varSet)
 
 
 # var = case expr of {Con t _ _ -> t}
@@ -59,5 +78,5 @@ def makePatternDefStr(exprStr: str, conStr: str, conIdx: int, conCount: int) -> 
     return f"case ({exprStr}) of {{({conStr}) {conVarsStr} -> Just {tmpStr}; _ -> Nothing}}"
 
 
-def getDef(var: haskell.Var) -> str:
+def getDef(var: haskell.Var) -> VarDef:
     return defOfVar[var]
