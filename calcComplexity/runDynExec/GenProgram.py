@@ -34,6 +34,9 @@ def showPragmasAndImports() -> str:
         "{-# HLINT ignore #-}",
         "",
         "module DynExprs where",
+        "",
+        "import qualified MainTmp",
+        "import qualified Data.Dynamic",
     ]
     ans = "\n".join(options) + "\n\n"
 
@@ -66,6 +69,8 @@ def showGroup(group: Group, groupName: str) -> str:
             # `maybe` vars
             ans += varValueGuard(2, f"mmv'{hask(var)}", varDepVars, varDef.defStr)
 
+    mExprs = []
+
     # exprs to be dynamically executed
     for sym in group.exprSymList:
         info = sym.exprInfo
@@ -74,11 +79,14 @@ def showGroup(group: Group, groupName: str) -> str:
         mExprName = "me'" + sym.name
         exprStr = hask(info.expr)
         ans += varValueGuard(2, mExprName, exprDepVars, exprStr)
+        mExprs.append(mExprName)
 
     ans += ident + "in\n"
 
-    # Final scale expr
-    ans += ident * 2 + "expr\n"
+    # Final maybe_exprs
+    dynExprs = ["Data.Dynamic.toDyn " + me for me in mExprs]
+    dynExprsStr = ", ".join(dynExprs)
+    ans += ident * 2 + "[" + dynExprsStr + "]\n"
 
     return ans
 
@@ -89,7 +97,7 @@ def showGroup(group: Group, groupName: str) -> str:
 # A var is valid, iff:
 #   1. All vars in the def of the var are valid
 #   2. The var *can* produce a valid value (see VarDef.py)
-# So you should do double pattern match before using a var. 
+# So you should do double pattern match before using a var.
 # m'expr =
 #   case (m'v1, m'v2) of
 #     (Just (Just v1), Just (Just v2)) -> Just (expr)
