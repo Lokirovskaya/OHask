@@ -96,7 +96,10 @@ executable DynExec
     import:           common-options
     main-is:          Main.hs
     build-depends:    
-        QuickCheck ^>=2.14.3
+        QuickCheck ^>=2.14.3,
+        DynExprs
+    other-modules:
+        Scales
     ghc-options:      
         -O1
     hs-source-dirs:   dynExec
