@@ -1,5 +1,5 @@
 {-# NOINLINE split #-}
-split :: [a] -> ([a], [a])
+split :: [Int] -> ([Int], [Int])
 split a =
   let len = length a
       lenL = div len 2
@@ -8,7 +8,7 @@ split a =
    in (l, r)
 
 {-# NOINLINE merge #-}
-merge :: (Ord a) => [a] -> [a] -> [a]
+merge :: [Int] -> [Int] -> [Int]
 merge [] [] = []
 merge a [] = a
 merge [] b = b
@@ -17,7 +17,7 @@ merge (x : a) (y : b)
   | otherwise = y : merge (x : a) b
 
 {-# NOINLINE sort #-}
-sort :: (Ord a) => [a] -> [a]
+sort :: [Int] -> [Int]
 sort [] = []
 sort [x] = [x]
 sort [x, y]

@@ -49,6 +49,10 @@ def showPragmasAndImports() -> str:
 def showGroup(group: Group, groupName: str) -> str:
     ans = ""
 
+    # group signature
+    typesStr = " -> ".join([f"({var.varType})" for var in group.paramVars])
+    ans += f"{groupName} :: {typesStr} -> [Data.Dynamic.Dynamic]\n"
+
     # group decl
     varsStr = " ".join([hask(var) for var in group.paramVars])
     ans += f"{groupName} {varsStr} = \n"
