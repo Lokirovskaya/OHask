@@ -99,7 +99,8 @@ executable DynExec
         QuickCheck ^>=2.14.3,
         DynExprs
     other-modules:
-        Scales
+        TestGroup,
+        RandomGen
     ghc-options:      
         -O1
     hs-source-dirs:   dynExec
