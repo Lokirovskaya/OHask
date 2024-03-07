@@ -8,7 +8,7 @@ cradle:
       config:
         cradle:
           cabal:
-            - path: "./funcInfoStat/util"
+            - path: "./util"
               component: "lib:Util"
             - path: "./funcInfoStat/gen"
               component: "lib:Gen"

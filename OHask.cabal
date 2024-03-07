@@ -26,7 +26,7 @@ library Util
     import:           common-options
     exposed-modules:  
         Util
-    hs-source-dirs:   funcInfoStat/util
+    hs-source-dirs:   util
 
 
 library Gen
@@ -101,7 +101,8 @@ library DynExecLib
         Result,
         Scale
     build-depends:
-        QuickCheck ^>=2.14.3
+        QuickCheck ^>=2.14.3,
+        Util
     hs-source-dirs:   dynExec/lib
 
 
