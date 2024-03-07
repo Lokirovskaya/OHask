@@ -29,4 +29,4 @@ instance Show Result where
     let groupName = "g" ++ show (groupIdx res)
         inputs = concatWithChar ' ' (map show (inputVals res))
         outputs = concatWithChar ' ' (map show (outputVals res))
-     in groupName ++ "\n" ++ inputs ++ "\n" ++ outputs ++ "\n"
+     in "$ " ++ groupName ++ "\n> " ++ inputs ++ "\n< " ++ outputs ++ "\n"

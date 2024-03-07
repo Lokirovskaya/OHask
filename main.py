@@ -64,6 +64,7 @@ if runCabal:
     createEmpty("stat/stat_brief.txt")
     createEmpty("stat/stat.json")
     createEmpty("stat/tree.txt")
+    createEmpty("stat/dyn_result.txt")
 
     # Run cabal
     print(f"{BOLD}{YELLOW}=== Analysing Haskell File ==={END}")

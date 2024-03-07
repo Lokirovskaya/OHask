@@ -8,8 +8,9 @@
 {-# HLINT ignore "Replace case with maybe" #-}
 {-# HLINT ignore "Avoid lambda using `infix`" #-}
 
-module TestGroup (testGroup1, testGroup2, testGroup3) where
+module TestGroup (testGroup1, testGroup2, testGroup3, testGroup4) where
 
+import Control.Monad (replicateM_)
 import Data.Dynamic (Dynamic, fromDynamic)
 import Data.Foldable (asum)
 import RandomGen
@@ -33,26 +34,57 @@ dynToCell dyn = do
 scaleOutput :: [Dynamic] -> [Cell]
 scaleOutput = map dynToCell
 
-makeResult :: (Scale a) => [a] -> [Dynamic] -> Result
-makeResult rawInputs dynOutputs =
+makeResult :: (Scale a) => Int -> [a] -> [Dynamic] -> Result
+makeResult idx rawInputs dynOutputs =
   let inputs = map scale rawInputs
       outputs = scaleOutput dynOutputs
-   in Result {groupIdx = 0, inputVals = inputs, outputVals = outputs}
+   in Result {groupIdx = idx, inputVals = inputs, outputVals = outputs}
 
-testGroup1 :: (Rand t, Scale t) => (t -> [Dynamic]) -> IO Result
-testGroup1 g = do
+testGroup1_ :: (Rand t, Scale t) => Int -> (t -> [Dynamic]) -> IO Result
+testGroup1_ idx group = do
   x <- rand
-  return $ makeResult [x] (g x)
+  return $ makeResult idx [x] (group x)
 
-testGroup2 :: (Rand t, Scale t) => (t -> t -> [Dynamic]) -> IO Result
-testGroup2 g = do
+testGroup2_ :: (Rand t, Scale t) => Int -> (t -> t -> [Dynamic]) -> IO Result
+testGroup2_ idx group = do
   x1 <- rand
   x2 <- rand
-  return $ makeResult [x1, x2] (g x1 x2)
+  return $ makeResult idx [x1, x2] (group x1 x2)
 
-testGroup3 :: (Rand t, Scale t) => (t -> t -> t -> [Dynamic]) -> IO Result
-testGroup3 g = do
+testGroup3_ :: (Rand t, Scale t) => Int -> (t -> t -> t -> [Dynamic]) -> IO Result
+testGroup3_ idx group = do
   x1 <- rand
   x2 <- rand
   x3 <- rand
-  return $ makeResult [x1, x2, x3] (g x1 x2 x3)
+  return $ makeResult idx [x1, x2, x3] (group x1 x2 x3)
+
+testGroup4_ :: (Rand t, Scale t) => Int -> (t -> t -> t -> t -> [Dynamic]) -> IO Result
+testGroup4_ idx group = do
+  x1 <- rand
+  x2 <- rand
+  x3 <- rand
+  x4 <- rand
+  return $ makeResult idx [x1, x2, x3, x4] (group x1 x2 x3 x4)
+
+resultOutputFile :: String
+resultOutputFile = "stat/dyn_result.txt"
+
+printResult :: Result -> IO ()
+printResult res = do
+  appendFile resultOutputFile $ show res
+
+testGroup1 :: (Rand t, Scale t) => Int -> Int -> (t -> [Dynamic]) -> IO ()
+testGroup1 times idx group =
+  replicateM_ times (testGroup1_ idx group >>= printResult)
+
+testGroup2 :: (Rand t, Scale t) => Int -> Int -> (t -> t -> [Dynamic]) -> IO ()
+testGroup2 times idx group =
+  replicateM_ times (testGroup2_ idx group >>= printResult)
+
+testGroup3 :: (Rand t, Scale t) => Int -> Int -> (t -> t -> t -> [Dynamic]) -> IO ()
+testGroup3 times idx group =
+  replicateM_ times (testGroup3_ idx group >>= printResult)
+
+testGroup4 :: (Rand t, Scale t) => Int -> Int -> (t -> t -> t -> t -> [Dynamic]) -> IO ()
+testGroup4 times idx group =
+  replicateM_ times (testGroup4_ idx group >>= printResult)
