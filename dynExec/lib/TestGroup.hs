@@ -37,7 +37,7 @@ makeResult :: (Scale a) => [a] -> [Dynamic] -> Result
 makeResult rawInputs dynOutputs =
   let inputs = map scale rawInputs
       outputs = scaleOutput dynOutputs
-   in Result {resultGroupIdx = 0, inputVals = inputs, outputVals = outputs}
+   in Result {groupIdx = 0, inputVals = inputs, outputVals = outputs}
 
 testGroup1 :: (Rand t, Scale t) => (t -> [Dynamic]) -> IO Result
 testGroup1 g = do

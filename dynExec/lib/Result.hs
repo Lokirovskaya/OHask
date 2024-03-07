@@ -1,24 +1,32 @@
 module Result where
 
-data ValType = IntVal | ListLen
+import Util
+import Text.Printf (printf)
 
-data Value = Value {
-  value :: Int,
-  valType :: ValType
-}
+
+data Value = Value
+  { value :: Int,
+    valType :: String
+  }
 
 type Cell = [Value]
 
 data Result = Result
-  { resultGroupIdx :: Int,
+  { groupIdx :: Int,
     inputVals :: [Cell],
     outputVals :: [Cell]
   }
 
 instance Show Value where
-  show val = show (value val) ++ suffix
-    where 
-      suffix = 
-        case valType val of
-          IntVal -> ""
-          ListLen -> "L"
+  show val =
+    printf
+      "(%s,%d)"
+      (valType val)
+      (value val)
+
+instance Show Result where
+  show res =
+    let groupName = "g" ++ show (groupIdx res)
+        inputs = concatWithChar ' ' (map show (inputVals res))
+        outputs = concatWithChar ' ' (map show (outputVals res))
+     in groupName ++ "\n" ++ inputs ++ "\n" ++ outputs ++ "\n"
