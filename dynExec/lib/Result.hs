@@ -14,3 +14,11 @@ data Result = Result
     inputVals :: [Cell],
     outputVals :: [Cell]
   }
+
+instance Show Value where
+  show val = show (value val) ++ suffix
+    where 
+      suffix = 
+        case valType val of
+          IntVal -> ""
+          ListLen -> "L"

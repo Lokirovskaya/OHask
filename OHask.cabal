@@ -92,17 +92,23 @@ library DynExprs
     hs-source-dirs:   tmp/dynExprs
 
 
+library DynExecLib
+    import:           common-options
+    exposed-modules:  
+        TestGroup
+    other-modules:
+        RandomGen, 
+        Result,
+        Scale
+    build-depends:
+        QuickCheck ^>=2.14.3
+    hs-source-dirs:   dynExec/lib
+
+
 executable DynExec
     import:           common-options
     main-is:          Main.hs
     build-depends:    
-        QuickCheck ^>=2.14.3,
+        DynExecLib,
         DynExprs
-    other-modules:
-        TestGroup,
-        RandomGen,
-        Result,
-        Scale
-    ghc-options:      
-        -O1
     hs-source-dirs:   dynExec

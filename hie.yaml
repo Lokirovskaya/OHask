@@ -20,5 +20,7 @@ cradle:
               component: "lib:MainTmp"
             - path: "./tmp/dynExprs"
               component: "lib:DynExprs"
+            - path: "./dynExec/lib"
+              component: "lib:DynExecLib"
             - path: "./dynExec"
               component: "exe:DynExec"

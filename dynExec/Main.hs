@@ -4,7 +4,6 @@ module Main where
 
 import DynExprs
 import TestGroup
-import Result
 
 main :: IO ()
 main = return ()
