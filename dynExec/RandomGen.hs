@@ -1,10 +1,14 @@
-module RandomGen where
+{-# LANGUAGE FlexibleInstances #-}
 
+module RandomGen where
 
 import Test.QuickCheck
 
-randInt :: IO Int
-randInt = generate arbitrary
+class Rand a where
+  rand :: IO a
 
-randIntList :: IO [Int]
-randIntList = generate arbitrary
+instance Rand Int where
+  rand = generate arbitrary
+
+instance Rand [Int] where
+  rand = generate arbitrary

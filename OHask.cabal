@@ -100,7 +100,9 @@ executable DynExec
         DynExprs
     other-modules:
         TestGroup,
-        RandomGen
+        RandomGen,
+        Result,
+        Scale
     ghc-options:      
         -O1
     hs-source-dirs:   dynExec
