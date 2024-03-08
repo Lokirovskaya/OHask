@@ -11,7 +11,7 @@ def genHaskellProgram(funcList: List[haskell.Func], groupList: List[Group]):
     text = showPragmasAndImports() + "\n"
 
     for i, group in enumerate(groupList):
-        text += showGroup(group, f"g{i}") + "\n"
+        text += showGroup(group) + "\n"
 
     with open("./tmp/dynExprs/DynExprs.hs", "w") as f:
         f.write(text)
@@ -46,16 +46,16 @@ def showPragmasAndImports() -> str:
     return ans
 
 
-def showGroup(group: Group, groupName: str) -> str:
+def showGroup(group: Group) -> str:
     ans = ""
 
     # group signature
     typesStr = " -> ".join([f"({var.varType})" for var in group.paramVars])
-    ans += f"{groupName} :: {typesStr} -> [Data.Dynamic.Dynamic]\n"
+    ans += f"{group.groupName} :: {typesStr} -> [Data.Dynamic.Dynamic]\n"
 
     # group decl
     varsStr = " ".join([hask(var) for var in group.paramVars])
-    ans += f"{groupName} {varsStr} = \n"
+    ans += f"{group.groupName} {varsStr} = \n"
 
     domVars = group.domVars
     paramVars = group.paramVars

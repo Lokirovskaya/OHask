@@ -111,5 +111,6 @@ executable DynExec
     main-is:          Main.hs
     build-depends:    
         DynExecLib,
-        DynExprs
+        DynExprs,
+        deepseq
     hs-source-dirs:   dynExec

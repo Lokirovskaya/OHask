@@ -7,9 +7,14 @@ import calcComplexity.genConstraints.VarDep as varDep
 
 
 class Group:
+    _groupIdx = 0
+
     def __init__(
         self, paramVars: Tuple[haskell.Var, ...], exprSymList: List[ExprSymbol]
     ) -> None:
+        self.groupIdx = Group._groupIdx
+        Group._groupIdx += 1
+        self.groupName = "g" + str(self.groupIdx)
         self.paramVars = paramVars
         self.exprSymList = exprSymList
         # Dominant by param vars

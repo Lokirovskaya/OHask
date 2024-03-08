@@ -4,6 +4,7 @@ module Main where
 
 import DynExprs
 import TestGroup
+import Control.DeepSeq (deepseq)
 
 resultOutputFile :: String
 resultOutputFile = "stat/dyn_result.txt"

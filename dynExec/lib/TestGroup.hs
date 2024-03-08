@@ -74,17 +74,21 @@ printResult res = do
   appendFile resultOutputFile $ show res
 
 testGroup1 :: (Rand t, Scale t) => Int -> Int -> (t -> [Dynamic]) -> IO ()
-testGroup1 times idx group =
+testGroup1 times idx group = do
+  putStrLn $ "Group: " ++ show idx ++ ", Times: " ++ show times
   replicateM_ times (testGroup1_ idx group >>= printResult)
 
 testGroup2 :: (Rand t, Scale t) => Int -> Int -> (t -> t -> [Dynamic]) -> IO ()
-testGroup2 times idx group =
+testGroup2 times idx group = do
+  putStrLn $ "Group: " ++ show idx ++ ", Times: " ++ show times
   replicateM_ times (testGroup2_ idx group >>= printResult)
 
 testGroup3 :: (Rand t, Scale t) => Int -> Int -> (t -> t -> t -> [Dynamic]) -> IO ()
-testGroup3 times idx group =
+testGroup3 times idx group = do
+  putStrLn $ "Group: " ++ show idx ++ ", Times: " ++ show times
   replicateM_ times (testGroup3_ idx group >>= printResult)
 
 testGroup4 :: (Rand t, Scale t) => Int -> Int -> (t -> t -> t -> t -> [Dynamic]) -> IO ()
-testGroup4 times idx group =
+testGroup4 times idx group = do
+  putStrLn $ "Group: " ++ show idx ++ ", Times: " ++ show times
   replicateM_ times (testGroup4_ idx group >>= printResult)

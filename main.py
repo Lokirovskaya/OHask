@@ -35,6 +35,12 @@ BOLD = "\x1b[1m"
 END = "\x1b[0m"
 
 
+# Clear essential files
+def createEmpty(path):
+    with open(path, "w"):
+        pass
+
+
 if runCabal:
     # Copy to tmp/maintmp/MainTmp.hs
     if srcPath == "":
@@ -50,21 +56,15 @@ if runCabal:
 
     with open("tmp/mainTmp/MainTmp.hs", "w") as f:
         curDatetime = str(datetime.datetime.now())
-        f.write("-- " + curDatetime + "\n" )
+        f.write("-- " + curDatetime + "\n")
         f.write("module MainTmp where\n")
         f.write(srcContent)
-
-    # Clear essential files
-    def createEmpty(path):
-        with open(path, "w"):
-            pass
 
     os.makedirs("stat", exist_ok=True)
     createEmpty("stat/calc_log.txt")
     createEmpty("stat/stat_brief.txt")
     createEmpty("stat/stat.json")
     createEmpty("stat/tree.txt")
-    createEmpty("stat/dyn_result.txt")
 
     # Run cabal
     print(f"{BOLD}{YELLOW}=== Analysing Haskell File ==={END}")
@@ -79,6 +79,9 @@ if runCabal:
 
 if runComplCalc:
     print(f"{BOLD}{YELLOW}=== Solving Complexity ==={END}")
+
+    os.makedirs("stat", exist_ok=True)
+    createEmpty("stat/dyn_result.txt")
 
     # calc func complexity
     # from calcFuncComplexity.CalcFuncComplexity import calcCompl

@@ -26,7 +26,7 @@ instance Show Value where
 
 instance Show Result where
   show res =
-    let groupName = "g" ++ show (groupIdx res)
+    let groupName = show (groupIdx res)
         inputs = concatWithChar ' ' (map show (inputVals res))
         outputs = concatWithChar ' ' (map show (outputVals res))
-     in "$ " ++ groupName ++ "\n> " ++ inputs ++ "\n< " ++ outputs ++ "\n"
+     in "$ " ++ groupName ++ " < " ++ inputs ++ " > " ++ outputs ++ " ^\n"
