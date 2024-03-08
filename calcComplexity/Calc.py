@@ -1,5 +1,6 @@
 from calcComplexity.genConstraints import buildStruct, genConstraints
 from calcComplexity.runDynExec import makeGroups, genHaskellProgram, runRepl
+from calcComplexity.solve import parseDynResult
 
 
 def calcComplexity(funcsData):
@@ -10,3 +11,5 @@ def calcComplexity(funcsData):
     genHaskellProgram(funcList, groupList)
 
     runRepl(groupList)
+
+    parseDynResult()
