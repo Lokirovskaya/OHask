@@ -8,6 +8,10 @@ defaultTimes = 100
 
 def runRepl(groups: List[Group]):
     tests = []
+    
+    with open("stat/dyn_result.txt", "w"):
+        pass
+    
     for g in groups:
         paramCount = len(g.paramVars)
         if paramCount >= 1 and paramCount <= 4:

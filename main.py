@@ -6,26 +6,30 @@ import subprocess as sp
 import datetime
 
 # Read args
-# required: srcPath
-# optional: --cabal
-#           --compl
+#   --stat      Collect program info only. Source file path required.
+#   --dyn       Dynamic analysis only, based on program info above.
+#   --solve     Solve complexity only, based on dyn analysis result above.
+# If non of args provided, all processes will be executed.
 
 srcPath = ""
-runCabal = False
-runComplCalc = False
-hasOptArg = False
+runStat = False
+runDyn = False
+runSolve = False
+
 for arg in sys.argv[1:]:
     if not arg.startswith("--"):
         srcPath = arg
-    if arg == "--cabal":
-        runCabal = True
-        hasOptArg = True
-    elif arg == "--compl":
-        runComplCalc = True
-        hasOptArg = True
-if not hasOptArg:
-    runCabal = True
-    runComplCalc = True
+    if arg == "--stat":
+        runStat = True
+    elif arg == "--dyn":
+        runDyn = True
+    elif arg == "--solve":
+        runSolve = True
+
+if not runStat and not runDyn and not runSolve:
+    runStat = True
+    runDyn = True
+    runSolve = True
 
 
 RED = "\x1b[31m"
@@ -41,8 +45,8 @@ def createEmpty(path):
         pass
 
 
-if runCabal:
-    # Copy to tmp/maintmp/MainTmp.hs
+if runStat:
+    # Copy src file to tmp/maintmp/MainTmp.hs
     if srcPath == "":
         print("Error: No src path provided.")
         exit(-1)
@@ -67,7 +71,7 @@ if runCabal:
     createEmpty("stat/tree.txt")
 
     # Run cabal
-    print(f"{BOLD}{YELLOW}=== Analysing Haskell File ==={END}")
+    print(f"{BOLD}{YELLOW}=== Analysing Haskell Program ==={END}")
     r = sp.run(["cabal", "build", "MainTmp"])
 
     if r.returncode != 0:
@@ -77,20 +81,8 @@ if runCabal:
         print(f"{GREEN}Success{END}\n")
 
 
-if runComplCalc:
-    print(f"{BOLD}{YELLOW}=== Solving Complexity ==={END}")
-
-    os.makedirs("stat", exist_ok=True)
-    createEmpty("stat/dyn_result.txt")
-
-    # calc func complexity
-    # from calcFuncComplexity.CalcFuncComplexity import calcCompl
-    # calcCompl(funcListData)
-    import ujson
+if runDyn or runSolve:
     from calcComplexity import calcComplexity
+    calcComplexity(runDyn, runSolve)
 
-    with open("stat/stat.json", "r") as f:
-        funcsData = ujson.load(f)
-    calcComplexity(funcsData)
-
-    print(f"{GREEN}Success{END}\n")
+    
