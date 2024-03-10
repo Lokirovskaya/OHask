@@ -1,10 +1,10 @@
+from itertools import combinations
 from typing import Dict, List
 
 import pandas as pd
 
-from calcComplexity.regression.BasicFuncs import basicFuncs1, basicFuncs2, basicFuncs3
-from calcComplexity.regression.Data import Data, RawData
-from itertools import combinations
+from .BasicFuncs import basicFuncs1, basicFuncs2, basicFuncs3
+from .Data import Data, RawData
 
 # {"v0": [], ...}
 DictT = Dict[str, List[int]]

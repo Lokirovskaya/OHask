@@ -1,8 +1,9 @@
 # pyright: reportPossiblyUnboundVariable=false
 
-from typing import Tuple, List
 import re
-from calcComplexity.regression.Data import Item, RawData, RawLine
+from typing import List, Tuple
+
+from .Data import Item, RawData, RawLine
 
 
 def parseDynResult() -> List[RawData]:
