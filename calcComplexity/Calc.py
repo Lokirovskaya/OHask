@@ -1,6 +1,6 @@
 from calcComplexity.genConstraints import buildStruct, genConstraints
 from calcComplexity.runDynExec import makeGroups, genHaskellProgram, runRepl
-from calcComplexity.solve import parseDynResult, genData
+from calcComplexity.regression import parseDynResult, genData
 
 RED = "\x1b[31m"
 GREEN = "\x1b[32m"
@@ -37,6 +37,6 @@ def calcComplexity(runDyn: bool, runSolve: bool):
         print(f"{BOLD}{YELLOW}=== Solving Complexity ==={END}")
 
         rawDatas = parseDynResult()
-        genData(rawDatas[0])
+        datas = map(genData, rawDatas)
         
         print(f"{GREEN}Success{END}\n")

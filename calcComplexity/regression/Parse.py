@@ -2,7 +2,7 @@
 
 from typing import Tuple, List
 import re
-from calcComplexity.solve.Data import Item, RawData, RawLine
+from calcComplexity.regression.Data import Item, RawData, RawLine
 
 
 def parseDynResult() -> List[RawData]:

@@ -2,8 +2,8 @@ from typing import Dict, List
 
 import pandas as pd
 
-from calcComplexity.solve.BasicFuncs import basicFuncs1, basicFuncs2, basicFuncs3
-from calcComplexity.solve.Data import Data, RawData
+from calcComplexity.regression.BasicFuncs import basicFuncs1, basicFuncs2, basicFuncs3
+from calcComplexity.regression.Data import Data, RawData
 from itertools import combinations
 
 # {"v0": [], ...}
