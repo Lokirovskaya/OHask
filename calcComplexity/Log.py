@@ -4,3 +4,4 @@ f = open(LOG_PATH, "w")
 
 def logln(s=""):
     f.write(s + "\n")
+    f.flush()
