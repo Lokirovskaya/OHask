@@ -1,7 +1,6 @@
-import ujson
 from calcComplexity.genConstraints import buildStruct, genConstraints
 from calcComplexity.runDynExec import makeGroups, genHaskellProgram, runRepl
-from calcComplexity.solve import parseDynResult
+from calcComplexity.solve import parseDynResult, genData
 
 RED = "\x1b[31m"
 GREEN = "\x1b[32m"
@@ -16,9 +15,7 @@ def calcComplexity(runDyn: bool, runSolve: bool):
 
     print(f"{BOLD}{YELLOW}=== Loading Program Info ==={END}")
 
-    with open("stat/stat.json", "r") as f:
-        funcsData = ujson.load(f)
-    funcList = buildStruct(funcsData)
+    funcList = buildStruct()
     constrList, exprSymbolList = genConstraints(funcList)
     groupList = makeGroups(exprSymbolList)
 
@@ -39,6 +36,7 @@ def calcComplexity(runDyn: bool, runSolve: bool):
     if runSolve:
         print(f"{BOLD}{YELLOW}=== Solving Complexity ==={END}")
 
-        parseDynResult()
+        rawDatas = parseDynResult()
+        genData(rawDatas[0])
         
         print(f"{GREEN}Success{END}\n")

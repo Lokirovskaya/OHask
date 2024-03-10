@@ -1,12 +1,16 @@
 from typing import Any, Dict, List
 
+import ujson
+
 from calcComplexity.Log import logln
 from calcComplexity.haskellStruct import Alt, App, Case, Expr, Func, Lit, Var, addImport
 
-
-def buildStruct(funcsData: List[Any]) -> List[Func]:
+def buildStruct() -> List[Func]:
     funcList: List[Func] = []
     unique2FuncDict: Dict[str, Func] = {}
+    
+    with open("stat/stat.json", "r") as f:
+        funcsData = ujson.load(f)
 
     for funcData in funcsData:
         unique = funcData["funcUnique"]

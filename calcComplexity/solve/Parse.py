@@ -1,15 +1,33 @@
+# pyright: reportPossiblyUnboundVariable=false
+
 from typing import Tuple, List
 import re
+from calcComplexity.solve.Data import Item, RawData, RawLine
 
-Item = Tuple[str, int]
 
-
-def parseDynResult():
+def parseDynResult() -> List[RawData]:
     with open("stat/dyn_result.txt", "r") as f:
         lines = f.readlines()
 
+    rawDatas: List[RawData] = []
+    curGroup = -1
+
     for line in lines:
         groupIdx, inputItems, outputItems = parseLine(line)
+        # New group or first group
+        if groupIdx != curGroup:
+            curGroup = groupIdx
+            curData = RawData(groupIdx)
+            rawDatas.append(curData)
+
+        curData.inputLines.append(inputItems)
+        curData.outputLines.append(outputItems)
+        for name, _ in inputItems:
+            curData.inputVarNames.add(name)
+        for name, _ in outputItems:
+            curData.outputVarNames.add(name)
+
+    return rawDatas
 
 
 def parseLine(line: str) -> Tuple[int, List[Item], List[Item]]:
@@ -46,7 +64,8 @@ def parseItemList(itemStr: str, prefix: str) -> List[Item]:
         return []
 
     # [(ValType,Value)]
-    groups = re.findall(r"\((\w+),(\d+)\)", itemStr)
+    groups = re.findall(r"\((\w+),(-?\d+)\)", itemStr)
+    assert len(groups) > 0, f"Nothing matches in '{itemStr}'"
 
     def toItem(tup):
         return prefix + tup[0], int(tup[1])
