@@ -24,3 +24,5 @@ class Data:
     # Data cols: vars
     inputData: pd.DataFrame
     outputData: pd.DataFrame
+    # Filled in GenData/extendInputVars
+    inputExtData: pd.DataFrame = field(default_factory=pd.DataFrame)
