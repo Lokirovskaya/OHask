@@ -13,7 +13,6 @@ DictT = Dict[str, List[int]]
 def genData(raw: RawData) -> Data:
     data = rawToData(raw)
     extendInputVars(data)
-    print(data.inputExtData)
     return data
 
 
