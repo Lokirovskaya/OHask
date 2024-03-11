@@ -9,8 +9,8 @@ from .Data import Data
 from .RegressionResult import LassoResult
 
 # hyperparams
-lassoAlpha = 0.3
-lassoIter = 2000
+lassoAlpha = 1.0
+lassoIter = 1000
 filterThresh = 0.05
 
 

@@ -42,3 +42,6 @@ class LassoResult(RegressionResult):
 @dataclass
 class LinearResult(RegressionResult):
     r2: float
+
+    def __str__(self) -> str:
+        return super().__str__() + f"  (r2={self.r2:.4f})"
