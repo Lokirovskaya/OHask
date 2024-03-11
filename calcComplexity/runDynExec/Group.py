@@ -37,9 +37,9 @@ def makeGroups(exprSymList: List[ExprSymbol]) -> List[Group]:
     groupList = list(vars2GroupDict.values())
 
     logln("[Dyn Exec Groups]")
-    for i, group in enumerate(groupList):
+    for group in groupList:
         logln(
-            f"group{i}: paramVars={group.paramVars}, exprs={group.exprSymList}, domVars={group.domVars}"
+            f"group{group.groupIdx}: paramVars={group.paramVars}, exprs={group.exprSymList}, domVars={group.domVars}"
         )
     logln()
 
