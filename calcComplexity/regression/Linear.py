@@ -1,13 +1,13 @@
 from typing import Dict, List
 
-from .RegressionResult import LassoResult, LinearResult
-from .Data import Data
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 
 from calcComplexity.Log import logln
 
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import r2_score
-import numpy as np
+from .Data import Data
+from .RegressionResult import LassoResult, LinearResult
 
 
 def linearRegression(

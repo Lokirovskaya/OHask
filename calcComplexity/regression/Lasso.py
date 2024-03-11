@@ -1,17 +1,21 @@
 from typing import List
+import warnings
 
+from sklearn.exceptions import ConvergenceWarning
 from sklearn.linear_model import Lasso
-from sklearn.model_selection import train_test_split
 
 from calcComplexity.Log import logln
 
 from .Data import Data
 from .RegressionResult import LassoResult
 
+
 # hyperparams
 lassoAlpha = 1.0
 lassoIter = 1000
 filterThresh = 0.05
+
+warnings.filterwarnings(action="ignore", category=ConvergenceWarning)
 
 
 def lassoRegression(datas: List[Data]) -> List[LassoResult]:
@@ -28,10 +32,6 @@ def lassoRegression(datas: List[Data]) -> List[LassoResult]:
 
 
 def lassoOneData(data: Data) -> List[LassoResult]:
-    inputTrain, inputTest, outputTrain, outputTest = train_test_split(
-        data.inputExtData, data.outputData, test_size=0.01, random_state=111
-    )
-
     lassoModel = Lasso(
         alpha=lassoAlpha,
         fit_intercept=True,
@@ -40,7 +40,7 @@ def lassoOneData(data: Data) -> List[LassoResult]:
         random_state=111,
     )
 
-    lassoModel.fit(inputTrain, outputTrain)
+    lassoModel.fit(data.inputExtData, data.outputData)
 
     coefsList = lassoModel.coef_
     constList = lassoModel.intercept_
