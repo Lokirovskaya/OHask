@@ -3,7 +3,7 @@ from typing import List
 
 from calcComplexity.runDynExec import Group
 
-defaultTimes = 100
+defaultTimes = 500
 
 
 def runRepl(groups: List[Group]):

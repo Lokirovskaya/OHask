@@ -8,7 +8,7 @@ class Rand a where
   rand :: IO a
 
 instance Rand Int where
-  rand = generate arbitrary
+  rand = generate (resize 500 arbitrary)
 
 instance Rand [Int] where
-  rand = generate arbitrary
+  rand = generate (resize 200 arbitrary)
