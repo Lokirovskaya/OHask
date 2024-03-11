@@ -6,14 +6,19 @@ import pandas as pd
 from .BasicFuncs import basicFuncs1, basicFuncs2, basicFuncs3
 from .Data import Data, RawData
 
-# {"v0": [], ...}
-DictT = Dict[str, List[int]]
+
+def genDatas(raws: List[RawData]) -> List[Data]:
+    return list(map(genData, raws))
 
 
 def genData(raw: RawData) -> Data:
     data = rawToData(raw)
     extendInputVars(data)
     return data
+
+
+# {"v0": [], ...}
+DictT = Dict[str, List[int]]
 
 
 def rawToData(raw: RawData) -> Data:
@@ -60,4 +65,6 @@ def extendInputVars(data: Data):
         for col1, col2 in combinations(cols, 2):
             for bfName, bfFunc in basicFuncs2.items():
                 extName = col1 + "$" + col2 + "$" + bfName
-                ext[extName] = origin.apply(lambda row: bfFunc(row[col1], row[col2]), axis=1)
+                ext[extName] = origin.apply(
+                    lambda row: bfFunc(row[col1], row[col2]), axis=1
+                )

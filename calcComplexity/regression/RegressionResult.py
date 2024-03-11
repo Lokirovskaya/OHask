@@ -10,6 +10,11 @@ class RegressionResult:
     xConst: float
 
     def __str__(self) -> str:
+        if self.xConst >= 0.0:
+            constStr = f"{self.xConst:.3f}"
+        else:
+            constStr = f"({self.xConst:.3f})"
+
         if len(self.xTerms) > 0:
             terms = []
             for t in self.xTerms:
@@ -18,9 +23,10 @@ class RegressionResult:
                 else:
                     terms.append(f"({t[1]:.3f})*{t[0]}")
             termsStr = " + ".join(terms)
-            return f"group{self.groupIdx}: {self.y} = {termsStr} + {self.xConst:.3f}"
+            return f"group{self.groupIdx}: {self.y} = {termsStr} + {constStr}"
+        
         else:
-            return f"group{self.groupIdx}: {self.y} = {self.xConst:.3f}"
+            return f"group{self.groupIdx}: {self.y} = {constStr}"
 
     def __repr__(self) -> str:
         return self.__str__()

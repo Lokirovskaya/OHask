@@ -1,6 +1,6 @@
 from calcComplexity.genConstraints import buildStruct, genConstraints
 from calcComplexity.runDynExec import makeGroups, genHaskellProgram, runRepl
-from calcComplexity.regression import parseDynResult, genData, lassoRegression
+from calcComplexity.regression import parseDynResult, genDatas, lassoRegression
 
 RED = "\x1b[31m"
 GREEN = "\x1b[32m"
@@ -37,6 +37,7 @@ def calcComplexity(runDyn: bool, runSolve: bool):
         print(f"{BOLD}{YELLOW}=== Solving Complexity ==={END}")
 
         rawDatas = parseDynResult()
-        datas = list(map(lambda x: lassoRegression(genData(x)), rawDatas))
-        
+        datas = genDatas(rawDatas)
+        regressionResults = lassoRegression(datas)
+
         print(f"{GREEN}Success{END}\n")
