@@ -1,6 +1,6 @@
 from typing import List
 
-from sklearn.linear_model import Lasso
+from sklearn.linear_model import MultiTaskLassoCV
 from sklearn.model_selection import train_test_split
 
 from .Data import Data
@@ -8,17 +8,18 @@ from .RegressionResult import RegressionResult
 from calcComplexity.Log import logln
 
 # hyperparams
-lassoAlpha = 0.5
 lassoIter = 2000
 filterThresh = 0.01
 
 
 def lassoRegression(data: Data) -> List[RegressionResult]:
     inputTrain, inputTest, outputTrain, outputTest = train_test_split(
-        data.inputExtData, data.outputData, test_size=0.1, random_state=None
+        data.inputExtData, data.outputData, test_size=0.2, random_state=111
     )
 
-    lassoModel = Lasso(alpha=lassoAlpha, fit_intercept=True, max_iter=lassoIter)
+    lassoModel = MultiTaskLassoCV(
+        cv=2, fit_intercept=True, max_iter=lassoIter, random_state=111
+    )
     lassoModel.fit(inputTrain, outputTrain)
 
     coefsList = lassoModel.coef_

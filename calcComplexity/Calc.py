@@ -37,7 +37,6 @@ def calcComplexity(runDyn: bool, runSolve: bool):
         print(f"{BOLD}{YELLOW}=== Solving Complexity ==={END}")
 
         rawDatas = parseDynResult()
-        # datas = map(genData, rawDatas)
-        lassoRegression(genData(rawDatas[0]))
+        datas = list(map(lambda x: lassoRegression(genData(x)), rawDatas))
         
         print(f"{GREEN}Success{END}\n")
