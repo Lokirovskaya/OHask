@@ -6,19 +6,20 @@ from sklearn.model_selection import train_test_split
 from calcComplexity.Log import logln
 
 from .Data import Data
-from .RegressionResult import RegressionResult
+from .RegressionResult import LassoResult
 
 # hyperparams
 lassoAlpha = 0.3
 lassoIter = 2000
 filterThresh = 0.05
 
-def lassoRegression(datas: List[Data]) -> List[RegressionResult]:
+
+def lassoRegression(datas: List[Data]) -> List[LassoResult]:
     results = []
     for data in datas:
         results += lassoOneData(data)
 
-    logln("[Regression Result]")
+    logln("[Lasso Result]")
     for result in results:
         logln(str(result))
     logln()
@@ -26,7 +27,7 @@ def lassoRegression(datas: List[Data]) -> List[RegressionResult]:
     return results
 
 
-def lassoOneData(data: Data) -> List[RegressionResult]:
+def lassoOneData(data: Data) -> List[LassoResult]:
     inputTrain, inputTest, outputTrain, outputTest = train_test_split(
         data.inputExtData, data.outputData, test_size=0.01, random_state=111
     )
@@ -58,7 +59,7 @@ def lassoOneData(data: Data) -> List[RegressionResult]:
         coefs = coefsList[i]
         const = constList[i]  # type: ignore
         regResults.append(
-            RegressionResult(
+            LassoResult(
                 groupIdx=data.groupIdx,
                 y=oVar,
                 xTerms=makeXTerms(inputVars, coefs),
@@ -77,7 +78,7 @@ def abs(x):
     return x if x >= 0.0 else -x
 
 
-def filterSmallTerms(result: RegressionResult):
+def filterSmallTerms(result: LassoResult):
     newTerms = []
     for term in result.xTerms:
         if abs(term[1]) > filterThresh:
