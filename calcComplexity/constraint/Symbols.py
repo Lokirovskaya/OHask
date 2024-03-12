@@ -11,14 +11,6 @@ def isConstant(var: Var) -> bool:
     return var.name == "C"
 
 
-def add() -> Var:
-    return Var("+", isValue=False)
-
-
-def maxN() -> Var:
-    return Var("maxN", isValue=False)
-
-
 uuidUnique = 0
 uuidExpr = 0
 
@@ -39,6 +31,16 @@ class ExprSymbol(Var):
     ) -> None:
         super().__init__(name, isValue, **kwargs)
         self.exprInfo = exprInfo
+
+    def __eq__(self, other) -> bool:
+        if isinstance(other, ExprSymbol):
+            # Each ExprSumbol holds a unique name
+            return self.name == other.name
+        else:
+            return False
+
+    def __hash__(self):
+        return hash(self.name)
 
 
 def expr(expr: haskell.Expr) -> ExprSymbol:

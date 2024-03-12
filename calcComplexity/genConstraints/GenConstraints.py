@@ -51,9 +51,11 @@ def calcVarCompl(var: Var) -> lam.Expr:
         return symbol.constant()
     else:
         # Complexity of var `f` is an lambda: `λp1. ... λpn. T(p1,...,pn)`
-        uniqueParams = [symbol.unique() for _ in range(0, arity)]
+        # uniqueParams = [symbol.unique() for _ in range(0, arity)]
+        # compl = symbol.complexity(var.varUnique)
+        # return lam.currying(uniqueParams, compl)
         compl = symbol.complexity(var.varUnique)
-        return lam.currying(uniqueParams, compl)
+        return compl
 
 
 def calcLitCompl(lit: Lit) -> lam.Expr:
@@ -76,8 +78,8 @@ def calcCaseCompl(case_: Case) -> lam.Expr:
         return caseExprCompl
     else:
         altsCompl = [calcExprCompl(alt.altExpr) for alt in case_.caseAlts]
-        return add(caseExprCompl, symbol.maxN()(*altsCompl))
+        return add(caseExprCompl, lam.MaxN(altsCompl))
 
 
 def add(x: lam.Expr, y: lam.Expr) -> lam.Expr:
-    return symbol.add()(x, y)
+    return lam.Add(x, y)

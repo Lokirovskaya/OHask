@@ -25,10 +25,12 @@ def preOrderTraversal(expr: Expr) -> Generator[Expr, None, None]:
     elif isinstance(expr, App):
         yield from preOrderTraversal(expr.expr)
         yield from preOrderTraversal(expr.arg)
-    elif isinstance(expr, UnevalSubst):
-        yield from preOrderTraversal(expr.expr)
-        yield expr.old
-        yield expr.new
+    elif isinstance(expr, Add):
+        yield from preOrderTraversal(expr.left)
+        yield from preOrderTraversal(expr.right)
+    elif isinstance(expr, MaxN):
+        for arg in expr.args:
+            yield from preOrderTraversal(arg)
     else:
         assert False
 
@@ -49,39 +51,13 @@ def getAllVarsIf(expr: Expr, pred: Callable[[Var], bool]) -> Set[Var]:
     return varSet
 
 
-def replaceVar(expr: Expr, old: Var, new: Var) -> None:
-    if old == new:
-        return
-
-    def replChild(expr: Expr, child: str):
-        var = getattr(expr, child)
-        if isinstance(var, Var) and var == old:
-            setattr(expr, child, new)
-        else:
-            replaceVar(getattr(expr, child), old, new)
-
-    if isinstance(expr, Var):
-        return
-    elif isinstance(expr, Abstr):
-        replChild(expr, "var")
-        replChild(expr, "expr")
-    elif isinstance(expr, App):
-        replChild(expr, "expr")
-        replChild(expr, "arg")
-    elif isinstance(expr, UnevalSubst):
-        replChild(expr, "old")
-        replChild(expr, "new")
-        replChild(expr, "expr")
-    else:
-        assert False
-
-
 # Replace by dictionary {old: new}
 def replaceVarDict(expr: Expr, dic: Dict[Var, Var]) -> None:
     def replChild(expr: Expr, child: str):
         var = getattr(expr, child)
-        if isinstance(var, Var) and var in dic:
-            setattr(expr, child, dic[var])
+        if isinstance(var, Var):
+            if var in dic:
+                setattr(expr, child, dic[var])
         else:
             replaceVarDict(getattr(expr, child), dic)
 
@@ -93,9 +69,16 @@ def replaceVarDict(expr: Expr, dic: Dict[Var, Var]) -> None:
     elif isinstance(expr, App):
         replChild(expr, "expr")
         replChild(expr, "arg")
-    elif isinstance(expr, UnevalSubst):
-        replChild(expr, "old")
-        replChild(expr, "new")
-        replChild(expr, "expr")
+    elif isinstance(expr, Add):
+        replChild(expr, "left")
+        replChild(expr, "right")
+    elif isinstance(expr, MaxN):
+        for i, arg in enumerate(expr.args):
+            var = expr.args[i]
+            if isinstance(var, Var):
+                if var in dic:
+                    expr.args[i] = dic[var]
+            else:
+                replaceVarDict(arg, dic)
     else:
         assert False
