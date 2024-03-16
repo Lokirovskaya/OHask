@@ -4,9 +4,30 @@ from typing import List
 
 
 class Expr:
+    def isValueVar(self) -> bool:
+        return isinstance(self, Var) and self.isValue
+
     def appOne(self, arg: Expr) -> Expr:
-        if isinstance(self, Var) and self.isValue:
+        if self.isValueVar():
             return self  # Application on value has no effect
+
+        # (value + value + func) x ==> value + value + func x
+        elif isinstance(self, Sum):
+            # If only ONE of the args is not a value
+            funcIdx = -1
+            for i, func in enumerate(self.args):
+                if not func.isValueVar():
+                    if funcIdx == -1:
+                        funcIdx = i
+                    else:
+                        # More than one no-value args found
+                        return App(self, arg)
+            if funcIdx != -1:
+                newArgs = self.args[:]
+                newArgs[funcIdx] = newArgs[funcIdx].appOne(arg)
+                return Sum(newArgs)
+            else:
+                return App(self, arg)
 
         else:
             return App(self, arg)
@@ -71,18 +92,25 @@ class App(Expr):
 ### Special Exprs ###
 
 
-@dataclass(repr=False)
-class Add(Expr):
-    left: Expr
-    right: Expr
+class Sum(Expr):
+    def __init__(self, args: List[Expr]) -> None:
+        # Simplify nested sum
+        self.args = []
+        for arg in args:
+            if isinstance(arg, Sum):
+                self.args.extend(arg.args)
+            else:
+                self.args.append(arg)
 
     def __str__(self) -> str:
-        return tryAddParen(self.left) + " + " + tryAddParen(self.right)
+        argStrs = map(tryAddParen, self.args)
+        s = " + ".join(argStrs)
+        return s
 
 
-@dataclass(repr=False)
 class MaxN(Expr):
-    args: List[Expr]
+    def __init__(self, args: List[Expr]) -> None:
+        self.args = args
 
     def __str__(self) -> str:
         argStrs = map(tryAddParen, self.args)

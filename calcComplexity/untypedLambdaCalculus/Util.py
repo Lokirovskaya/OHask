@@ -18,16 +18,16 @@ def currying(varList: Sequence[Var], expr: Expr) -> Expr:
 def preOrderTraversal(expr: Expr) -> Generator[Expr, None, None]:
     yield expr
     if isinstance(expr, Var):
-        yield expr
+        return
     elif isinstance(expr, Abstr):
-        yield expr.var
+        yield from preOrderTraversal(expr.var)
         yield from preOrderTraversal(expr.expr)
     elif isinstance(expr, App):
         yield from preOrderTraversal(expr.expr)
         yield from preOrderTraversal(expr.arg)
-    elif isinstance(expr, Add):
-        yield from preOrderTraversal(expr.left)
-        yield from preOrderTraversal(expr.right)
+    elif isinstance(expr, Sum):
+        for arg in expr.args:
+            yield from preOrderTraversal(arg)
     elif isinstance(expr, MaxN):
         for arg in expr.args:
             yield from preOrderTraversal(arg)
@@ -69,10 +69,7 @@ def replaceVarDict(expr: Expr, dic: Dict[Var, Var]) -> None:
     elif isinstance(expr, App):
         replChild(expr, "expr")
         replChild(expr, "arg")
-    elif isinstance(expr, Add):
-        replChild(expr, "left")
-        replChild(expr, "right")
-    elif isinstance(expr, MaxN):
+    elif isinstance(expr, Sum) or isinstance(expr, MaxN):
         for i, arg in enumerate(expr.args):
             var = expr.args[i]
             if isinstance(var, Var):

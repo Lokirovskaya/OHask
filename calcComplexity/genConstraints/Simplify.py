@@ -11,6 +11,7 @@ def simplify(constrList: List[Constraint], exprSymbolList: List[ExprSymbol]):
     # Remember to update exprSymbolList in every simplification funcs
     replaceConstSymbols(constrList, exprSymbolList)
     mergeIdenticalExprs(constrList, exprSymbolList)
+    simplifyConsts(constrList)
 
     logln("[Simplified Constraints]")
     for constr in constrList:
@@ -54,3 +55,22 @@ def mergeIdenticalExprs(constrList: List[Constraint], exprSymbolList: List[ExprS
         lam.replaceVarDict(constr.rhs, replDict)  # type: ignore
 
     exprSymbolList[:] = filter(lambda sym: sym not in replDict, exprSymbolList)
+
+
+def simplifyConsts(constrList: List[Constraint]):
+    def mergeC(args: List[lam.Expr]):
+        hasC = False
+        for arg in args:
+            if symbols.isConstant(arg):
+                hasC = True
+                break
+        if hasC:
+            newArgs = list(filter(lambda a: not symbols.isConstant(a), args))
+            args.clear()
+            args.extend(newArgs)
+            args.append(symbols.constant())
+
+    for constr in constrList:
+        for expr in lam.preOrderTraversal(constr.rhs):
+            if isinstance(expr, lam.Sum) or isinstance(expr, lam.MaxN):
+                mergeC(expr.args)

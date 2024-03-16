@@ -1,14 +1,14 @@
 from calcComplexity.constraint import ExprInfo
 import calcComplexity.haskellStruct as haskell
-from calcComplexity.untypedLambdaCalculus import Var
+from calcComplexity.untypedLambdaCalculus import Var, Expr
 
 
 def constant() -> Var:
     return Var("C")
 
 
-def isConstant(var: Var) -> bool:
-    return var.name == "C"
+def isConstant(var: Expr) -> bool:
+    return isinstance(var, Var) and var.isValue and var.name == "C"
 
 
 uuidUnique = 0

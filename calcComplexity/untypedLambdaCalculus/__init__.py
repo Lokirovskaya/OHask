@@ -1,4 +1,4 @@
-from .Lambda import Expr, Var, Abstr, App, Add, MaxN
+from .Lambda import Expr, Var, Abstr, App, Sum, MaxN
 from .Util import (
     currying,
     preOrderTraversal,

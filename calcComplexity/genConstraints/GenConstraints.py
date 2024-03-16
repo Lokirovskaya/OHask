@@ -69,7 +69,7 @@ def calcAppCompl(app: App) -> lam.Expr:
     argCompl = calcExprCompl(app.appArg)
     argExprSymbol = symbol.expr(app.appArg)
     exprSymbolList.append(argExprSymbol)  # Record all expr symbols
-    return add(symbol.constant(), add(argCompl, exprCompl(argExprSymbol)))
+    return lam.Sum([symbol.constant(), argCompl, exprCompl(argExprSymbol)])
 
 
 def calcCaseCompl(case_: Case) -> lam.Expr:
@@ -78,8 +78,4 @@ def calcCaseCompl(case_: Case) -> lam.Expr:
         return caseExprCompl
     else:
         altsCompl = [calcExprCompl(alt.altExpr) for alt in case_.caseAlts]
-        return add(caseExprCompl, lam.MaxN(altsCompl))
-
-
-def add(x: lam.Expr, y: lam.Expr) -> lam.Expr:
-    return lam.Add(x, y)
+        return lam.Sum([caseExprCompl, lam.MaxN(altsCompl)])
