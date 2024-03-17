@@ -27,6 +27,9 @@ class VarDef:
     def __hash__(self) -> int:
         return hash(self.defStr)
 
+    def __str__(self) -> str:
+        return str(self.defStr)
+
 
 defOfVar: Dict[haskell.Var, VarDef] = {}
 
