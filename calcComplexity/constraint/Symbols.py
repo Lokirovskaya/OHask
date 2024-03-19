@@ -2,6 +2,9 @@ from calcComplexity.constraint import ExprInfo
 import calcComplexity.haskellStruct as haskell
 from calcComplexity.untypedLambdaCalculus import Var, Expr
 
+uuidUnique = 0
+uuidExpr = 0
+
 
 def constant() -> Var:
     return Var("C")
@@ -11,18 +14,22 @@ def isConstant(var: Expr) -> bool:
     return isinstance(var, Var) and var.isValue and var.name == "C"
 
 
-uuidUnique = 0
-uuidExpr = 0
-
-
 def unique() -> Var:
     global uuidUnique
     uuidUnique += 1
     return Var(f"u{uuidUnique}")
 
 
+def param(name: str, idx: int) -> Var:
+    return Var(f"p{idx}_{name}")
+
+
 def complexity(name: str) -> Var:
     return Var(f"T_{name}", isValue=False)
+
+
+def isComplexity(var: Expr) -> bool:
+    return isinstance(var, Var) and not var.isValue and var.name.startswith("T_")
 
 
 class ExprSymbol(Var):

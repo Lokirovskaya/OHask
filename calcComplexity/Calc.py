@@ -1,6 +1,7 @@
 from calcComplexity.genConstraints import buildStruct, genConstraints
 from calcComplexity.runDynExec import makeGroups, genHaskellProgram, runRepl
 from calcComplexity.regression import parseDynResult, genDatas, lassoRegression, linearRegression
+from calcComplexity.solve import genDomGraph
 
 RED = "\x1b[31m"
 GREEN = "\x1b[32m"
@@ -16,7 +17,7 @@ def calcComplexity(runDyn: bool, runSolve: bool):
     print(f"{BOLD}{YELLOW}=== Loading Program Info ==={END}")
 
     funcList = buildStruct()
-    constrList, exprSymbolList = genConstraints(funcList)
+    constrList, exprSymbolList, paramH2LTable = genConstraints(funcList)
     groupList = makeGroups(exprSymbolList)
 
     print(f"{GREEN}Success{END}\n")
@@ -40,5 +41,7 @@ def calcComplexity(runDyn: bool, runSolve: bool):
         datas = genDatas(rawDatas)
         lassoResults = lassoRegression(datas)
         linearResults = linearRegression(datas, lassoResults)
+
+        genDomGraph(constrList)
 
         print(f"{GREEN}Success{END}\n")

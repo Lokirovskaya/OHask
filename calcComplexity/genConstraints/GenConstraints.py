@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 from calcComplexity.Log import logln
 from calcComplexity.constraint import Constraint, ExprSymbol
@@ -12,12 +12,29 @@ from .Simplify import simplify
 exprSymbolList: List[ExprSymbol] = []
 
 
-def genConstraints(funcList: List[Func]) -> Tuple[List[Constraint], List[ExprSymbol]]:
+def genConstraints(
+    funcList: List[Func],
+) -> Tuple[List[Constraint], List[ExprSymbol], Dict[Var, lam.Var]]:
+
     constrList = []
+    paramH2LTable = {}  # Haskell param => Constr param (lambda param) table
+
     for func in funcList:
-        complSymbol = symbol.complexity(func.funcUnique)
-        compl = calcExprCompl(func.funcExpr)
-        constr = Constraint(complSymbol, compl)
+        # Constraint: T == \ps. T'
+        # `ps` represents lambda params
+
+        lhs = symbol.complexity(func.funcUnique)  # T
+
+        compl = calcExprCompl(func.funcExpr)  # T'
+        paramLs = []  # ps
+        for idx, paramH in enumerate(func.funcParams):
+            paramL = symbol.param(func.funcUnique, idx)
+            paramLs.append(paramL)
+            paramH2LTable[paramH] = paramL
+
+        rhs = lam.currying(paramLs, compl)
+
+        constr = Constraint(lhs, rhs)
         constrList.append(constr)
 
     logln("[Constraints]")
@@ -25,11 +42,16 @@ def genConstraints(funcList: List[Func]) -> Tuple[List[Constraint], List[ExprSym
         logln(str(constr))
     logln()
 
+    logln("[Param Lookup Table]")
+    for h, l in paramH2LTable.items():
+        logln(f"{h} -> {l}")
+    logln()
+
     fillDepAndDef(funcList, exprSymbolList)
 
     simplify(constrList, exprSymbolList)
 
-    return constrList, exprSymbolList
+    return constrList, exprSymbolList, paramH2LTable
 
 
 def calcExprCompl(expr: Expr) -> lam.Expr:
