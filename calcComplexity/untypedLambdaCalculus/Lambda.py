@@ -61,6 +61,7 @@ class Expr:
 class Var(Expr):
     name: str
     isValue: bool = True
+    arity: int = 0
 
     def __str__(self) -> str:
         if self.isValue:

@@ -23,14 +23,14 @@ def genConstraints(
         # Constraint: T ps == T'
         # `ps` represents constr params
 
-        lhs = symbol.complexity(func.funcUnique)  # T
-        
+        lhs = symbol.complexity(func.funcUnique, arity=func.funcParamCount)  # T
+
         paramLs = []  # ps
         for idx, paramH in enumerate(func.funcParams):
             paramL = symbol.param(func.funcUnique, idx)
             paramLs.append(paramL)
             paramH2LTable[paramH] = paramL
-        
+
         rhs = calcExprCompl(func.funcExpr)  # T'
 
         constr = Constraint(lhs, paramLs, rhs)
@@ -71,11 +71,7 @@ def calcVarCompl(var: Var) -> lam.Expr:
     if arity == 0:
         return symbol.constant()
     else:
-        # Complexity of var `f` is an lambda: `λp1. ... λpn. T(p1,...,pn)`
-        # uniqueParams = [symbol.unique() for _ in range(0, arity)]
-        # compl = symbol.complexity(var.varUnique)
-        # return lam.currying(uniqueParams, compl)
-        compl = symbol.complexity(var.varUnique)
+        compl = symbol.complexity(var.varUnique, arity=arity)
         return compl
 
 

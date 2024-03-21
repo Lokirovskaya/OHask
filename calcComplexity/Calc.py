@@ -1,7 +1,7 @@
 from calcComplexity.genConstraints import buildStruct, genConstraints
 from calcComplexity.runDynExec import makeGroups, genHaskellProgram, runRepl
 from calcComplexity.regression import parseDynResult, genDatas, lassoRegression, linearRegression
-from calcComplexity.solve import genDomGraph
+from calcComplexity.solve import genDomGraph, convertToSympy
 
 RED = "\x1b[31m"
 GREEN = "\x1b[32m"
@@ -43,5 +43,6 @@ def calcComplexity(runDyn: bool, runSolve: bool):
         linearResults = linearRegression(datas, lassoResults)
 
         genDomGraph(constrList)
+        convertToSympy(constrList)
 
         print(f"{GREEN}Success{END}\n")
