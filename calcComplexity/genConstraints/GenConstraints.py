@@ -20,21 +20,20 @@ def genConstraints(
     paramH2LTable = {}  # Haskell param => Constr param (lambda param) table
 
     for func in funcList:
-        # Constraint: T == \ps. T'
-        # `ps` represents lambda params
+        # Constraint: T ps == T'
+        # `ps` represents constr params
 
         lhs = symbol.complexity(func.funcUnique)  # T
-
-        compl = calcExprCompl(func.funcExpr)  # T'
+        
         paramLs = []  # ps
         for idx, paramH in enumerate(func.funcParams):
             paramL = symbol.param(func.funcUnique, idx)
             paramLs.append(paramL)
             paramH2LTable[paramH] = paramL
+        
+        rhs = calcExprCompl(func.funcExpr)  # T'
 
-        rhs = lam.currying(paramLs, compl)
-
-        constr = Constraint(lhs, rhs)
+        constr = Constraint(lhs, paramLs, rhs)
         constrList.append(constr)
 
     logln("[Constraints]")
