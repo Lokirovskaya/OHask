@@ -3,7 +3,12 @@ from typing import Dict, List
 
 import pandas as pd
 
-from .BasicFuncs import basicFuncs1, basicFuncs2, basicFuncs3
+from calcComplexity.basicFuncs import (
+    unaryBasicFuncs,
+    binaryBasicFuncs,
+    ternaryBasicFuncs,
+)
+
 from .Data import Data, RawData
 
 
@@ -57,14 +62,22 @@ def extendInputVars(data: Data):
 
     if len(cols) >= 1:
         for col in cols:
-            for bfName, bfFunc in basicFuncs1.items():
-                extName = col + "$" + bfName
-                ext[extName] = origin.apply(lambda row: bfFunc(row[col]), axis=1)
+            for func in unaryBasicFuncs:
+                extName = col + "$" + func.name
+                ext[extName] = origin.apply(lambda row: func.lambda_(row[col]), axis=1)
 
     if len(cols) >= 2:
         for col1, col2 in combinations(cols, 2):
-            for bfName, bfFunc in basicFuncs2.items():
-                extName = col1 + "$" + col2 + "$" + bfName
+            for func in binaryBasicFuncs:
+                extName = col1 + "$" + col2 + "$" + func.name
                 ext[extName] = origin.apply(
-                    lambda row: bfFunc(row[col1], row[col2]), axis=1
+                    lambda row: func.lambda_(row[col1], row[col2]), axis=1
+                )
+
+    if len(cols) >= 3:
+        for col1, col2, col3 in combinations(cols, 3):
+            for func in binaryBasicFuncs:
+                extName = col1 + "$" + col2 + "$" + col3 + "$" + func.name
+                ext[extName] = origin.apply(
+                    lambda row: func.lambda_(row[col1], row[col2], row[col3]), axis=1
                 )
