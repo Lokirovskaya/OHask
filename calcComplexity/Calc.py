@@ -53,4 +53,6 @@ def calcComplexity(runDyn: bool, runSolve: bool):
             linearResults, groupList, paramH2LTable
         )
 
+        print(exprSymReplaceDict)
+
         print(f"{GREEN}Success{END}\n")

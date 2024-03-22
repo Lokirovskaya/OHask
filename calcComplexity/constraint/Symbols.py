@@ -24,7 +24,7 @@ def param(name: str, idx: int) -> Var:
     return Var(f"p{idx}_{name}")
 
 
-def complexity(name: str, arity:int ) -> Var:
+def complexity(name: str, arity: int) -> Var:
     return Var(f"T_{name}", isValue=False, arity=arity)
 
 

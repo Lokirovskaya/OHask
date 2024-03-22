@@ -7,16 +7,20 @@ from calcComplexity.constraint import Constraint, SympyConstraint
 from calcComplexity.solve.util.SympySymbols import makeSymbol
 import calcComplexity.untypedLambdaCalculus as lam
 
-from .util.ZEncoder import zEncode
 
 
 def convertToSympy(constrList: List[Constraint]) -> List[SympyConstraint]:
     result = []
 
     for constr in constrList:
-        lhsRaw = makeSymbol(constr.lhs.name, arity=len(constr.lhsParams))
-        lhsParams = map(lambda v: makeSymbol(v.name), constr.lhsParams)
-        lhs = lhsRaw(*lhsParams)
+        arity = len(constr.lhsParams)
+        if arity == 0:
+            lhs = makeSymbol(constr.lhs.name)
+        else:
+            lhsRaw = makeSymbol(constr.lhs.name, arity=len(constr.lhsParams))
+            assert isinstance(lhsRaw, sympy.Lambda)
+            lhsParams = map(lambda v: makeSymbol(v.name), constr.lhsParams)
+            lhs = lhsRaw(*lhsParams)
         rhs = convertExpr(constr.rhs)
         sympyConstr = SympyConstraint(lhs, rhs)
         result.append(sympyConstr)
