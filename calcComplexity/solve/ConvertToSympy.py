@@ -4,7 +4,7 @@ import sympy
 
 from calcComplexity.Log import logln
 from calcComplexity.constraint import Constraint, SympyConstraint
-from calcComplexity.solve.util.HigherOrder import HigherSymbol
+from calcComplexity.solve.util.SympySymbols import makeSymbol
 import calcComplexity.untypedLambdaCalculus as lam
 
 from .util.ZEncoder import zEncode
@@ -13,14 +13,12 @@ from .util.ZEncoder import zEncode
 def convertToSympy(constrList: List[Constraint]) -> List[SympyConstraint]:
     result = []
 
-    def makeSymbol(var):
-        return sympy.Symbol(zEncode(var.name))
-
     for constr in constrList:
-        lhs = makeSymbol(constr.lhs)
-        params = list(map(makeSymbol, constr.lhsParams))
+        lhsRaw = makeSymbol(constr.lhs.name, arity=len(constr.lhsParams))
+        lhsParams = map(lambda v: makeSymbol(v.name), constr.lhsParams)
+        lhs = lhsRaw(*lhsParams)
         rhs = convertExpr(constr.rhs)
-        sympyConstr = SympyConstraint(lhs, params, rhs)
+        sympyConstr = SympyConstraint(lhs, rhs)
         result.append(sympyConstr)
 
     logln("[SymPy Constraints]")
@@ -47,7 +45,7 @@ def convertExpr(expr: lam.Expr):
 
 
 def convertVar(var: lam.Var):
-    return HigherSymbol(zEncode(var.name), var.arity)
+    return makeSymbol(var.name, var.arity)
 
 
 def convertAbstr(abstr: lam.Abstr):

@@ -2,7 +2,7 @@ from sympy import Function, Lambda, Symbol
 
 
 class HigherSymbol:
-    def __new__(cls, name, arity=0):
+    def __new__(cls, name, arity=0) -> Symbol | Lambda:
         if arity == 0:
             return Symbol(name)
         elif arity == 1:

@@ -1,7 +1,12 @@
 from calcComplexity.genConstraints import buildStruct, genConstraints
 from calcComplexity.runDynExec import makeGroups, genHaskellProgram, runRepl
-from calcComplexity.regression import parseDynResult, genDatas, lassoRegression, linearRegression
-from calcComplexity.solve import genDomGraph, convertToSympy
+from calcComplexity.regression import (
+    parseDynResult,
+    genDatas,
+    lassoRegression,
+    linearRegression,
+)
+from calcComplexity.solve import genDomGraph, convertToSympy, getExprSymReplaceDict
 
 RED = "\x1b[31m"
 GREEN = "\x1b[32m"
@@ -44,5 +49,8 @@ def calcComplexity(runDyn: bool, runSolve: bool):
 
         genDomGraph(constrList)
         convertToSympy(constrList)
+        exprSymReplaceDict = getExprSymReplaceDict(
+            linearResults, groupList, paramH2LTable
+        )
 
         print(f"{GREEN}Success{END}\n")

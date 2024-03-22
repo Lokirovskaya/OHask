@@ -6,3 +6,4 @@ from .BasicFuncs import (
     binaryBasicFuncs,
     ternaryBasicFuncs,
 )
+from .SympyLog import sympyLog
