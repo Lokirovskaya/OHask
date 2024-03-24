@@ -1,5 +1,5 @@
 import re
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Set, Tuple
 
 import sympy
 
@@ -21,12 +21,15 @@ r2Thresh = 0.99
 
 # See [Linear Result], [Dyn Exec Groups], [Param Lookup Table] in calc_log.txt
 def getExprSymReplaceDict(
+    sympyConstrList: List[SympyConstraint],
     regressionResultList: List[LinearResult],
     groupList: List[Group],
     paramH2LTable: Dict[haskell.Var, lam.Var],
 ) -> Dict[sympy.Symbol, Any]:
 
-    def getSympyContrOfRegResult(regResult: LinearResult) -> SympyConstraint:
+    namesOfExprSymsOccur: Set[str] = set()
+
+    def getSympyContrOfRegResult(regResult: LinearResult) -> SympyConstraint | None:
         # S_ListLen(e0) = c + coef*i0 + ...
 
         # get lhs
@@ -34,6 +37,10 @@ def getExprSymReplaceDict(
         group = groupList[groupIdx]
         outputVarIdx, outputScaleName = parseRegVarName(regResult.y, isInput=False)
         exprVarName = group.exprSymList[outputVarIdx].name
+        if exprVarName not in namesOfExprSymsOccur:
+            # Current expr sym not occurs in any constraints (may be reduced by `reduceBuiltinFunctions`)
+            # Need not further calculation
+            return None
         exprSymbol = makeSymbol(exprVarName)
         scaleSymbol = makeScaleSymbol(outputScaleName)
         lhs = scaleSymbol(exprSymbol)
@@ -61,12 +68,21 @@ def getExprSymReplaceDict(
 
         return SympyConstraint(lhs, rhs)
 
+    # Fill `namesOfExprSymsOccur`
+    for constr in sympyConstrList:
+        exprSyms = filter(
+            lambda s: s.startswith("e"),
+            [sym.name for sym in constr.rhs.atoms(sympy.Symbol)],
+        )
+        namesOfExprSymsOccur.update(exprSyms)
+
     replaceDict = {}
 
     for regResult in regressionResultList:
         constr = getSympyContrOfRegResult(regResult)
-        replaceDict[constr.lhs] = constr.rhs
-    
+        if constr != None:
+            replaceDict[constr.lhs] = constr.rhs
+
     return replaceDict
 
 
