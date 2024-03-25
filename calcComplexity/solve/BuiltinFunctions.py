@@ -2,6 +2,7 @@ from typing import List
 
 from sympy import Function, Symbol
 
+from calcComplexity.Log import logln
 from calcComplexity.constraint import SympyConstraint
 
 from .util.ZEncoder import zDecode
@@ -13,6 +14,11 @@ constFuncs = {"+", "-", "*", "div", ":", "$", "I#", "C#", "(,)"}
 def reduceBuiltinFunctions(constrList: List[SympyConstraint]):
     for constr in constrList:
         reduceForConstr(constr)
+
+    logln("[Simplified SymPy Constraints]")
+    for constr in constrList:
+        logln(str(constr))
+    logln()
 
 
 def reduceForConstr(constr: SympyConstraint):
@@ -26,7 +32,7 @@ def reduceForConstr(constr: SympyConstraint):
             replaceDict[func] = Symbol("C")
 
     if len(replaceDict) > 0:
-        constr.rhs = constr.rhs.xreplace(replaceDict)
+        constr.rhs = constr.rhs.xreplace(replaceDict).doit(deep=True)
 
 
 # T_RealName'unique

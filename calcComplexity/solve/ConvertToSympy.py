@@ -5,6 +5,7 @@ import sympy
 from calcComplexity.Log import logln
 from calcComplexity.constraint import Constraint, SympyConstraint
 from calcComplexity.solve.util.SympySymbols import makeSymbol
+from calcComplexity.solve.util.MaxN import MaxN
 import calcComplexity.untypedLambdaCalculus as lam
 
 
@@ -73,4 +74,4 @@ def convertSum(sum_: lam.Sum):
 
 def convertMaxN(maxN: lam.MaxN):
     symArgs = map(convertExpr, maxN.args)
-    return sympy.Function("maxN")(*symArgs)
+    return MaxN(*symArgs)
