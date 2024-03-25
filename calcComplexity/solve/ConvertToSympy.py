@@ -21,7 +21,10 @@ def convertToSympy(constrList: List[Constraint]) -> List[SympyConstraint]:
             lhsRaw = makeSymbol(constr.lhs.name, arity=len(constr.lhsParams))
             assert isinstance(lhsRaw, sympy.Lambda)
             lhsParams = map(lambda v: makeSymbol(v.name), constr.lhsParams)
-            lhs = lhsRaw(*lhsParams)
+            # Currying-like application
+            lhs = lhsRaw
+            for p in lhsParams:
+                lhs = lhs(p)  # type: ignore
         rhs = convertExpr(constr.rhs)
         sympyConstr = SympyConstraint(lhs, rhs)
         result.append(sympyConstr)
