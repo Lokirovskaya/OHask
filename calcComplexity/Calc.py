@@ -7,10 +7,9 @@ from calcComplexity.regression import (
     linearRegression,
 )
 from calcComplexity.solve import (
-    genDomGraph,
     convertToSympy,
     reduceBuiltinFunctions,
-    getExprSymReplaceDict,
+    lookupExprSymScaleRelations,
 )
 
 RED = "\x1b[31m"
@@ -52,14 +51,10 @@ def calcComplexity(runDyn: bool, runSolve: bool):
         lassoResults = lassoRegression(datas)
         linearResults = linearRegression(datas, lassoResults)
 
-        genDomGraph(constrList)
         sympyConstrList = convertToSympy(constrList)
         reduceBuiltinFunctions(sympyConstrList)
-        exprSymReplaceDict = getExprSymReplaceDict(
-            sympyConstrList,
-            linearResults, groupList, paramH2LTable
+        exprSymScaleRelationDict = lookupExprSymScaleRelations(
+            sympyConstrList, linearResults, groupList, paramH2LTable
         )
-
-        print(exprSymReplaceDict)
 
         print(f"{GREEN}Success{END}\n")

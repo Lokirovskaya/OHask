@@ -1,8 +1,9 @@
 import re
-from typing import Any, Dict, List, Set, Tuple
+from typing import Dict, List, Set, Tuple
 
 import sympy
 
+from calcComplexity.Log import logln
 from calcComplexity.basicFuncs import basicFuncDict
 from calcComplexity.constraint import SympyConstraint
 import calcComplexity.haskellStruct as haskell
@@ -15,21 +16,24 @@ from calcComplexity.solve.util.SympySymbols import (
 )
 import calcComplexity.untypedLambdaCalculus as lam
 
+from .ScaleRelation import ScaleRelation
 
 r2Thresh = 0.99
 
 
 # See [Linear Result], [Dyn Exec Groups], [Param Lookup Table] in calc_log.txt
-def getExprSymReplaceDict(
+def lookupExprSymScaleRelations(
     sympyConstrList: List[SympyConstraint],
     regressionResultList: List[LinearResult],
     groupList: List[Group],
     paramH2LTable: Dict[haskell.Var, lam.Var],
-) -> Dict[sympy.Symbol, Any]:
+) -> Dict[str, ScaleRelation]:
 
     namesOfExprSymsOccur: Set[str] = set()
 
-    def getSympyContrOfRegResult(regResult: LinearResult) -> SympyConstraint | None:
+    def lookupOneRelation(
+        regResult: LinearResult,
+    ) -> Tuple[str, SympyConstraint] | None:
         # S_ListLen(e0) = c + coef*i0 + ...
 
         # get lhs
@@ -49,7 +53,7 @@ def getExprSymReplaceDict(
         if abs(regResult.r2) < r2Thresh:
             rhs = makeUnknownSymbol()
         else:
-            rhs = regResult.xConst
+            rhs = round(regResult.xConst, 3)
             for xName, coef in regResult.xTerms:
                 # One term of rhs
                 # coef * basicFuncLambda(*InputSymbolWithScaleList)
@@ -63,10 +67,13 @@ def getExprSymReplaceDict(
                     scaleSymbol = makeScaleSymbol(inputScaleName)
                     inputSymbolWithScale = scaleSymbol(inputSymbol)
                     inputSymbolWithScaleList.append(inputSymbolWithScale)
+                coef = round(coef, 3)
                 rhsTerm = coef * basicFuncLambda(*inputSymbolWithScaleList)
                 rhs += rhsTerm
 
-        return SympyConstraint(lhs, rhs)
+        constr = SympyConstraint(lhs, rhs)
+
+        return exprVarName, constr
 
     # Fill `namesOfExprSymsOccur`
     for constr in sympyConstrList:
@@ -76,14 +83,25 @@ def getExprSymReplaceDict(
         )
         namesOfExprSymsOccur.update(exprSyms)
 
-    replaceDict = {}
+    result: Dict[str, ScaleRelation] = {}
+
+    def appendResult(name, relation):
+        if name not in result:
+            result[name] = ScaleRelation(name, [])
+        result[name].constrList.append(relation)
 
     for regResult in regressionResultList:
-        constr = getSympyContrOfRegResult(regResult)
-        if constr != None:
-            replaceDict[constr.lhs] = constr.rhs
+        r = lookupOneRelation(regResult)
+        if r != None:
+            exprSymName, relationConstr = r
+            appendResult(exprSymName, relationConstr)
 
-    return replaceDict
+    logln("[Expr Symbol Scale Relations]")
+    for rel in result.values():
+        logln(str(rel))
+    logln()
+
+    return result
 
 
 # Names like: o0IntVal, o1ListLen, i0ListLen

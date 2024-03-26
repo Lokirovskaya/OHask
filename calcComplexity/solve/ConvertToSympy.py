@@ -9,7 +9,6 @@ from calcComplexity.solve.util.MaxN import MaxN
 import calcComplexity.untypedLambdaCalculus as lam
 
 
-
 def convertToSympy(constrList: List[Constraint]) -> List[SympyConstraint]:
     result = []
 

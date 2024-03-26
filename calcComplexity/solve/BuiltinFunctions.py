@@ -8,7 +8,7 @@ from calcComplexity.constraint import SympyConstraint
 from .util.ZEncoder import zDecode
 
 
-constFuncs = {"+", "-", "*", "div", ":", "$", "I#", "C#", "(,)"}
+constFuncs = {"+", "-", "*", "div", ":", "$", "I#", "C#", "(,)", ">", "<", ">=", "<="}
 
 
 def reduceBuiltinFunctions(constrList: List[SympyConstraint]):
