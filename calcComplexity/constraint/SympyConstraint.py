@@ -1,10 +1,13 @@
 from typing import Any
+from dataclasses import dataclass
 
 
+@dataclass
 class SympyConstraint:
-    def __init__(self, lhs: Any, rhs: Any) -> None:
-        self.lhs = lhs
-        self.rhs = rhs
+    lhs: Any
+    rhs: Any
+    # If it is self-recursive, if False, it can also be cyclic recursive
+    isRec: bool = False
 
     def __str__(self) -> str:
         return f"{self.lhs} = {self.rhs}"

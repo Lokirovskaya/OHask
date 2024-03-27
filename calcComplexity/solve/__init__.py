@@ -2,3 +2,4 @@ from .ConvertToSympy import convertToSympy
 from .BuiltinFunctions import reduceBuiltinFunctions
 from .LookupScaleRelations import lookupExprSymScaleRelations
 from .FunctionizeExprSymbols import functionizeExprSymbols
+from .MarkRecCalls import markRecCalls
