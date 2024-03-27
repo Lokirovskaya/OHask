@@ -8,3 +8,7 @@ class SympyConstraint:
 
     def __str__(self) -> str:
         return f"{self.lhs} = {self.rhs}"
+
+    def __iter__(self):
+        yield self.lhs
+        yield self.rhs

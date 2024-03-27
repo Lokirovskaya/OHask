@@ -10,6 +10,7 @@ from calcComplexity.solve import (
     convertToSympy,
     reduceBuiltinFunctions,
     lookupExprSymScaleRelations,
+    functionizeExprSymbols,
 )
 
 RED = "\x1b[31m"
@@ -56,5 +57,6 @@ def calcComplexity(runDyn: bool, runSolve: bool):
         exprSymScaleRelationDict = lookupExprSymScaleRelations(
             sympyConstrList, linearResults, groupList, paramH2LTable
         )
+        functionizeExprSymbols(sympyConstrList, exprSymScaleRelationDict)
 
         print(f"{GREEN}Success{END}\n")

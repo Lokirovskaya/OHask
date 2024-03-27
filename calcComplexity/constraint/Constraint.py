@@ -14,3 +14,7 @@ class Constraint:
         else:
             paramStr = " ".join(map(str,self.lhsParams))
             return f"{self.lhs} {paramStr} = {self.rhs}"
+
+    def __iter__(self):
+        yield self.lhs
+        yield self.rhs
